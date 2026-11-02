@@ -152,6 +152,9 @@ label b{color:var(--red)}
 .lbox label{text-align:left}
 .llogo{width:72px;height:72px;border-radius:18px}
 .lh{margin:10px 0 2px;font-size:30px;font-weight:800;letter-spacing:-1px;background-image:linear-gradient(180deg,#fffbe9 0%,#f3dc8e 42%,#c99a2e 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.pw{position:relative}.pw input{padding-right:50px}
+.pw button{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:42px;height:38px;border:0;border-radius:8px;background:none;font-size:18px;cursor:pointer;opacity:.75}
+.pw button.on{opacity:1;background:rgba(241,237,226,.08)}
 .lerr{color:var(--red);font-size:13px;min-height:18px;margin:8px 0 0}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 </style>
@@ -167,7 +170,7 @@ label b{color:var(--red)}
       <label>Email</label>
       <input id="lEmail" type="email" autocomplete="username" placeholder="email@contoh.com">
       <label>Kata Laluan</label>
-      <input id="lPass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="pw"><input id="lPass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"><button type="button" id="pwEye" onclick="togglePw()" aria-label="Tunjuk kata laluan">👁️</button></div>
       <p id="lErr" class="lerr"></p>
       <button class="btn gold full" id="lBtn" onclick="doLogin()" style="margin-top:6px">Log Masuk</button>
       <button class="btn sec full" onclick="forgotPass()" style="margin-top:8px">Lupa kata laluan?</button>
@@ -776,12 +779,13 @@ async function forgotPass(){
   try{await auth.sendPasswordResetEmail(em);$('lErr').style.color='var(--green)';$('lErr').textContent='Email set semula kata laluan telah dihantar';setTimeout(()=>$('lErr').style.color='',4000)}
   catch(e){$('lErr').textContent='Gagal: '+e.code}
 }
+function togglePw(){const i=$('lPass'),b=$('pwEye'),show=i.type==='password';i.type=show?'text':'password';b.textContent=show?'🙈':'👁️';b.classList.toggle('on',show);b.setAttribute('aria-label',show?'Sembunyi kata laluan':'Tunjuk kata laluan')}
 function doLogout(){if(!confirm('Log keluar dari ProTender?'))return;stopListen();auth.signOut()}
 function startAuth(){
   if(!auth){$('lSub').textContent='Tiada sambungan ke Firebase. Semak internet dan buka semula.';$('lForm').style.display='none';return}
   auth.onAuthStateChanged(u=>{
     USER=u;
-    if(!u){stopListen();S={tenders:[],companies:[]};$('lPass').value='';showLogin();return}
+    if(!u){stopListen();S={tenders:[],companies:[]};$('lPass').value='';$('lPass').type='password';$('pwEye').textContent='👁️';$('pwEye').classList.remove('on');showLogin();return}
     $('login').classList.add('off');
     load(); render(); listen(); notifyDue();
   });
