@@ -8,3 +8,7 @@ Aplikasi peringatan tender — tab **Register | Buy | Close**.
 - Sync antara telefon (Firebase, kod 20 aksara) + backup JSON / CSV.
 
 Web: https://alemmaxx.github.io/ProTender/ (deploy automatik melalui GitHub Actions).
+
+## APK Android
+Setiap push ke `main` akan bina APK secara automatik (tab **Actions → Build ProTender APK**).
+Muat turun terus: https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk

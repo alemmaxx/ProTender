@@ -156,6 +156,18 @@ label b{color:var(--red)}
 .pw button{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:42px;height:38px;border:0;border-radius:8px;background:none;font-size:18px;cursor:pointer;opacity:.75}
 .pw button.on{opacity:1;background:rgba(241,237,226,.08)}
 .lerr{color:var(--red);font-size:13px;min-height:18px;margin:8px 0 0}
+.rc{border-top:1px solid var(--line);padding:12px 0 4px}
+.rc .rh{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rc .rh b{font-size:15px}.rc .rh small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+.sw{position:relative;width:46px;height:26px;flex:none}.sw input{opacity:0;width:0;height:0;min-height:0}
+.sw span{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:.2s;cursor:pointer}
+.sw span:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:var(--ink);transition:.2s}
+.sw input:checked+span{background:var(--green)}.sw input:checked+span:before{transform:translateX(20px)}
+.rchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.rchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border-radius:999px;padding:5px 6px 5px 11px;background:var(--green2);color:var(--green)}
+.rchip button{border:0;background:rgba(0,0,0,.25);color:inherit;width:18px;height:18px;border-radius:50%;font-size:11px;line-height:18px;padding:0;cursor:pointer}
+.radd{display:flex;gap:6px;margin-top:8px}.radd select{flex:1.4}.radd input{flex:1}.radd .btn{flex:none}
+.rc.off .rchips,.rc.off .radd{opacity:.4;pointer-events:none}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 </style>
 </head>
@@ -295,7 +307,7 @@ label b{color:var(--red)}
 <div class="sheet" id="sAlert" onclick="if(event.target===this)closeS('sAlert')">
   <div class="panel">
     <div class="ph"><h2>🔔 Peringatan</h2><button class="x" onclick="closeS('sAlert')">✕</button></div>
-    <p class="muted">Tarikh penting dalam 3 hari akan datang.</p>
+    <p class="muted" id="alertSub">Tarikh penting dalam 3 hari akan datang.</p>
     <div id="alertList"></div>
   </div>
 </div>
@@ -640,11 +652,7 @@ function settingsHTML(){
       <p class="muted">Gred & kod CIDB serta kod bidang MOF setiap syarikat. Dipadankan dengan syarat tender untuk tunjuk syarikat yang layak.</p>
       ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada syarikat.</div>'}
     </div>
-    <div class="card">
-      <h2>🔔 Peringatan</h2>
-      <p class="muted">Bila app dibuka, loceng 🔔 tunjuk tarikh penting dalam 3 hari (tamat daftar, briefing, tamat jualan, closing).</p>
-      <button class="btn sec full" onclick="askNotif()">Benarkan Notifikasi</button>
-    </div>
+    ${remCardHTML()}
     <div class="card">
       <h2>👤 Akaun</h2>
       <p class="muted"><span class="dot ${NET?'on':''}" id="syncDot"></span><span id="syncTxt">${NET?'Data disimpan terus ke Firebase':'Luar talian — data akan dihantar bila ada internet'}</span></p>
@@ -660,7 +668,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.0 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v3.1 · ProKuiz</p>
   </div>`;
 }
 function openCo(id){
@@ -688,6 +696,7 @@ function alerts(){
   return out.sort((a,b)=>a.ms-b.ms);
 }
 function openAlerts(){
+  $('alertSub').textContent='Tarikh penting dalam 3 hari akan datang.';
   const a=alerts();
   $('alertList').innerHTML=a.length?a.map(x=>{const l=left(x.t[x.k]);return `<div class="al ${x.ms<86400000?'hot':''}" onclick="closeS('sAlert');openDetail('${x.t.id}')"><b>${x.lbl} · ${l.big} ${l.small}</b><br>${esc(x.t.nama)}<br><span class="muted">${x.k==='closing'?fmtClose(x.t[x.k]):fmt(x.t[x.k])}</span></div>`}).join(''):'<div class="emptyrail" style="margin:0">Tiada tarikh penting dalam 3 hari. 👍</div>';
   openS('sAlert');
@@ -695,23 +704,112 @@ function openAlerts(){
 const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const LN=()=>window.Capacitor?.Plugins?.LocalNotifications;
 async function askNotif(){
-  if(isNative()&&LN()){const r=await LN().requestPermissions();toast(r.display==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');scheduleNative();return}
+  if(isNative()&&LN()){const r=await LN().requestPermissions();toast(r.display==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');scheduleNative();render();return}
   if(!('Notification' in window)){toast('Browser ini tak sokong notifikasi');return}
-  const p=await Notification.requestPermission();toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');if(p==='granted')notifyDue();
+  const p=await Notification.requestPermission();toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');render();
 }
-function hashId(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)%100000}
-async function scheduleNative(){ // untuk APK nanti: 1 hari & 2 jam sebelum setiap tarikh
-  if(!isNative()||!LN())return;
-  try{
-    const pend=await LN().getPending(); if(pend.notifications.length) await LN().cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
-    const list=[],now=Date.now();
-    T().forEach(t=>[['regEnd','Tamat daftar'],['briefing','Site briefing'],['saleEnd','Tamat jualan'],['closing','Closing']].forEach(([k,lbl],i)=>{
-      if(!t[k])return; [[86400000,'esok'],[7200000,'2 jam lagi']].forEach(([off,txt],j)=>{
-        const at=new Date(D(t[k]).getTime()-off); if(at.getTime()>now) list.push({id:hashId(t.id)*10+i*2+j,title:`ProTender: ${lbl} ${txt}`,body:t.nama,schedule:{at,allowWhileIdle:true}});
+// ================== PERINGATAN BERBUNYI ==================
+const REMKEY='protender_rem';
+const RCATS={register:['📝','Register','Tamat pendaftaran','regEnd','registered'],buy:['🛒','Buy','Tamat jualan dokumen','saleEnd','bought'],briefing:['🗣️','Briefing','Site briefing','briefing',''],closing:['⏳','Closing','Tender closing','closing','submitted']};
+const SOUNDS={pt_chime:'Chime',pt_bell:'Loceng',pt_alarm:'Alarm'};
+const REM_DEF={sound:'pt_chime',cats:{register:{on:true,list:[{d:1,t:'09:00'},{d:0,t:'09:00'}]},buy:{on:true,list:[{d:1,t:'09:00'},{d:0,t:'09:00'}]},briefing:{on:false,list:[{d:1,t:'09:00'}]},closing:{on:true,list:[{d:7,t:'09:00'},{d:3,t:'09:00'},{d:1,t:'09:00'},{d:0,t:'09:00'}]}}};
+function getRem(){let r;try{r=JSON.parse(localStorage.getItem(REMKEY))}catch(e){} r=r||JSON.parse(JSON.stringify(REM_DEF)); for(const k in REM_DEF.cats) r.cats[k]=r.cats[k]||JSON.parse(JSON.stringify(REM_DEF.cats[k])); return r}
+function setRem(r){localStorage.setItem(REMKEY,JSON.stringify(r));scheduleNative();render()}
+const dLbl=d=>d==0?'Pada hari tamat':d==1?'1 hari sebelum':d+' hari sebelum';
+function remCardHTML(){
+  const R=getRem(), dOpts=[0,1,2,3,4,5,7,10,14,21,30];
+  const notifOk=isNative()?true:('Notification' in window&&Notification.permission==='granted');
+  return `<div class="card">
+    <h2>🔔 Peringatan & Bunyi</h2>
+    <p class="muted">Notifikasi ikut <b>tarikh tamat</b> setiap tab. Tetapkan berapa hari sebelum dan pukul berapa.</p>
+    <label>Bunyi notifikasi</label>
+    <div style="display:flex;gap:8px"><select id="rSound" onchange="const r=getRem();r.sound=this.value;setRem(r);playSound(this.value)">${Object.entries(SOUNDS).map(([k,v])=>`<option value="${k}" ${R.sound===k?'selected':''}>${v}</option>`).join('')}</select><button class="btn sec" onclick="playSound($('rSound').value)">▶ Uji</button></div>
+    <div style="margin-top:12px">
+    ${Object.entries(RCATS).map(([k,[ic,nm,lbl]])=>{const c=R.cats[k];return `<div class="rc ${c.on?'':'off'}">
+      <div class="rh"><b>${ic} ${nm}<small>${lbl}</small></b><label class="sw" style="margin:0"><input type="checkbox" ${c.on?'checked':''} onchange="remToggle('${k}',this.checked)"><span></span></label></div>
+      <div class="rchips">${c.list.length?c.list.sort((a,b)=>b.d-a.d||a.t.localeCompare(b.t)).map((r,i)=>`<span class="rchip">${dLbl(r.d)} · ${r.t}<button onclick="remDel('${k}',${i})">✕</button></span>`).join(''):'<span class="muted">Tiada peringatan</span>'}</div>
+      <div class="radd"><select id="rd_${k}">${dOpts.map(d=>`<option value="${d}">${dLbl(d)}</option>`).join('')}</select><input type="time" id="rt_${k}" value="09:00"><button class="btn gold sm" onclick="remAdd('${k}')">+</button></div>
+    </div>`}).join('')}
+    </div>
+    ${isNative()?'':'<a class="btn gold full" style="margin-top:12px" href="https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk">⬇ Muat Turun APK Android</a>'}
+    <p class="muted" style="margin-top:12px">${isNative()?'APK: notifikasi berbunyi pada masa ditetapkan walaupun app ditutup.':'Versi web/pasang: notifikasi berbunyi bila app sedang dibuka. Untuk bunyi walaupun app ditutup, guna <b>APK</b>.'}</p>
+    <button class="btn ${notifOk?'sec':'gold'} full" onclick="askNotif()">${notifOk?'✓ Notifikasi dibenarkan':'Benarkan Notifikasi'}</button>
+    <button class="btn sec full" style="margin-top:8px" onclick="testNotif()">Uji Notifikasi</button>
+  </div>`;
+}
+function remToggle(k,on){const r=getRem();r.cats[k].on=on;setRem(r)}
+function remDel(k,i){const r=getRem();r.cats[k].list.sort((a,b)=>b.d-a.d||a.t.localeCompare(b.t));r.cats[k].list.splice(i,1);setRem(r)}
+function remAdd(k){const r=getRem(),d=+$('rd_'+k).value,t=$('rt_'+k).value||'09:00';if(r.cats[k].list.some(x=>x.d===d&&x.t===t)){toast('Sudah ada');return}r.cats[k].list.push({d,t});setRem(r);toast('Peringatan ditambah ✓')}
+// senarai semua peringatan yang dijadualkan
+function remEvents(){
+  const R=getRem(),out=[];
+  Object.entries(RCATS).forEach(([k,[ic,nm,lbl,field,flag]])=>{
+    const c=R.cats[k]; if(!c.on)return;
+    T().forEach(t=>{
+      if(!t[field]||(flag&&t[flag]))return;
+      const end=D(t[field]); if(isNaN(end))return;
+      c.list.forEach(r=>{
+        const at=new Date(end); at.setDate(at.getDate()-r.d); const [h,m]=r.t.split(':'); at.setHours(+h,+m,0,0);
+        if(at>end)return;
+        const when=r.d==0?'hari ini':r.d==1?'esok':r.d+' hari lagi';
+        out.push({key:[t.id,k,r.d,r.t,t[field]].join('|'),at,cat:k,t,
+          title:`${ic} ${lbl} ${when} (${p2(end.getHours())}:${p2(end.getMinutes())})`,body:t.nama});
       });
-    }));
-    if(list.length) await LN().schedule({notifications:list.slice(0,60)});
-  }catch(e){console.log(e)}
+    });
+  });
+  return out.sort((a,b)=>a.at-b.at);
+}
+function hashId(s){let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return (Math.abs(h)%2000000000)+1}
+let AUD=null;
+function playSound(name){try{if(AUD){AUD.pause()}AUD=new Audio('sounds/'+(name||getRem().sound)+'.wav');AUD.play().catch(()=>{})}catch(e){}}
+async function testNotif(){
+  const R=getRem();
+  if(isNative()&&LN()){await ensureChannels();await LN().schedule({notifications:[{id:999999,title:'🔔 ProTender',body:'Ini notifikasi ujian · bunyi '+SOUNDS[R.sound],channelId:R.sound,smallIcon:'ic_stat_pt',schedule:{at:new Date(Date.now()+3000),allowWhileIdle:true}}]});toast('Notifikasi ujian dalam 3 saat…');return}
+  if(!('Notification' in window)||Notification.permission!=='granted'){await askNotif();if(Notification.permission!=='granted')return}
+  showNote('🔔 ProTender','Ini notifikasi ujian · bunyi '+SOUNDS[R.sound],'test'+Date.now());
+}
+async function showNote(title,body,tag){
+  playSound();
+  try{
+    const reg='serviceWorker' in navigator?await navigator.serviceWorker.getRegistration():null;
+    const opt={body,tag,icon:'icons/icon-192.png',badge:'icons/icon-192.png',vibrate:[300,150,300],requireInteraction:true};
+    if(reg) await reg.showNotification(title,opt); else new Notification(title,opt);
+  }catch(e){toast(title)}
+}
+// WEB: semak setiap 20 saat semasa app dibuka
+function webTick(){
+  if(isNative()||!USER)return;
+  let fired={};try{fired=JSON.parse(localStorage.getItem('protender_fired'))||{}}catch(e){}
+  const now=Date.now(), due=[];
+  remEvents().forEach(e=>{const ms=e.at.getTime();if(ms<=now&&ms>now-12*3600000&&!fired[e.key]){fired[e.key]=ms;due.push(e)}});
+  for(const k in fired) if(fired[k]<now-40*86400000) delete fired[k];
+  localStorage.setItem('protender_fired',JSON.stringify(fired));
+  if(!due.length)return;
+  const canN='Notification' in window&&Notification.permission==='granted';
+  due.forEach(e=>{ if(canN) showNote(e.title,e.body,e.key); });
+  if(!canN) playSound();
+  $('alertSub').textContent='Peringatan yang baru sampai masanya.';
+  $('alertList').innerHTML=due.map(e=>`<div class="al hot" onclick="closeS('sAlert');openDetail('${e.t.id}')"><b>${esc(e.title)}</b><br>${esc(e.body)}</div>`).join('');
+  openS('sAlert');
+}
+// APK: jadualkan notifikasi tempatan (berbunyi walaupun app ditutup)
+let chOk=false;
+async function ensureChannels(){
+  if(chOk||!LN()||!LN().createChannel)return;
+  for(const [id,nm] of Object.entries(SOUNDS)){try{await LN().createChannel({id,name:'ProTender · '+nm,description:'Peringatan tender',importance:5,visibility:1,sound:id+'.wav',vibration:true,lights:true})}catch(e){}}
+  chOk=true;
+}
+let schedT=null;
+function scheduleNative(){clearTimeout(schedT);schedT=setTimeout(doSchedule,600)}
+async function doSchedule(){
+  if(!isNative()||!LN()||!USER)return;
+  try{
+    await ensureChannels();
+    const pend=await LN().getPending(); if(pend.notifications.length) await LN().cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
+    const R=getRem(), now=Date.now();
+    const list=remEvents().filter(e=>e.at.getTime()>now).slice(0,60).map(e=>({id:hashId(e.key),title:e.title,body:e.body,channelId:R.sound,smallIcon:'ic_stat_pt',iconColor:'#d9b44a',extra:{tid:e.t.id},schedule:{at:e.at,allowWhileIdle:true}}));
+    if(list.length) await LN().schedule({notifications:list});
+  }catch(e){console.log('schedule',e)}
 }
 
 // ================== FIREBASE (LOG MASUK & DATA) ==================
@@ -787,7 +885,7 @@ function startAuth(){
     USER=u;
     if(!u){stopListen();S={tenders:[],companies:[]};$('lPass').value='';$('lPass').type='password';$('pwEye').textContent='👁️';$('pwEye').classList.remove('on');showLogin();return}
     $('login').classList.add('off');
-    load(); render(); listen(); notifyDue();
+    load(); render(); listen(); setTimeout(webTick,2500);
   });
 }
 
@@ -826,30 +924,20 @@ async function installApp(){
     :'<ol class="ins"><li>Buka laman ini dalam <b>Chrome</b>.</li><li>Tekan menu <b>⋮</b> di atas kanan.</li><li>Pilih <b>Pasang aplikasi</b> atau <b>Tambah ke skrin utama</b>, kemudian tekan <b>Pasang</b>.</li></ol>';
   openS('sInstall');
 }
-// Notifikasi sekali sehari bagi setiap tarikh penting dalam 3 hari (bila app dibuka)
-async function notifyDue(){
-  try{
-    if(isNative()||!('Notification' in window)||Notification.permission!=='granted')return;
-    const reg='serviceWorker' in navigator?await navigator.serviceWorker.getRegistration():null;
-    let sent={};try{sent=JSON.parse(localStorage.getItem('protender_sent'))||{}}catch(e){}
-    const day=todayStr();
-    for(const x of alerts()){
-      const k=x.t.id+x.k+day; if(sent[k])continue; sent[k]=1;
-      const l=left(x.t[x.k]), title=`${x.lbl} · ${l.big} ${l.small}`, opt={body:x.t.nama,tag:k,icon:'icons/icon-192.png',badge:'icons/icon-192.png'};
-      if(reg) await reg.showNotification(title,opt); else new Notification(title,opt);
-    }
-    localStorage.setItem('protender_sent',JSON.stringify(sent));
-  }catch(e){console.log(e)}
-}
-
 // ================== MULA ==================
 render();
 startAuth();
 setInterval(()=>{if(tab!=='setting'&&!document.querySelector('.sheet.on'))render()},60000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();notifyDue()}});
-if(isNative()) scheduleNative();
+setInterval(webTick,20000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();webTick()}});
+// APK: butang Kembali & tekan notifikasi
+if(isNative()){
+  const App=window.Capacitor.Plugins.App;
+  App&&App.addListener('backButton',()=>{const o=[...document.querySelectorAll('.sheet.on')].pop();if(o){o.classList.remove('on');return}if(tab!=='register'){go('register');return}App.minimizeApp()});
+  LN()&&LN().addListener('localNotificationActionPerformed',a=>{const id=a.notification?.extra?.tid;if(id&&findT(id))setTimeout(()=>openDetail(id),400)});
+}
 updateInstallBtn();
-if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(!isNative()&&'serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>

@@ -1,0 +1,52 @@
+name: Build ProTender APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: apk
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Sediakan fail web
+        run: mkdir -p www && cp -r index.html manifest.webmanifest sw.js icons sounds www/
+      - run: npm install
+      - run: npx cap add android
+      - name: Ikon app, ikon notifikasi & bunyi
+        run: |
+          RES=android/app/src/main/res
+          rm -rf $RES/mipmap-anydpi-v26
+          cp -r android-icons/res/* $RES/
+          mkdir -p $RES/raw
+          cp sounds/*.wav $RES/raw/
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#0a1210</color>\n</resources>\n' > $RES/values/ic_launcher_background.xml
+      - name: Permission notifikasi & alarm tepat
+        run: |
+          sed -i 's#<application#<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n    <uses-permission android:name="android.permission.VIBRATE"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+      - run: npx cap sync android
+      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk ProTender.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ProTender-apk
+          path: ProTender.apk
+      - name: Terbit ke Release "latest" (muat turun terus dari telefon)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: ProTender APK (terkini)
+          body: "Muat turun ProTender.apk di bawah dan pasang di telefon Android."
+          files: ProTender.apk
+          make_latest: true

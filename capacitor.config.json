@@ -1,0 +1,12 @@
+{
+  "appId": "com.prokuiz.protender",
+  "appName": "ProTender",
+  "webDir": "www",
+  "backgroundColor": "#0a1210",
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_pt",
+      "iconColor": "#d9b44a"
+    }
+  }
+}
