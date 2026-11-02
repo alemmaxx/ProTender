@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4f46e5">
+<title>ProTender by ProKuiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pri:#4f46e5;--pri2:#7c3aed;--bg:#f1f3fb;--card:#fff;--txt:#1e1b4b;--mut:#6b7280;
+  --red:#ef4444;--amb:#f59e0b;--grn:#10b981;--blu:#3b82f6;--line:#e5e7eb;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Poppins',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:90px}
+header{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;padding:calc(18px + env(safe-area-inset-top)) 18px 64px;border-radius:0 0 28px 28px;position:relative}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:24px}
+.brand h1{font-size:22px;font-weight:800;letter-spacing:.3px}
+.brand small{display:block;font-size:11px;opacity:.85;font-weight:500}
+.hbtn{position:absolute;right:16px;top:calc(18px + env(safe-area-inset-top));width:42px;height:42px;border-radius:12px;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:-46px 14px 0;position:relative;z-index:2}
+.stat{background:var(--card);border-radius:16px;padding:12px 10px;text-align:center;box-shadow:0 6px 18px rgba(79,70,229,.12);cursor:pointer;border:2px solid transparent;transition:.2s}
+.stat.on{border-color:var(--pri)}
+.stat b{display:block;font-size:24px;font-weight:800}
+.stat span{font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.stat.r b{color:var(--blu)}.stat.y b{color:var(--amb)}.stat.c b{color:var(--grn)}
+.tabs{display:flex;margin:16px 14px 6px;background:#e0e3f5;border-radius:14px;padding:4px}
+.tabs button{flex:1;border:0;background:none;padding:11px 4px;border-radius:11px;font:600 14px 'Poppins';color:var(--mut);cursor:pointer;transition:.2s}
+.tabs button.on{background:#fff;color:var(--pri);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.toolbar{display:flex;gap:8px;margin:10px 14px}
+.toolbar input,.toolbar select{flex:1;padding:11px 14px;border-radius:12px;border:1px solid var(--line);font:500 13px 'Poppins';background:#fff;color:var(--txt);min-width:0}
+.toolbar select{flex:0 0 auto}
+#list{padding:4px 14px}
+.empty{text-align:center;color:var(--mut);padding:50px 20px;font-size:14px}
+.empty div{font-size:48px;margin-bottom:8px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 3px 12px rgba(30,27,75,.06);border-left:5px solid var(--blu);position:relative}
+.card.warn{border-left-color:var(--amb)}.card.urgent{border-left-color:var(--red)}.card.over{border-left-color:#9ca3af}.card.closed{border-left-color:var(--grn)}
+.card .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.card .no{font-size:11px;color:var(--pri);font-weight:700;letter-spacing:.3px}
+.card h3{font-size:15px;font-weight:600;line-height:1.35;margin:2px 0 4px}
+.card .ag{font-size:12px;color:var(--mut)}
+.badge{flex:0 0 auto;text-align:center;border-radius:12px;padding:6px 9px;min-width:62px;background:#eef2ff;color:var(--blu)}
+.badge b{display:block;font-size:18px;font-weight:800;line-height:1}
+.badge small{font-size:10px;font-weight:600}
+.warn .badge{background:#fef3c7;color:#b45309}.urgent .badge{background:#fee2e2;color:var(--red)}.over .badge{background:#f3f4f6;color:#6b7280}.closed .badge{background:#d1fae5;color:#047857}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:11px;background:#f3f4f6;border-radius:8px;padding:4px 8px;color:#374151;font-weight:500}
+.chip.k{background:#ede9fe;color:#6d28d9}
+.acts{display:flex;gap:8px;margin-top:12px}
+.acts button{flex:1;border:0;border-radius:10px;padding:9px 6px;font:600 12px 'Poppins';cursor:pointer}
+.b-main{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff}
+.b-soft{background:#eef2ff;color:var(--pri)}
+.b-del{background:#fee2e2;color:var(--red);flex:0 0 44px!important}
+.fab{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;font-size:30px;box-shadow:0 8px 22px rgba(79,70,229,.45);cursor:pointer;z-index:20}
+.modal{position:fixed;inset:0;background:rgba(15,13,40,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}
+.modal.show{display:flex}
+.sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.sheet h2{font-size:18px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.sheet h2 button{border:0;background:#f3f4f6;width:34px;height:34px;border-radius:10px;font-size:18px;cursor:pointer}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);font:500 14px 'Poppins';color:var(--txt);background:#fafafe}
+.fld textarea{min-height:70px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.req{color:var(--red)}
+.save{width:100%;border:0;border-radius:14px;padding:14px;font:700 15px 'Poppins';color:#fff;background:linear-gradient(135deg,var(--pri),var(--pri2));cursor:pointer;margin-top:6px}
+.sec{font-size:13px;font-weight:700;color:var(--pri);margin:16px 0 8px;padding-top:12px;border-top:1px dashed var(--line)}
+.sbtn{width:100%;border:0;border-radius:12px;padding:12px;font:600 13px 'Poppins';cursor:pointer;margin-bottom:8px;background:#eef2ff;color:var(--pri)}
+.note{font-size:12px;color:var(--mut);line-height:1.5;margin-bottom:10px}
+.code{font:700 15px monospace;background:#f3f4f6;padding:10px;border-radius:10px;text-align:center;letter-spacing:1px;word-break:break-all;margin-bottom:8px}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#1e1b4b;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;z-index:99;opacity:0;transition:.3s;pointer-events:none;max-width:90%;text-align:center}
+.toast.show{opacity:1}
+.alert{background:#fff;border-radius:20px;max-width:420px;width:92%;padding:20px;margin:auto;align-self:center}
+.alert h2{font-size:17px;margin-bottom:10px}
+.alert ul{list-style:none;max-height:50vh;overflow:auto}
+.alert li{padding:10px;border-radius:10px;background:#fef2f2;margin-bottom:8px;font-size:13px}
+.alert li b{color:var(--red)}
+.detail p{font-size:13px;margin-bottom:8px;display:flex;gap:8px}
+.detail p span:first-child{color:var(--mut);min-width:120px;flex:0 0 120px}
+.sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ca3af;margin-right:6px}
+.sync-dot.on{background:#34d399}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">📋</div>
+    <div><h1>ProTender</h1><small>by ProKuiz · Peringatan Tender</small></div>
+  </div>
+  <button class="hbtn" onclick="openSettings()" title="Tetapan">⚙️</button>
+</header>
+
+<div class="stats">
+  <div class="stat r" data-tab="register" onclick="setTab('register')"><b id="cReg">0</b><span>Register</span></div>
+  <div class="stat y" data-tab="buy" onclick="setTab('buy')"><b id="cBuy">0</b><span>Buy</span></div>
+  <div class="stat c" data-tab="close" onclick="setTab('close')"><b id="cClose">0</b><span>Close</span></div>
+</div>
+
+<div class="tabs">
+  <button data-tab="register" onclick="setTab('register')">Register</button>
+  <button data-tab="buy" onclick="setTab('buy')">Buy</button>
+  <button data-tab="close" onclick="setTab('close')">Close</button>
+</div>
+
+<div class="toolbar">
+  <input id="q" placeholder="🔍 Cari no. tender / tajuk / agensi" oninput="render()">
+  <select id="sort" onchange="render()">
+    <option value="tutup">Ikut tarikh tutup</option>
+    <option value="baru">Terbaru</option>
+  </select>
+</div>
+
+<div id="list"></div>
+
+<button class="fab" id="fab" onclick="openForm()">+</button>
+
+<!-- Borang tender -->
+<div class="modal" id="mForm" onclick="if(event.target===this)closeM('mForm')">
+  <div class="sheet">
+    <h2><span id="fTitle">Tambah Tender</span><button onclick="closeM('mForm')">✕</button></h2>
+    <input type="hidden" id="fId">
+    <div class="fld"><label>No. Tender / Sebut Harga <span class="req">*</span></label><input id="fNo" placeholder="cth: JKR/T/2026/015"></div>
+    <div class="fld"><label>Tajuk <span class="req">*</span></label><textarea id="fTajuk" placeholder="Tajuk tender"></textarea></div>
+    <div class="fld"><label>Agensi / Jabatan</label><input id="fAgensi" placeholder="cth: JKR Daerah"></div>
+    <div class="row">
+      <div class="fld"><label>Jenis</label><select id="fJenis"><option>Tender</option><option>Sebut Harga</option><option>Rundingan Terus</option></select></div>
+      <div class="fld"><label>Kategori</label><select id="fKat"><option>Kerja</option><option>Bekalan</option><option>Perkhidmatan</option></select></div>
+    </div>
+    <div class="row">
+      <div class="fld"><label>Tarikh Tutup <span class="req">*</span></label><input type="date" id="fTutup"></div>
+      <div class="fld"><label>Masa Tutup</label><input type="time" id="fMasa" value="12:00"></div>
+    </div>
+    <div class="row">
+      <div class="fld"><label>Tarikh Iklan</label><input type="date" id="fIklan"></div>
+      <div class="fld"><label>Taklimat / Lawatan Tapak</label><input type="datetime-local" id="fTaklimat"></div>
+    </div>
+    <div class="fld"><label>Catatan</label><textarea id="fCatatan" placeholder="Syarat, lokasi hantar, dll."></textarea></div>
+    <button class="save" onclick="saveTender()">💾 Simpan</button>
+  </div>
+</div>
+
+<!-- Beli dokumen -->
+<div class="modal" id="mBuy" onclick="if(event.target===this)closeM('mBuy')">
+  <div class="sheet">
+    <h2><span>Beli Dokumen Tender</span><button onclick="closeM('mBuy')">✕</button></h2>
+    <input type="hidden" id="bId">
+    <p class="note" id="bInfo"></p>
+    <div class="row">
+      <div class="fld"><label>Tarikh Beli</label><input type="date" id="bTarikh"></div>
+      <div class="fld"><label>Harga Dokumen (RM)</label><input type="number" id="bHarga" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="fld"><label>No. Resit</label><input id="bResit"></div>
+    <button class="save" onclick="saveBuy()">🛒 Sahkan Beli</button>
+  </div>
+</div>
+
+<!-- Tutup -->
+<div class="modal" id="mClose" onclick="if(event.target===this)closeM('mClose')">
+  <div class="sheet">
+    <h2><span>Tutup Tender</span><button onclick="closeM('mClose')">✕</button></h2>
+    <input type="hidden" id="xId">
+    <p class="note" id="xInfo"></p>
+    <div class="fld"><label>Status</label>
+      <select id="xStatus"><option>Dihantar</option><option>Menang</option><option>Kalah</option><option>Tidak Hantar</option><option>Dibatalkan</option></select>
+    </div>
+    <div class="row">
+      <div class="fld"><label>Tarikh</label><input type="date" id="xTarikh"></div>
+      <div class="fld"><label>Harga Ditawar (RM)</label><input type="number" id="xHarga" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="fld"><label>Catatan</label><textarea id="xCatatan"></textarea></div>
+    <button class="save" onclick="saveClose()">✅ Tutup</button>
+  </div>
+</div>
+
+<!-- Butiran -->
+<div class="modal" id="mDetail" onclick="if(event.target===this)closeM('mDetail')">
+  <div class="sheet">
+    <h2><span>Butiran Tender</span><button onclick="closeM('mDetail')">✕</button></h2>
+    <div class="detail" id="dBody"></div>
+  </div>
+</div>
+
+<!-- Tetapan -->
+<div class="modal" id="mSet" onclick="if(event.target===this)closeM('mSet')">
+  <div class="sheet">
+    <h2><span>Tetapan</span><button onclick="closeM('mSet')">✕</button></h2>
+    <div class="sec" style="border:0;padding-top:0;margin-top:0">🔔 Peringatan</div>
+    <p class="note">Ingatkan saya sebelum tarikh tutup: 7 hari, 3 hari, 1 hari dan pada hari tutup.</p>
+    <button class="sbtn" onclick="askNotif()">Benarkan Notifikasi</button>
+
+    <div class="sec">☁️ Sync Antara Telefon</div>
+    <p class="note"><span class="sync-dot" id="syncDot"></span><span id="syncTxt">Belum disambung</span></p>
+    <div id="syncBox"></div>
+
+    <div class="sec">💾 Backup</div>
+    <button class="sbtn" onclick="exportJSON()">Eksport Backup (JSON)</button>
+    <button class="sbtn" onclick="exportCSV()">Eksport ke Excel (CSV)</button>
+    <button class="sbtn" onclick="document.getElementById('imp').click()">Import Backup</button>
+    <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
+    <p class="note" style="text-align:center;margin-top:14px">ProTender v1.0 · ProKuiz</p>
+  </div>
+</div>
+
+<!-- Amaran hampir tutup -->
+<div class="modal" id="mAlert" onclick="if(event.target===this)closeM('mAlert')">
+  <div class="alert">
+    <h2>⏰ Tender Hampir Tutup</h2>
+    <ul id="alertList"></ul>
+    <button class="save" onclick="closeM('mAlert')">OK, Faham</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// ================== DATA ==================
+const KEY='protender_data_v1', SKEY='protender_sync_code', NKEY='protender_notified';
+let tenders=[]; let tab='register';
+const $=id=>document.getElementById(id);
+
+function load(){ try{tenders=JSON.parse(localStorage.getItem(KEY))||[]}catch(e){tenders=[]} }
+function persist(push=true){ localStorage.setItem(KEY,JSON.stringify(tenders)); render(); scheduleNative(); if(push) pushSync(); }
+const live=()=>tenders.filter(t=>!t.deleted);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtD=s=>{if(!s)return '-';const d=new Date(s.length<=10?s+'T00:00':s);return d.toLocaleDateString('ms-MY',{day:'numeric',month:'short',year:'numeric'})+(s.length>10?' '+d.toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'}):'')};
+const rm=v=>v?'RM '+Number(v).toLocaleString('ms-MY',{minimumFractionDigits:2}):'-';
+
+function daysLeft(t){
+  const now=new Date(); now.setHours(0,0,0,0);
+  const d=new Date(t.tutup+'T00:00');
+  return Math.round((d-now)/86400000);
+}
+function closeDT(t){return new Date(t.tutup+'T'+(t.masa||'12:00'))}
+
+// ================== RENDER ==================
+function setTab(t){tab=t;render()}
+function render(){
+  document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
+  const L=live();
+  $('cReg').textContent=L.filter(t=>t.stage==='register').length;
+  $('cBuy').textContent=L.filter(t=>t.stage==='buy').length;
+  $('cClose').textContent=L.filter(t=>t.stage==='close').length;
+  $('fab').style.display=tab==='register'?'block':'none';
+
+  const q=$('q').value.toLowerCase().trim();
+  let arr=L.filter(t=>t.stage===tab).filter(t=>!q||[t.no,t.tajuk,t.agensi].join(' ').toLowerCase().includes(q));
+  if($('sort').value==='baru') arr.sort((a,b)=>b.created-a.created);
+  else arr.sort((a,b)=>tab==='close'?closeDT(b)-closeDT(a):closeDT(a)-closeDT(b));
+
+  if(!arr.length){
+    const msg={register:['📝','Tiada tender didaftar.<br>Tekan <b>+</b> untuk tambah tender.'],buy:['🛒','Tiada dokumen tender dibeli lagi.<br>Tekan <b>Beli</b> pada tender di tab Register.'],close:['📁','Tiada tender ditutup lagi.']}[tab];
+    $('list').innerHTML=`<div class="empty"><div>${msg[0]}</div>${msg[1]}</div>`;return;
+  }
+  $('list').innerHTML=arr.map(card).join('');
+}
+function card(t){
+  const dl=daysLeft(t); let cls='', badge='';
+  if(t.stage==='close'){cls='closed';badge=`<b>✓</b><small>${esc(t.close?.status||'Tutup')}</small>`}
+  else{
+    cls=dl<0?'over':dl<=3?'urgent':dl<=7?'warn':'';
+    badge=dl<0?`<b>!</b><small>Lepas tutup</small>`:dl===0?`<b>HARI</b><small>INI</small>`:`<b>${dl}</b><small>hari lagi</small>`;
+  }
+  let chips=`<span class="chip">📅 Tutup: ${fmtD(t.tutup)} ${t.masa?esc(t.masa):''}</span><span class="chip k">${esc(t.jenis)} · ${esc(t.kat)}</span>`;
+  if(t.taklimat) chips+=`<span class="chip">🗣️ Taklimat: ${fmtD(t.taklimat)}</span>`;
+  if(t.buy) chips+=`<span class="chip">🛒 Beli ${fmtD(t.buy.tarikh)} · ${rm(t.buy.harga)}</span>`;
+  if(t.close?.harga) chips+=`<span class="chip">💰 Tawaran ${rm(t.close.harga)}</span>`;
+  let acts='';
+  if(t.stage==='register') acts=`<button class="b-main" onclick="openBuy('${t.id}')">🛒 Beli</button><button class="b-soft" onclick="openForm('${t.id}')">✏️ Edit</button>`;
+  else if(t.stage==='buy') acts=`<button class="b-main" onclick="openClose('${t.id}')">✅ Tutup</button><button class="b-soft" onclick="openForm('${t.id}')">✏️ Edit</button><button class="b-soft" onclick="moveBack('${t.id}')">↩️</button>`;
+  else acts=`<button class="b-soft" onclick="openDetail('${t.id}')">📄 Butiran</button><button class="b-soft" onclick="moveBack('${t.id}')">↩️ Buka Semula</button>`;
+  acts+=`<button class="b-del" onclick="delTender('${t.id}')">🗑️</button>`;
+  return `<div class="card ${cls}">
+    <div class="top" onclick="openDetail('${t.id}')">
+      <div><div class="no">${esc(t.no)}</div><h3>${esc(t.tajuk)}</h3><div class="ag">🏢 ${esc(t.agensi||'-')}</div></div>
+      <div class="badge">${badge}</div>
+    </div>
+    <div class="meta">${chips}</div>
+    <div class="acts">${acts}</div>
+  </div>`;
+}
+
+// ================== MODALS ==================
+function openM(id){$(id).classList.add('show')}
+function closeM(id){$(id).classList.remove('show')}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200)}
+const find=id=>tenders.find(t=>t.id===id);
+
+function openForm(id){
+  const t=id?find(id):null;
+  $('fTitle').textContent=t?'Edit Tender':'Tambah Tender';
+  $('fId').value=t?.id||'';
+  $('fNo').value=t?.no||''; $('fTajuk').value=t?.tajuk||''; $('fAgensi').value=t?.agensi||'';
+  $('fJenis').value=t?.jenis||'Tender'; $('fKat').value=t?.kat||'Kerja';
+  $('fTutup').value=t?.tutup||''; $('fMasa').value=t?.masa||'12:00';
+  $('fIklan').value=t?.iklan||''; $('fTaklimat').value=t?.taklimat||''; $('fCatatan').value=t?.catatan||'';
+  openM('mForm');
+}
+function saveTender(){
+  const no=$('fNo').value.trim(), tajuk=$('fTajuk').value.trim(), tutup=$('fTutup').value;
+  if(!no||!tajuk||!tutup){toast('Sila isi No. Tender, Tajuk dan Tarikh Tutup');return}
+  const data={no,tajuk,agensi:$('fAgensi').value.trim(),jenis:$('fJenis').value,kat:$('fKat').value,tutup,masa:$('fMasa').value,iklan:$('fIklan').value,taklimat:$('fTaklimat').value,catatan:$('fCatatan').value.trim(),updated:Date.now()};
+  const id=$('fId').value;
+  if(id) Object.assign(find(id),data);
+  else tenders.push({id:uid(),stage:'register',created:Date.now(),...data});
+  closeM('mForm'); persist(); toast(id?'Tender dikemas kini':'Tender didaftar ✓');
+}
+function openBuy(id){
+  const t=find(id); $('bId').value=id; $('bInfo').innerHTML=`<b>${esc(t.no)}</b><br>${esc(t.tajuk)}`;
+  $('bTarikh').value=t.buy?.tarikh||todayStr(); $('bHarga').value=t.buy?.harga||''; $('bResit').value=t.buy?.resit||'';
+  openM('mBuy');
+}
+function saveBuy(){
+  const t=find($('bId').value);
+  t.buy={tarikh:$('bTarikh').value,harga:$('bHarga').value,resit:$('bResit').value.trim()};
+  t.stage='buy'; t.updated=Date.now();
+  closeM('mBuy'); persist(); toast('Dipindah ke tab Buy 🛒');
+}
+function openClose(id){
+  const t=find(id); $('xId').value=id; $('xInfo').innerHTML=`<b>${esc(t.no)}</b><br>${esc(t.tajuk)}`;
+  $('xStatus').value=t.close?.status||'Dihantar'; $('xTarikh').value=t.close?.tarikh||todayStr();
+  $('xHarga').value=t.close?.harga||''; $('xCatatan').value=t.close?.catatan||'';
+  openM('mClose');
+}
+function saveClose(){
+  const t=find($('xId').value);
+  t.close={status:$('xStatus').value,tarikh:$('xTarikh').value,harga:$('xHarga').value,catatan:$('xCatatan').value.trim()};
+  t.stage='close'; t.updated=Date.now();
+  closeM('mClose'); persist(); toast('Dipindah ke tab Close ✅');
+}
+function moveBack(id){
+  const t=find(id); const prev=t.stage==='close'?'buy':'register';
+  if(!confirm(`Pindah semula ke tab ${prev==='buy'?'Buy':'Register'}?`))return;
+  t.stage=prev; t.updated=Date.now(); persist(); toast('Dipindah semula');
+}
+function delTender(id){
+  const t=find(id); if(!confirm(`Padam tender ${t.no}?`))return;
+  t.deleted=true; t.updated=Date.now(); persist(); toast('Tender dipadam');
+}
+function openDetail(id){
+  const t=find(id);
+  const p=(k,v)=>`<p><span>${k}</span><span>${v}</span></p>`;
+  let h=p('No. Tender','<b>'+esc(t.no)+'</b>')+p('Tajuk',esc(t.tajuk))+p('Agensi',esc(t.agensi||'-'))+p('Jenis / Kategori',esc(t.jenis)+' · '+esc(t.kat))
+    +p('Tarikh Iklan',fmtD(t.iklan))+p('Taklimat / Lawatan',fmtD(t.taklimat))+p('Tarikh Tutup','<b>'+fmtD(t.tutup)+' '+esc(t.masa||'')+'</b>')+p('Catatan',esc(t.catatan||'-'));
+  if(t.buy) h+='<div class="sec">🛒 Pembelian Dokumen</div>'+p('Tarikh Beli',fmtD(t.buy.tarikh))+p('Harga',rm(t.buy.harga))+p('No. Resit',esc(t.buy.resit||'-'));
+  if(t.close) h+='<div class="sec">✅ Penutupan</div>'+p('Status','<b>'+esc(t.close.status)+'</b>')+p('Tarikh',fmtD(t.close.tarikh))+p('Harga Ditawar',rm(t.close.harga))+p('Catatan',esc(t.close.catatan||'-'));
+  $('dBody').innerHTML=h; openM('mDetail');
+}
+
+// ================== PERINGATAN ==================
+const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+const LN=()=>window.Capacitor?.Plugins?.LocalNotifications;
+
+function checkDue(){
+  const due=live().filter(t=>t.stage!=='close').map(t=>({t,d:daysLeft(t)})).filter(x=>x.d>=0&&x.d<=3).sort((a,b)=>a.d-b.d);
+  if(!due.length)return;
+  $('alertList').innerHTML=due.map(({t,d})=>`<li><b>${d===0?'HARI INI':d+' hari lagi'}</b> — ${esc(t.no)}<br>${esc(t.tajuk)}<br><small>Tutup: ${fmtD(t.tutup)} ${esc(t.masa||'')} · ${t.stage==='buy'?'Dokumen dah dibeli':'Belum beli dokumen'}</small></li>`).join('');
+  openM('mAlert');
+  // Notifikasi browser (sekali sehari setiap tender)
+  if(!isNative() && 'Notification' in window && Notification.permission==='granted'){
+    let sent={}; try{sent=JSON.parse(localStorage.getItem(NKEY))||{}}catch(e){}
+    const day=todayStr();
+    due.forEach(({t,d})=>{ const k=t.id+day; if(sent[k])return; sent[k]=1;
+      new Notification('ProTender: '+(d===0?'Tutup HARI INI':d+' hari lagi'),{body:t.no+' — '+t.tajuk}); });
+    localStorage.setItem(NKEY,JSON.stringify(sent));
+  }
+}
+async function askNotif(){
+  if(isNative()&&LN()){ const r=await LN().requestPermissions(); toast(r.display==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak'); scheduleNative(); return; }
+  if(!('Notification' in window)){toast('Browser ini tak sokong notifikasi');return}
+  const p=await Notification.requestPermission(); toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');
+}
+// APK: jadual notifikasi tempatan (7, 3, 1 hari & hari tutup, jam 8 pagi)
+function hashId(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)%100000}
+async function scheduleNative(){
+  if(!isNative()||!LN())return;
+  try{
+    const pend=await LN().getPending(); if(pend.notifications.length) await LN().cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
+    const list=[]; const now=Date.now();
+    live().filter(t=>t.stage!=='close').forEach(t=>{
+      [7,3,1,0].forEach((d,i)=>{
+        const at=new Date(t.tutup+'T08:00'); at.setDate(at.getDate()-d);
+        if(at.getTime()>now) list.push({id:hashId(t.id)*10+i,title:d?`ProTender: ${d} hari lagi`:'ProTender: Tutup HARI INI',body:`${t.no} — ${t.tajuk}`,schedule:{at,allowWhileIdle:true}});
+      });
+    });
+    if(list.length) await LN().schedule({notifications:list.slice(0,60)});
+  }catch(e){console.log(e)}
+}
+
+// ================== SYNC FIREBASE ==================
+const firebaseConfig={apiKey:"AIzaSyAi5O-7iD9E67Gc_mLLW726_ms5EkmV-5U",authDomain:"ar-trading-b246f.firebaseapp.com",projectId:"ar-trading-b246f",storageBucket:"ar-trading-b246f.firebasestorage.app",messagingSenderId:"252959184778",appId:"1:252959184778:web:f0eb94f71a56941ffb1a73"};
+let db=null, unsub=null, pushTimer=null;
+try{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); }catch(e){console.log('Firebase off',e)}
+const syncCode=()=>localStorage.getItem(SKEY)||'';
+function newCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';let s='';const a=crypto.getRandomValues(new Uint8Array(20));a.forEach(x=>s+=c[x%c.length]);return s}
+
+function merge(remote){
+  const map={}; tenders.forEach(t=>map[t.id]=t);
+  let changed=false;
+  (remote||[]).forEach(r=>{ const l=map[r.id]; if(!l||(r.updated||0)>(l.updated||0)){map[r.id]=r;changed=true} });
+  tenders=Object.values(map); return changed;
+}
+function pushSync(){
+  if(!db||!syncCode())return;
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(()=>{
+    db.collection('ptender').doc(syncCode()).set({data:JSON.stringify(tenders),updated:Date.now()})
+      .then(()=>setSyncUI(true)).catch(e=>{setSyncUI(false,'Gagal sync: '+e.code)});
+  },800);
+}
+function listen(){
+  if(unsub){unsub();unsub=null}
+  if(!db||!syncCode())return;
+  unsub=db.collection('ptender').doc(syncCode()).onSnapshot(s=>{
+    setSyncUI(true);
+    if(!s.exists){pushSync();return}
+    let r=[];try{r=JSON.parse(s.data().data)}catch(e){}
+    const before=JSON.stringify(tenders);
+    merge(r);
+    if(JSON.stringify(tenders)!==before){ localStorage.setItem(KEY,JSON.stringify(tenders)); render(); scheduleNative(); }
+    if(r.length!==tenders.length||JSON.stringify(r)!==JSON.stringify(tenders)) pushSync();
+  },e=>setSyncUI(false,'Gagal sync: '+e.code));
+}
+function setSyncUI(ok,msg){
+  $('syncDot').classList.toggle('on',!!ok&&!!syncCode());
+  $('syncTxt').textContent=msg||(syncCode()?(ok?'Disambung · data disync':'Menyambung…'):'Belum disambung');
+}
+function syncBoxUI(){
+  const c=syncCode();
+  $('syncBox').innerHTML=c?`
+    <p class="note">Kod sync telefon ini. Masukkan kod yang sama di telefon lain untuk kongsi data. <b>Jangan kongsi dengan orang lain.</b></p>
+    <div class="code">${c}</div>
+    <button class="sbtn" onclick="copyCode()">📋 Salin Kod</button>
+    <button class="sbtn" onclick="stopSync()" style="background:#fee2e2;color:#ef4444">Putuskan Sync</button>`:`
+    <p class="note">Sync supaya data tender sama di semua telefon.</p>
+    <button class="sbtn" onclick="startSync()">✨ Cipta Kod Sync Baru</button>
+    <div class="fld"><input id="joinCode" placeholder="Atau tampal kod 20 aksara dari telefon lain"></div>
+    <button class="sbtn" onclick="joinSync()">🔗 Sambung Guna Kod</button>`;
+  setSyncUI(!!c);
+}
+function startSync(){ if(!db){toast('Tiada internet / Firebase');return} localStorage.setItem(SKEY,newCode()); syncBoxUI(); listen(); pushSync(); toast('Sync dihidupkan ✓'); }
+function joinSync(){ const c=$('joinCode').value.trim(); if(c.length!==20){toast('Kod mesti 20 aksara');return} localStorage.setItem(SKEY,c); syncBoxUI(); listen(); toast('Disambung ✓'); }
+function stopSync(){ if(!confirm('Putuskan sync? Data dalam telefon ini kekal.'))return; localStorage.removeItem(SKEY); if(unsub)unsub(); syncBoxUI(); }
+function copyCode(){ navigator.clipboard?.writeText(syncCode()).then(()=>toast('Kod disalin')).catch(()=>toast(syncCode())); }
+function openSettings(){ syncBoxUI(); openM('mSet'); }
+
+// ================== BACKUP ==================
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click()}
+function exportJSON(){ download(`ProTender-backup-${todayStr()}.json`,JSON.stringify(tenders,null,1),'application/json'); }
+function exportCSV(){
+  const h=['Tab','No Tender','Tajuk','Agensi','Jenis','Kategori','Tarikh Tutup','Masa','Taklimat','Tarikh Beli','Harga Dokumen','Status Tutup','Harga Ditawar','Catatan'];
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const rows=live().map(t=>[t.stage,t.no,t.tajuk,t.agensi,t.jenis,t.kat,t.tutup,t.masa,t.taklimat,t.buy?.tarikh,t.buy?.harga,t.close?.status,t.close?.harga,t.catatan].map(q).join(','));
+  download(`ProTender-${todayStr()}.csv`,'﻿'+h.join(',')+'\n'+rows.join('\n'),'text/csv');
+}
+function importJSON(inp){
+  const f=inp.files[0]; if(!f)return;
+  f.text().then(txt=>{ const arr=JSON.parse(txt); if(!Array.isArray(arr))throw 0; merge(arr); persist(); toast('Import berjaya ✓'); })
+   .catch(()=>toast('Fail tidak sah')); inp.value='';
+}
+
+// ================== MULA ==================
+load(); render();
+if(syncCode()) listen();
+setTimeout(checkDue,600);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden){render()} });
+if(isNative()) scheduleNative();
+</script>
+</body>
+</html>
