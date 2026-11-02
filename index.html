@@ -6,6 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a1210">
 <title>ProTender</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ProTender">
+<meta name="application-name" content="ProTender">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
 <style>
@@ -19,11 +27,15 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5}
 header{position:sticky;top:0;z-index:5;padding:calc(14px + env(safe-area-inset-top)) 16px 18px;background:linear-gradient(180deg,rgba(10,18,16,.96) 40%,rgba(10,18,16,0));display:flex;align-items:center;gap:10px}
-header .mark{width:36px;height:36px;border-radius:9px;background:var(--gold);display:grid;place-items:center;color:#1b1503;font-weight:800;font-size:18px}
-header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.3px}
+header .mark{width:36px;height:36px;border-radius:9px;object-fit:cover;background:var(--gold);display:grid;place-items:center;color:#1b1503;font-weight:800;font-size:18px}
+header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
+body.ins header h1 span{display:none}
 header h1 span{font-weight:400;color:var(--muted);font-size:12px;letter-spacing:0;margin-left:4px}
 .hb{width:40px;height:40px;border-radius:10px;border:0;background:rgba(241,237,226,.08);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center;position:relative}
 .hb.first{margin-left:auto}
+.instb{margin-left:auto;height:40px;border:0;border-radius:10px;padding:0 12px;background:var(--gold);color:#1b1503;font:800 13px var(--f);cursor:pointer;white-space:nowrap}
+.instb+.hb.first{margin-left:0}
+ol.ins{padding-left:20px;margin:10px 0}ol.ins li{margin-bottom:8px}
 .hb.add{background:var(--gold);color:#1b1503;font:800 26px var(--f);line-height:1}
 .hb span{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font:800 11px var(--f);display:none;place-items:center}
 main{padding:0 0 100px;max-width:760px;margin:0 auto}
@@ -123,8 +135,9 @@ label b{color:var(--red)}
 <body>
 
 <header>
-  <div class="mark">📋</div>
+  <img class="mark" src="icons/icon-192.png" alt="">
   <h1>ProTender<span>by ProKuiz</span></h1>
+  <button class="instb" id="instB" onclick="installApp()" style="display:none">⬇ Pasang</button>
   <button class="hb first" id="bell" onclick="openAlerts()" aria-label="Amaran">🔔<span id="bellN"></span></button>
   <button class="hb add" id="addB" onclick="openForm()" aria-label="Tambah tender">+</button>
 </header>
@@ -217,6 +230,14 @@ label b{color:var(--red)}
     <div class="ph"><h2>🔔 Peringatan</h2><button class="x" onclick="closeS('sAlert')">✕</button></div>
     <p class="muted">Tarikh penting dalam 3 hari akan datang.</p>
     <div id="alertList"></div>
+  </div>
+</div>
+
+<div class="sheet" id="sInstall" onclick="if(event.target===this)closeS('sInstall')">
+  <div class="panel">
+    <div class="ph"><h2>Pasang ProTender</h2><button class="x" onclick="closeS('sInstall')">✕</button></div>
+    <div id="insBody"></div>
+    <p class="muted">App dibuka dalam tetingkap sendiri tanpa bar alamat, ada ikon di skrin utama dan boleh dibuka walaupun tiada internet.</p>
   </div>
 </div>
 
@@ -485,7 +506,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v2.0 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v2.1 · ProKuiz</p>
   </div>`;
 }
 function openCo(id){
@@ -522,7 +543,7 @@ const LN=()=>window.Capacitor?.Plugins?.LocalNotifications;
 async function askNotif(){
   if(isNative()&&LN()){const r=await LN().requestPermissions();toast(r.display==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');scheduleNative();return}
   if(!('Notification' in window)){toast('Browser ini tak sokong notifikasi');return}
-  const p=await Notification.requestPermission();toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');
+  const p=await Notification.requestPermission();toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');if(p==='granted')notifyDue();
 }
 function hashId(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)%100000}
 async function scheduleNative(){ // untuk APK nanti: 1 hari & 2 jam sebelum setiap tarikh
@@ -583,12 +604,46 @@ function importJSON(inp){
   f.text().then(x=>{const d=JSON.parse(x);if(!d.tenders)throw 0;S.tenders=mergeArr(S.tenders,d.tenders);S.companies=mergeArr(S.companies,d.companies||[]);persist();toast('Import berjaya ✓')}).catch(()=>toast('Fail tidak sah'));inp.value='';
 }
 
+// ================== PASANG APP ==================
+let INSTALL_EVT=null;
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();INSTALL_EVT=e;updateInstallBtn()});
+window.addEventListener('appinstalled',()=>{INSTALL_EVT=null;updateInstallBtn();toast('✓ ProTender dipasang')});
+function canOfferInstall(){return !isNative()&&!isStandalone()&&(INSTALL_EVT||isIOS()||/android/i.test(navigator.userAgent))}
+function updateInstallBtn(){const on=canOfferInstall();$('instB').style.display=on?'':'none';document.body.classList.toggle('ins',!!on)}
+async function installApp(){
+  if(INSTALL_EVT){INSTALL_EVT.prompt();const r=await INSTALL_EVT.userChoice;INSTALL_EVT=null;updateInstallBtn();if(r.outcome==='accepted')toast('✓ ProTender dipasang');return}
+  $('insBody').innerHTML=isIOS()
+    ?'<ol class="ins"><li>Buka laman ini dalam <b>Safari</b>.</li><li>Tekan butang <b>Kongsi</b> (petak dengan anak panah ke atas).</li><li>Pilih <b>Tambah ke Skrin Utama</b>, kemudian tekan <b>Tambah</b>.</li></ol>'
+    :'<ol class="ins"><li>Buka laman ini dalam <b>Chrome</b>.</li><li>Tekan menu <b>⋮</b> di atas kanan.</li><li>Pilih <b>Pasang aplikasi</b> atau <b>Tambah ke skrin utama</b>, kemudian tekan <b>Pasang</b>.</li></ol>';
+  openS('sInstall');
+}
+// Notifikasi sekali sehari bagi setiap tarikh penting dalam 3 hari (bila app dibuka)
+async function notifyDue(){
+  try{
+    if(isNative()||!('Notification' in window)||Notification.permission!=='granted')return;
+    const reg='serviceWorker' in navigator?await navigator.serviceWorker.getRegistration():null;
+    let sent={};try{sent=JSON.parse(localStorage.getItem('protender_sent'))||{}}catch(e){}
+    const day=todayStr();
+    for(const x of alerts()){
+      const k=x.t.id+x.k+day; if(sent[k])continue; sent[k]=1;
+      const l=left(x.t[x.k]), title=`${x.lbl} · ${l.big} ${l.small}`, opt={body:x.t.nama,tag:k,icon:'icons/icon-192.png',badge:'icons/icon-192.png'};
+      if(reg) await reg.showNotification(title,opt); else new Notification(title,opt);
+    }
+    localStorage.setItem('protender_sent',JSON.stringify(sent));
+  }catch(e){console.log(e)}
+}
+
 // ================== MULA ==================
 load(); render();
 if(syncCode()) listen();
 setInterval(()=>{if(tab!=='setting'&&!document.querySelector('.sheet.on'))render()},60000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();notifyDue()}});
 if(isNative()) scheduleNative();
+updateInstallBtn();
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').then(()=>notifyDue()).catch(()=>notifyDue());
+else notifyDue();
 </script>
 </body>
 </html>
