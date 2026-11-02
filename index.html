@@ -734,7 +734,10 @@ function listen(){
     S[key]=snap.docs.map(d=>d.data());
     if(++got===2) migrateOld();
     persist();
-  },e=>{fbErr(e);if(e.code==='permission-denied')showLogin('Akaun ini tiada akses ProTender. Hubungi admin.');});
+  },e=>{
+    if(e.code==='permission-denied'){stopListen();showDenied();return}
+    fbErr(e);
+  });
   unsubs=[on('pt_tenders','tenders'),on('pt_companies','companies')];
 }
 // Data lama (sebelum log masuk) dalam telefon ini → naik ke Firebase sekali sahaja
@@ -748,6 +751,10 @@ function migrateOld(){
     if(n) b.commit().then(()=>toast(n+' rekod lama dinaikkan ke Firebase ✓')).catch(fbErr);
   }catch(e){}
 }
+function showDenied(){
+  $('login').classList.remove('off'); $('lForm').style.display='none';
+  $('lSub').innerHTML=`<span style="color:var(--amber)">Log masuk berjaya, tetapi Firestore Rules belum benarkan akaun ini.</span><br><br>Email: <b>${esc(USER.email)}</b><br>UID: <b style="user-select:all;-webkit-user-select:all;word-break:break-all">${esc(USER.uid)}</b><br><br>Pastikan UID ini ada dalam <b>isProTender()</b> dan rules sudah di-<b>Publish</b>.<br><br><button class="btn gold full" onclick="location.reload()">Cuba Lagi</button><button class="btn sec full" style="margin-top:8px" onclick="auth.signOut()">Log Keluar</button>`;
+}
 function showLogin(msg){
   $('login').classList.remove('off'); $('lForm').style.display='block';
   $('lSub').textContent='Log masuk untuk teruskan'; $('lErr').textContent=msg||'';
@@ -758,8 +765,9 @@ async function doLogin(){
   $('lBtn').disabled=true;$('lBtn').textContent='Sedang log masuk…';$('lErr').textContent='';
   try{await auth.signInWithEmailAndPassword(em,pw)}
   catch(e){
-    const m={'auth/invalid-credential':'Email atau kata laluan salah','auth/wrong-password':'Kata laluan salah','auth/user-not-found':'Akaun tidak wujud','auth/invalid-email':'Format email tidak sah','auth/too-many-requests':'Terlalu banyak cubaan. Cuba sebentar lagi.','auth/network-request-failed':'Tiada sambungan internet','auth/user-disabled':'Akaun ini telah disekat'};
-    $('lErr').textContent=m[e.code]||('Gagal log masuk: '+e.code);
+    const m={'auth/operation-not-allowed':'Log masuk Email/Password belum dihidupkan. Firebase Console → Authentication → Sign-in method → Email/Password → Enable.','auth/invalid-login-credentials':'Email atau kata laluan salah','auth/invalid-credential':'Email atau kata laluan salah','auth/wrong-password':'Kata laluan salah','auth/user-not-found':'Akaun tidak wujud','auth/invalid-email':'Format email tidak sah','auth/too-many-requests':'Terlalu banyak cubaan. Cuba sebentar lagi.','auth/network-request-failed':'Tiada sambungan internet','auth/user-disabled':'Akaun ini telah disekat'};
+    $('lErr').textContent=(m[e.code]||('Gagal log masuk.'))+' ['+(e.code||e.message||e)+']';
+    if(/referer|api-key|API key/i.test((e.code||'')+(e.message||''))) $('lErr').textContent='API key Firebase menyekat domain ini. Google Cloud Console → Credentials → API key → tambah alemmaxx.github.io/* dalam Website restrictions. ['+(e.code||'')+']';
   }
   $('lBtn').disabled=false;$('lBtn').textContent='Log Masuk';
 }
@@ -770,7 +778,7 @@ async function forgotPass(){
 }
 function doLogout(){if(!confirm('Log keluar dari ProTender?'))return;stopListen();auth.signOut()}
 function startAuth(){
-  if(!auth){$('lSub').textContent='Tiada sambungan ke Firebase. Semak internet dan buka semula.';return}
+  if(!auth){$('lSub').textContent='Tiada sambungan ke Firebase. Semak internet dan buka semula.';$('lForm').style.display='none';return}
   auth.onAuthStateChanged(u=>{
     USER=u;
     if(!u){stopListen();S={tenders:[],companies:[]};$('lPass').value='';showLogin();return}
