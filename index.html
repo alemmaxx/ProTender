@@ -129,6 +129,22 @@ label b{color:var(--red)}
 .dot.on{background:var(--green)}
 .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;display:none;max-width:90%;text-align:center}
 .al{border-radius:10px;padding:10px 12px;margin:0 0 8px;font-size:13px;background:var(--amber2);border-left:3px solid var(--amber)}
+/* pemilih CIDB */
+.cpick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:46px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);cursor:pointer}
+.cpick .ph0{color:var(--muted);font-size:14px;padding:0 4px}
+.cc{display:inline-flex;align-items:center;gap:5px;font-size:12px;border-radius:999px;padding:4px 6px 4px 10px;background:var(--gold2);color:var(--gold);font-weight:700}
+.cc button{border:0;background:rgba(0,0,0,.25);color:inherit;width:18px;height:18px;border-radius:50%;font-size:11px;line-height:18px;padding:0;cursor:pointer}
+.cc.ro{padding-right:10px}
+.cc small{font-weight:500;opacity:.85}
+.plist{max-height:52vh;overflow:auto;margin:10px -4px 0;padding:0 4px}
+.pcat{font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 4px;position:sticky;top:0;background:var(--bg);padding:4px 0;z-index:1}
+.pi{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px}
+.pi input{width:20px;height:20px;min-height:0;accent-color:var(--gold);flex:none}
+.pi b{min-width:42px;font-variant-numeric:tabular-nums;color:var(--gold)}
+.pi.on{background:rgba(217,180,74,.08)}
+.segs{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
+.segs button{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;font:600 12px var(--f);cursor:pointer}
+.segs button.on{background:var(--gold);color:#1b1503;border-color:var(--gold)}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 </style>
 </head>
@@ -176,8 +192,10 @@ label b{color:var(--red)}
       <div><small>Tamat</small><input type="datetime-local" id="fRegE"></div>
     </div>
 
-    <label>Company Code</label>
-    <input id="fCodes" placeholder="cth: 222301, 221001 (asingkan dengan koma)" oninput="eligUI()">
+    <label>Gred CIDB Minimum</label>
+    <select id="fGred" onchange="eligUI()"><option value="">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select>
+    <label>Company Code (Kod Pengkhususan CIDB)</label>
+    <div class="cpick" id="fCodesBox" onclick="openPick('t')"></div>
     <div class="elig" id="eligBox"></div>
 
     <label>Site Briefing</label>
@@ -214,12 +232,28 @@ label b{color:var(--red)}
     <input type="hidden" id="cId">
     <label>Nama Syarikat <b>*</b></label>
     <input id="cNama" placeholder="cth: KUKUSAN LEGACY">
-    <label>Company Code yang dimiliki</label>
-    <textarea id="cCodes" rows="3" placeholder="cth: 222301, 221001, 210103 (asingkan dengan koma)"></textarea>
-    <p class="muted">Syarikat akan dikira <b>layak</b> untuk sesuatu tender bila ia ada semua code yang tender itu minta.</p>
+    <label>Gred CIDB</label>
+    <select id="cGred"><option value="">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select>
+    <label>Kod Pengkhususan CIDB yang dimiliki</label>
+    <div class="cpick" id="cCodesBox" onclick="openPick('c')"></div>
+    <p class="muted">Syarikat dikira <b>layak</b> bila ia ada <b>semua</b> kod yang tender minta, dan gred syarikat sama atau lebih tinggi daripada gred minimum tender.</p>
     <div style="display:flex;gap:10px;margin-top:14px">
       <button class="btn red" id="cDel" onclick="delCo()">🗑️</button>
       <button class="btn gold full" onclick="saveCo()">Simpan Syarikat</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pemilih kod CIDB -->
+<div class="sheet" id="sPick" onclick="if(event.target===this)closeS('sPick')" style="z-index:25">
+  <div class="panel">
+    <div class="ph"><h2>Kod Pengkhususan CIDB</h2><button class="x" onclick="closeS('sPick')">✕</button></div>
+    <input id="pQ" placeholder="Cari kod atau bidang, cth: CE21 / SCADA" oninput="pickList()">
+    <div class="segs" id="pCats"></div>
+    <div class="plist" id="pList"></div>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn sec" onclick="PK.sel=[];pickList()">Kosongkan</button>
+      <button class="btn gold full" id="pDone" onclick="pickDone()">Selesai</button>
     </div>
   </div>
 </div>
@@ -284,15 +318,58 @@ const isPast=s=>s&&D(s)<new Date();
 
 // ================== CODE & SYARIKAT ==================
 const parseCodes=s=>[...new Set(String(s||'').split(/[,;\n]+/).map(x=>x.trim().toUpperCase().replace(/\s+/g,' ')).filter(Boolean))];
-function eligible(codes){
-  if(!codes||!codes.length) return {ok:[],part:[]};
+const CIDB={"B01": "IBS: Sistem Konkrit Pasang Siap", "B02": "IBS: Sistem Kerangka Keluli", "B03": "Pemulihan dan Pemuliharaan", "B04": "Kerja Pembinaan Bangunan", "B05": "Kerja Cerucuk", "B06": "Pembaikan Struktur Konkrit", "B07": "Hiasan Dalaman", "B08": "Pemasangan Kalis Air", "B09": "Lanskap Dalam Bangunan", "B10": "Sistem Paip Air Dalaman", "B11": "Papan Tanda Bangunan", "B12": "Pemasangan Kaca", "B13": "Pemasangan Jubin", "B14": "Kerja-kerja Cat", "B15": "Pemasangan Bumbung", "B16": "Kolam Renang", "B17": "Prestressing & Post-Tensioning", "B18": "Kerja-kerja Logam", "B19": "IBS: Sistem Formwork", "B20": "Sistem Paip Gas Dalaman", "B21": "Pemasangan Perancah", "B22": "IBS: Sistem Blok", "B23": "IBS: Kerangka Kayu", "B24": "Penyenggaraan Bangunan", "B25": "Sambungan Paip Kumbahan", "B26": "Kerja-kerja Meroboh", "B27": "Penyenggaraan Air/Kumbahan", "B28": "Kerja-kerja Ubahsuai", "B29": "Kerja Bangunan Kesihatan", "CE01": "Jalan dan Pavmen", "CE02": "Jambatan dan Jeti", "CE03": "Struktur Marin", "CE04": "Empangan", "CE05": "Terowong & Sokong Bawah", "CE06": "Saliran & Kawalan Banjir", "CE07": "Landasan Rel", "CE08": "Perlindungan Cerun", "CE09": "Paip Utama Minyak/Gas", "CE10": "Kerja Cerucuk", "CE11": "Pembaikan Struktur Konkrit", "CE12": "Penyiasatan Tanah", "CE13": "Pemasangan Papan Iklan", "CE14": "Lanskap Luar Bangunan", "CE15": "Pelantar Minyak dan Gas", "CE16": "Penyenggaraan Struktur Bawah Air", "CE17": "Lapangan Terbang", "CE18": "Tebusguna Tanah", "CE19": "Sistem Pembetungan", "CE20": "Sistem Bekalan Air", "CE21": "Pembinaan Kejuruteraan Awam", "CE22": "Padang Permainan Sintetik", "CE23": "Prestressing & Post-Tensioning", "CE24": "Struktur Menara", "CE25": "Kerja-kerja Meletup", "CE26": "Struktur Berukir", "CE27": "Penebatan Haba/Refractory", "CE28": "Acuan Konkrit Khusus", "CE29": "Pemasangan Perancah", "CE30": "Penstabilan Tanah", "CE31": "Laluan Kabel Bawah Tanah", "CE32": "Penyenggaraan Awam", "CE33": "Telaga Tiub", "CE34": "Pemasangan Konkrit Pratuang", "CE35": "Ujian Konkrit", "CE36": "Kerja-kerja Tanah", "CE37": "Cerobong Stesen Kuasa", "CE38": "Penyenggaraan Pembetungan", "CE39": "Penyenggaraan Bekalan Air", "CE40": "Korekan & Kawalan Hakisan", "CE41": "Takungan Air", "CE42": "Mengecat Jalan", "CE43": "Perabot Jalan", "M01": "Hawa Dingin & Pengedaran Udara", "M02": "Pencegahan Kebakaran", "M03": "Lif dan Eskalator", "M04": "Sistem Automasi Bangunan", "M05": "Sistem Bengkel, Kilang & Kuari", "M06": "Sistem Peralatan Perubatan", "M07": "Sistem Peralatan Dapur", "M08": "Dandang & Tekanan Berapi", "M09": "Pemampatan & Penjanaan", "M10": "Sistem Pendingin Kuasa", "M11": "Rawatan Khusus", "M12": "Loji Khusus", "M13": "Pengerudian Luar Pantai", "M14": "Kawalan Pencemaran", "M15": "Kelengkapan Mekanikal Pelbagai", "M16": "Kren Menara", "M17": "Sistem Peralatan Dobi", "M18": "Sistem Air Panas", "M19": "Pemasangan Kelengkapan Loji", "M20": "Penyenggaraan Mekanikal Am", "M21": "Kerja-kerja Kimpalan", "M22": "Sistem Pam", "M23": "SCADA dan Telemetri", "E01": "Sistem Bunyi", "E02": "Pengawasan & Keselamatan", "E03": "Sistem Automasi Bangunan", "E04": "Voltan Rendah", "E05": "Voltan Tinggi (sehingga 11KV)", "E06": "Sistem Pencahayaan Khas", "E07": "Telekomunikasi Dalaman", "E08": "Telekomunikasi Luaran", "E09": "Peralatan Perubatan", "E10": "Bekalan Kuasa Tanpa Gangguan", "E11": "Kerja Am Elektrik", "E12": "Papan Tanda Elektrik", "E13": "Telekomunikasi Rel", "E14": "Kabel Rangkaian Komputer", "E15": "Lampu Landasan Terbang", "E16": "Lampu Jalan & Isyarat", "E17": "Kabel Bawah Tanah LV", "E18": "Kabel Bawah Tanah (11KV)", "E19": "Kabel Bawah Tanah (33KV)", "E20": "Kabel Bawah Tanah (>33KV)", "E21": "Talian Atas LV", "E22": "Talian Atas (33KV)", "E23": "Talian Atas (>33KV)", "E24": "Pemasangan HV (11-33KV)", "E25": "Pemasangan HV (>33KV)", "E26": "Camtum Kabel LV (1KV)", "E27": "Camtum Kabel (11KV)", "E28": "Camtum Kabel (33KV)", "E29": "Camtum Kabel (66KV)", "E30": "Camtum Kabel (132KV)", "E31": "Camtum Kabel (Tiada Sekatan)", "E32": "Janakuasa LV", "E33": "Janakuasa HV (33KV)", "E34": "Solar PV (sehingga 72kW)", "E35": "Solar PV (>72kW)", "F01": "Fasiliti Bangunan & Infrastruktur Am", "F02": "Fasiliti Bangunan Penjagaan Kesihatan"};
+const CAT={B:'Pembinaan Bangunan (B)',CE:'Kejuruteraan Awam (CE)',M:'Mekanikal (M)',E:'Elektrikal (E)',F:'Fasiliti (F)'};
+const catOf=c=>c.startsWith('CE')?'CE':c[0];
+const gNum=g=>g?parseInt(String(g).replace(/\D/g,''))||0:0;
+const codeName=c=>CIDB[c]||'';
+function eligible(codes,gred){
+  codes=codes||[];
+  if(!codes.length&&!gred) return {ok:[],part:[]};
   const ok=[],part=[];
   C().forEach(c=>{
     const have=parseCodes(c.codes);
     const miss=codes.filter(k=>!have.includes(k));
-    if(!miss.length) ok.push(c); else if(miss.length<codes.length) part.push({c,miss});
+    const gOk=!gred||gNum(c.gred)>=gNum(gred);
+    if(gred&&!gOk) miss.push(c.gred?'Gred '+gred+' (syarikat '+c.gred+')':'Gred '+gred+' (gred syarikat belum diisi)');
+    if(!miss.length) ok.push(c); else if(miss.length<codes.length+(gred?1:0)) part.push({c,miss});
   });
   return {ok,part};
+}
+// ----- pemilih kod -----
+const PK={target:'t',sel:[],cat:''};
+let selT=[],selC=[];
+function chipsHTML(arr,box){
+  return arr.length?arr.map(c=>`<span class="cc" title="${esc(codeName(c))}">${esc(c)} <small>${esc(codeName(c))}</small><button onclick="event.stopPropagation();rmCode('${box}','${c}')">✕</button></span>`).join('')
+    :'<span class="ph0">Tekan untuk pilih kod CIDB…</span>';
+}
+function drawCodes(){ $('fCodesBox').innerHTML=chipsHTML(selT,'t'); $('cCodesBox').innerHTML=chipsHTML(selC,'c'); }
+function rmCode(box,c){ if(box==='t'){selT=selT.filter(x=>x!==c);eligUI()}else selC=selC.filter(x=>x!==c); drawCodes(); }
+function openPick(t){ PK.target=t; PK.sel=[...(t==='t'?selT:selC)]; PK.cat=''; $('pQ').value=''; pickList(); openS('sPick'); setTimeout(()=>$('pList').scrollTop=0,0); }
+function pickList(){
+  const q=$('pQ').value.toLowerCase().trim();
+  $('pCats').innerHTML=[['','Semua'],...Object.entries(CAT).map(([k,v])=>[k,k])].map(([k,v])=>{
+    const n=PK.sel.filter(c=>!k||catOf(c)===k).length;
+    return `<button class="${PK.cat===k?'on':''}" onclick="PK.cat='${k}';pickList()">${v}${n?' · '+n:''}</button>`}).join('');
+  let h='';
+  Object.keys(CAT).forEach(cat=>{
+    if(PK.cat&&PK.cat!==cat)return;
+    const rows=Object.keys(CIDB).filter(c=>catOf(c)===cat&&(!q||c.toLowerCase().includes(q)||CIDB[c].toLowerCase().includes(q)));
+    if(!rows.length)return;
+    h+=`<div class="pcat">${CAT[cat]}</div>`+rows.map(c=>{const on=PK.sel.includes(c);
+      return `<label class="pi ${on?'on':''}" style="margin:0;color:var(--ink)"><input type="checkbox" ${on?'checked':''} onchange="togPick('${c}')"><b>${c}</b><span>${esc(CIDB[c])}</span></label>`}).join('');
+  });
+  // kod lama yang bukan dalam senarai CIDB
+  const extra=PK.sel.filter(c=>!CIDB[c]);
+  if(extra.length&&!PK.cat) h=`<div class="pcat">Kod lain</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">Bukan kod CIDB</span></label>`).join('')+h;
+  $('pList').innerHTML=h||'<div class="emptyrail" style="margin:10px 0">Tiada kod sepadan.</div>';
+  $('pDone').textContent=`Selesai (${PK.sel.length} dipilih)`;
+}
+function togPick(c){ PK.sel=PK.sel.includes(c)?PK.sel.filter(x=>x!==c):[...PK.sel,c]; const st=$('pList').scrollTop; pickList(); $('pList').scrollTop=st; }
+function pickDone(){
+  const sorted=[...PK.sel].sort((a,b)=>Object.keys(CIDB).indexOf(a)-Object.keys(CIDB).indexOf(b));
+  if(PK.target==='t'){selT=sorted;eligUI()}else selC=sorted;
+  drawCodes(); closeS('sPick');
 }
 
 // ================== RENDER ==================
@@ -377,8 +454,8 @@ function card(t,key){
   else if(key==='briefing'){ rows+=kv('Site Briefing','<b>'+fmt(t.briefing)+'</b>'); rows+=kv('Closing',fmtClose(t.closing)); }
   else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',fmtClose(t.closing)); }
   else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
-  const el=eligible(t.codes);
-  const chips=t.codes&&t.codes.length?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):'<span class="chip">Tiada syarikat layak</span>'}</div>`:'';
+  const el=eligible(t.codes,t.gred);
+  const chips=(t.codes&&t.codes.length)||t.gred?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):'<span class="chip">Tiada syarikat layak</span>'}</div>`:'';
   let acts='';
   if(t.type==='invite'&&t.link&&key==='regEnd') acts+=`<a class="btn sec sm" href="${esc(t.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📝 Google Form</a>`;
   if(key==='regEnd') acts+=flagBtn(t,'registered','✓ Sudah Daftar','Tanda Sudah Daftar');
@@ -409,12 +486,12 @@ function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';cle
 // ================== BORANG TENDER ==================
 function typeUI(){$('formLinkBox').style.display=$('fType').value==='invite'?'block':'none'}
 function eligUI(){
-  const codes=parseCodes($('fCodes').value);
-  if(!codes.length){$('eligBox').innerHTML='<span class="muted">Masukkan code dari client — syarikat yang layak akan keluar di sini.</span>';return}
+  const codes=selT, gred=$('fGred').value;
+  if(!codes.length&&!gred){$('eligBox').innerHTML='<span class="muted">Pilih kod CIDB dari client — syarikat yang layak akan keluar di sini.</span>';return}
   if(!C().length){$('eligBox').innerHTML='<span class="muted">Belum ada syarikat. Tambah syarikat & code di tab <b>Setting</b>.</span>';return}
-  const el=eligible(codes);
+  const el=eligible(codes,gred);
   let h=`<div class="muted" style="margin-bottom:4px">Syarikat layak (${el.ok.length})</div>`;
-  h+=el.ok.length?el.ok.map(c=>`<div class="row"><span class="done">✓ ${esc(c.nama)}</span></div>`).join(''):'<div class="row"><span style="color:var(--red)">✗ Tiada syarikat yang ada semua code</span></div>';
+  h+=el.ok.length?el.ok.map(c=>`<div class="row"><span class="done">✓ ${esc(c.nama)}</span></div>`).join(''):'<div class="row"><span style="color:var(--red)">✗ Tiada syarikat yang memenuhi semua syarat</span></div>';
   if(el.part.length) h+=`<div class="muted" style="margin:8px 0 4px">Hampir layak</div>`+el.part.map(p=>`<div class="row"><span>${esc(p.c.nama)}</span><span class="muted">kurang: ${esc(p.miss.join(', '))}</span></div>`).join('');
   $('eligBox').innerHTML=h;
 }
@@ -422,7 +499,7 @@ function openForm(id){
   const t=id?findT(id):null;
   $('fTitle').textContent=t?'Edit Tender':'Tambah Tender';
   $('fId').value=t?.id||''; $('fNama').value=t?.nama||''; $('fType').value=t?.type||'website'; $('fLink').value=t?.link||'';
-  $('fRegS').value=t?.regStart||''; $('fRegE').value=t?.regEnd||''; $('fCodes').value=(t?.codes||[]).join(', ');
+  $('fRegS').value=t?.regStart||''; $('fRegE').value=t?.regEnd||''; selT=[...(t?.codes||[])]; $('fGred').value=t?.gred||''; drawCodes();
   $('fBrief').value=t?.briefing||''; $('fSaleS').value=t?.saleStart||''; $('fSaleE').value=t?.saleEnd||'';
   $('fClose').value=t?.closing||''; $('fNote').value=t?.note||'';
   $('fDel').style.display=t?'inline-flex':'none';
@@ -433,7 +510,7 @@ function saveTender(){
   if(!nama){toast('Sila isi Nama Tender');return}
   if(!closing){toast('Sila isi Tender Closing Date');return}
   const v={nama,type:$('fType').value,link:$('fType').value==='invite'?$('fLink').value.trim():'',
-    regStart:$('fRegS').value,regEnd:$('fRegE').value,codes:parseCodes($('fCodes').value),
+    regStart:$('fRegS').value,regEnd:$('fRegE').value,codes:[...selT],gred:$('fGred').value,
     briefing:$('fBrief').value,saleStart:$('fSaleS').value,saleEnd:$('fSaleE').value,closing,note:$('fNote').value.trim(),updated:Date.now()};
   if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast('Tarikh tamat pendaftaran sebelum tarikh mula');return}
   if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast('Tarikh tamat jualan sebelum tarikh mula');return}
@@ -447,7 +524,7 @@ function delTender(){
 }
 function openDetail(id){
   const t=findT(id); const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
-  const el=eligible(t.codes);
+  const el=eligible(t.codes,t.gred);
   $('dPanel').innerHTML=`<div class="ph"><h2>Butiran Tender</h2><button class="x" onclick="closeS('sDetail')">✕</button></div>
     <div class="card"><div style="margin-bottom:6px">${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'}</div>
       <h2>${esc(t.nama)}</h2>
@@ -459,7 +536,8 @@ function openDetail(id){
       ${t.note?kv('Catatan',esc(t.note)):''}
     </div>
     <div class="card"><h2>Company Code</h2>
-      <div class="chips" style="margin:0 0 10px">${(t.codes||[]).map(c=>`<span class="chip">${esc(c)}</span>`).join('')||'<span class="muted">Tiada code</span>'}</div>
+      ${t.gred?`<div class="kv"><span>Gred minimum</span><span><b>${esc(t.gred)}</b></span></div>`:''}
+      <div class="chips" style="margin:6px 0 10px">${(t.codes||[]).map(c=>`<span class="cc ro">${esc(c)} <small>${esc(codeName(c))}</small></span>`).join('')||'<span class="muted">Tiada kod</span>'}</div>
       <div class="muted">Syarikat layak</div>
       <div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):'<span class="chip">Tiada</span>'}</div>
     </div>
@@ -478,9 +556,9 @@ function settingsHTML(){
   return hero('Setting','Tetapan.','Syarikat & code, peringatan, sync dan backup.',null,'#2b3a33')+`
   <div class="pad">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 Syarikat & Code</h2><button class="btn gold sm" onclick="openCo()">+ Tambah</button></div>
-      <p class="muted">Code ini dipadankan dengan Company Code tender untuk tunjuk syarikat yang layak.</p>
-      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted">${esc(parseCodes(c.codes).join(', ')||'Tiada code')}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada syarikat.</div>'}
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 Syarikat & Kod CIDB</h2><button class="btn gold sm" onclick="openCo()">+ Tambah</button></div>
+      <p class="muted">Gred & kod pengkhususan CIDB setiap syarikat. Dipadankan dengan syarat tender untuk tunjuk syarikat yang layak.</p>
+      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted">${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'Tiada kod')}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada syarikat.</div>'}
     </div>
     <div class="card">
       <h2>🔔 Peringatan</h2>
@@ -506,18 +584,18 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v2.1 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v2.2 · ProKuiz</p>
   </div>`;
 }
 function openCo(id){
   const c=id?findC(id):null;
   $('cTitle').textContent=c?'Edit Syarikat':'Tambah Syarikat';
-  $('cId').value=c?.id||''; $('cNama').value=c?.nama||''; $('cCodes').value=c?parseCodes(c.codes).join(', '):'';
+  $('cId').value=c?.id||''; $('cNama').value=c?.nama||''; selC=c?parseCodes(c.codes):[]; $('cGred').value=c?.gred||''; drawCodes();
   $('cDel').style.display=c?'inline-flex':'none'; openS('sCo');
 }
 function saveCo(){
   const nama=$('cNama').value.trim(); if(!nama){toast('Sila isi nama syarikat');return}
-  const v={nama,codes:parseCodes($('cCodes').value).join(', '),updated:Date.now()};
+  const v={nama,gred:$('cGred').value,codes:selC.join(', '),updated:Date.now()};
   const id=$('cId').value; if(id) Object.assign(findC(id),v); else S.companies.push({id:uid(),...v});
   closeS('sCo'); persist(); toast('Syarikat disimpan ✓');
 }
@@ -594,9 +672,9 @@ const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth(
 function download(n,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()}
 function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.stringify({v:2,...S},null,1),'application/json')}
 function exportCSV(){
-  const h=['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','Company Code','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
+  const h=['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','Gred Min','Kod CIDB','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),(t.codes||[]).join(' / '),eligible(t.codes).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?'Ya':'',t.bought?'Ya':'',t.submitted?'Ya':'',t.note].map(q).join(','));
+  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),t.gred,(t.codes||[]).join(' / '),eligible(t.codes,t.gred).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?'Ya':'',t.bought?'Ya':'',t.submitted?'Ya':'',t.note].map(q).join(','));
   download(`ProTender-${todayStr()}.csv`,'﻿'+h.join(',')+'\n'+rows.join('\n'),'text/csv');
 }
 function importJSON(inp){
