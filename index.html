@@ -1,216 +1,222 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="ms" translate="no" class="notranslate">
 <head>
 <meta charset="UTF-8">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#4f46e5">
-<title>ProTender by ProKuiz</title>
+<meta name="theme-color" content="#0a1210">
+<title>ProTender</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --pri:#4f46e5;--pri2:#7c3aed;--bg:#f1f3fb;--card:#fff;--txt:#1e1b4b;--mut:#6b7280;
-  --red:#ef4444;--amb:#f59e0b;--grn:#10b981;--blu:#3b82f6;--line:#e5e7eb;
+  --bg:#0a1210;--card:#141f1b;--card2:#1b2a24;--ink:#f1ede2;--muted:#93a39b;--line:#25342e;
+  --green:#2fbf8c;--green2:#123528;--gold:#d9b44a;--gold2:#2e2712;
+  --red:#ef6b5c;--red2:#3a1c19;--amber:#e9a640;--amber2:#33270f;--blue:#7aa7f5;--blue2:#16233b;
+  --star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23d9b44a' stroke-width='1'%3E%3Crect x='16' y='16' width='24' height='24'/%3E%3Crect x='16' y='16' width='24' height='24' transform='rotate(45 28 28)'/%3E%3Ccircle cx='28' cy='28' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  --f:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Poppins',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:90px}
-header{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;padding:calc(18px + env(safe-area-inset-top)) 18px 64px;border-radius:0 0 28px 28px;position:relative}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:24px}
-.brand h1{font-size:22px;font-weight:800;letter-spacing:.3px}
-.brand small{display:block;font-size:11px;opacity:.85;font-weight:500}
-.hbtn{position:absolute;right:16px;top:calc(18px + env(safe-area-inset-top));width:42px;height:42px;border-radius:12px;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:20px;cursor:pointer}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:-46px 14px 0;position:relative;z-index:2}
-.stat{background:var(--card);border-radius:16px;padding:12px 10px;text-align:center;box-shadow:0 6px 18px rgba(79,70,229,.12);cursor:pointer;border:2px solid transparent;transition:.2s}
-.stat.on{border-color:var(--pri)}
-.stat b{display:block;font-size:24px;font-weight:800}
-.stat span{font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.stat.r b{color:var(--blu)}.stat.y b{color:var(--amb)}.stat.c b{color:var(--grn)}
-.tabs{display:flex;margin:16px 14px 6px;background:#e0e3f5;border-radius:14px;padding:4px}
-.tabs button{flex:1;border:0;background:none;padding:11px 4px;border-radius:11px;font:600 14px 'Poppins';color:var(--mut);cursor:pointer;transition:.2s}
-.tabs button.on{background:#fff;color:var(--pri);box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.toolbar{display:flex;gap:8px;margin:10px 14px}
-.toolbar input,.toolbar select{flex:1;padding:11px 14px;border-radius:12px;border:1px solid var(--line);font:500 13px 'Poppins';background:#fff;color:var(--txt);min-width:0}
-.toolbar select{flex:0 0 auto}
-#list{padding:4px 14px}
-.empty{text-align:center;color:var(--mut);padding:50px 20px;font-size:14px}
-.empty div{font-size:48px;margin-bottom:8px}
-.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 3px 12px rgba(30,27,75,.06);border-left:5px solid var(--blu);position:relative}
-.card.warn{border-left-color:var(--amb)}.card.urgent{border-left-color:var(--red)}.card.over{border-left-color:#9ca3af}.card.closed{border-left-color:var(--grn)}
-.card .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.card .no{font-size:11px;color:var(--pri);font-weight:700;letter-spacing:.3px}
-.card h3{font-size:15px;font-weight:600;line-height:1.35;margin:2px 0 4px}
-.card .ag{font-size:12px;color:var(--mut)}
-.badge{flex:0 0 auto;text-align:center;border-radius:12px;padding:6px 9px;min-width:62px;background:#eef2ff;color:var(--blu)}
-.badge b{display:block;font-size:18px;font-weight:800;line-height:1}
-.badge small{font-size:10px;font-weight:600}
-.warn .badge{background:#fef3c7;color:#b45309}.urgent .badge{background:#fee2e2;color:var(--red)}.over .badge{background:#f3f4f6;color:#6b7280}.closed .badge{background:#d1fae5;color:#047857}
-.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{font-size:11px;background:#f3f4f6;border-radius:8px;padding:4px 8px;color:#374151;font-weight:500}
-.chip.k{background:#ede9fe;color:#6d28d9}
-.acts{display:flex;gap:8px;margin-top:12px}
-.acts button{flex:1;border:0;border-radius:10px;padding:9px 6px;font:600 12px 'Poppins';cursor:pointer}
-.b-main{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff}
-.b-soft{background:#eef2ff;color:var(--pri)}
-.b-del{background:#fee2e2;color:var(--red);flex:0 0 44px!important}
-.fab{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;font-size:30px;box-shadow:0 8px 22px rgba(79,70,229,.45);cursor:pointer;z-index:20}
-.modal{position:fixed;inset:0;background:rgba(15,13,40,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}
-.modal.show{display:flex}
-.sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease}
-@keyframes up{from{transform:translateY(40px);opacity:0}}
-.sheet h2{font-size:18px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-.sheet h2 button{border:0;background:#f3f4f6;width:34px;height:34px;border-radius:10px;font-size:18px;cursor:pointer}
-.fld{margin-bottom:12px}
-.fld label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:5px}
-.fld input,.fld select,.fld textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);font:500 14px 'Poppins';color:var(--txt);background:#fafafe}
-.fld textarea{min-height:70px;resize:vertical}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.req{color:var(--red)}
-.save{width:100%;border:0;border-radius:14px;padding:14px;font:700 15px 'Poppins';color:#fff;background:linear-gradient(135deg,var(--pri),var(--pri2));cursor:pointer;margin-top:6px}
-.sec{font-size:13px;font-weight:700;color:var(--pri);margin:16px 0 8px;padding-top:12px;border-top:1px dashed var(--line)}
-.sbtn{width:100%;border:0;border-radius:12px;padding:12px;font:600 13px 'Poppins';cursor:pointer;margin-bottom:8px;background:#eef2ff;color:var(--pri)}
-.note{font-size:12px;color:var(--mut);line-height:1.5;margin-bottom:10px}
-.code{font:700 15px monospace;background:#f3f4f6;padding:10px;border-radius:10px;text-align:center;letter-spacing:1px;word-break:break-all;margin-bottom:8px}
-.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#1e1b4b;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;z-index:99;opacity:0;transition:.3s;pointer-events:none;max-width:90%;text-align:center}
-.toast.show{opacity:1}
-.alert{background:#fff;border-radius:20px;max-width:420px;width:92%;padding:20px;margin:auto;align-self:center}
-.alert h2{font-size:17px;margin-bottom:10px}
-.alert ul{list-style:none;max-height:50vh;overflow:auto}
-.alert li{padding:10px;border-radius:10px;background:#fef2f2;margin-bottom:8px;font-size:13px}
-.alert li b{color:var(--red)}
-.detail p{font-size:13px;margin-bottom:8px;display:flex;gap:8px}
-.detail p span:first-child{color:var(--mut);min-width:120px;flex:0 0 120px}
-.sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ca3af;margin-right:6px}
-.sync-dot.on{background:#34d399}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5}
+header{position:sticky;top:0;z-index:5;padding:calc(14px + env(safe-area-inset-top)) 16px 18px;background:linear-gradient(180deg,rgba(10,18,16,.96) 40%,rgba(10,18,16,0));display:flex;align-items:center;gap:10px}
+header .mark{width:36px;height:36px;border-radius:9px;background:var(--gold);display:grid;place-items:center;color:#1b1503;font-weight:800;font-size:18px}
+header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.3px}
+header h1 span{font-weight:400;color:var(--muted);font-size:12px;letter-spacing:0;margin-left:4px}
+.hb{width:40px;height:40px;border-radius:10px;border:0;background:rgba(241,237,226,.08);color:var(--ink);font-size:18px;cursor:pointer;display:grid;place-items:center;position:relative}
+.hb.first{margin-left:auto}
+.hb.add{background:var(--gold);color:#1b1503;font:800 26px var(--f);line-height:1}
+.hb span{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font:800 11px var(--f);display:none;place-items:center}
+main{padding:0 0 100px;max-width:760px;margin:0 auto}
+.pad{margin:0 16px}
+nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,18,16,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;background:none;color:var(--muted);padding:9px 2px 10px;font:500 11px var(--f);display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;position:relative}
+nav button .ic{font-size:20px;line-height:1;filter:grayscale(1);opacity:.7}
+nav button.on{color:var(--ink);font-weight:700}
+nav button.on .ic{filter:none;opacity:1}
+nav button i{position:absolute;top:4px;left:calc(50% + 8px);min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--gold);color:#1b1503;font:800 10px/17px var(--f);font-style:normal}
+/* hero */
+.hero{position:relative;margin-top:-72px;padding:96px 16px 20px;overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(120% 80% at 85% 10%,var(--hc,#0f5a45) 0%,transparent 60%),radial-gradient(90% 70% at 0% 100%,#2a2210 0%,transparent 60%),var(--bg)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:var(--star) 0 0/56px;opacity:.07;mask-image:linear-gradient(180deg,#000 10%,transparent 85%);-webkit-mask-image:linear-gradient(180deg,#000 10%,transparent 85%)}
+.hero .tag{font-size:13px;color:var(--muted)}
+.hero .tag b{color:var(--gold)}
+.hero h2{margin:6px 0 4px;font-size:clamp(38px,11vw,64px);line-height:.95;font-weight:800;letter-spacing:-2px;background-image:linear-gradient(180deg,#fffbe9 0%,#f3dc8e 42%,#c99a2e 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 0 #3a2a08) drop-shadow(0 5px 12px rgba(217,180,74,.32))}
+.hero .sub{font-size:14px;opacity:.86;margin:6px 0 0}
+.hero .stats{display:flex;gap:22px;margin:14px 0 0;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.hero .stats b{display:block;color:var(--ink);font-size:20px;font-variant-numeric:tabular-nums}
+/* komponen */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 12px}
+.card h2{margin:0 0 8px;font-size:17px;font-weight:800}
+.muted{color:var(--muted);font-size:13px}
+.sec-h{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:18px 16px 8px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:4px 16px 12px}
+.seg button{flex:1;border:0;background:var(--bg);color:var(--ink);padding:9px;font:13px var(--f);cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--bg);font-weight:700}
+.search{margin:4px 16px 12px;position:relative}
+.search input{padding-left:38px}
+.search:before{content:"⌕";position:absolute;left:14px;top:10px;color:var(--muted);font-size:18px}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:15px var(--f);min-height:46px}
+input[type=datetime-local]{-webkit-appearance:none;appearance:none;color-scheme:dark}
+textarea{min-height:80px;resize:vertical}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}
+label b{color:var(--red)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.grid2.dt{grid-template-columns:1fr;gap:6px}
+.grid2 small{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.btn{border:0;border-radius:8px;padding:11px 16px;font:700 14px var(--f);background:var(--ink);color:var(--bg);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn.gold{background:var(--gold);color:#1b1503}
+.btn.sec{background:rgba(241,237,226,.1);color:var(--ink)}
+.btn.red{background:var(--red2);color:var(--red)}
+.btn.sm{padding:7px 11px;font-size:13px}
+.btn.full{width:100%}
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.b-ok{background:var(--green2);color:var(--green)}
+.b-no{background:var(--red2);color:var(--red)}
+.b-na{background:var(--line);color:var(--muted)}
+.b-warn{background:var(--amber2);color:var(--amber)}
+.b-gold{background:var(--gold2);color:var(--gold)}
+.b-blue{background:var(--blue2);color:var(--blue)}
+.emptyrail{margin:0 16px;padding:22px 18px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:14px;text-align:center}
+/* kad tender */
+.tc{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 16px 12px;padding:14px;border-left:3px solid var(--green);cursor:pointer}
+.tc.warn{border-left-color:var(--amber)}.tc.hot{border-left-color:var(--red)}.tc.past{border-left-color:var(--line);opacity:.62}
+.tc .t1{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.tc h3{margin:4px 0 0;font-size:15px;font-weight:700;line-height:1.3}
+.cd{flex:none;text-align:center;min-width:64px;border-radius:10px;padding:6px 8px;background:var(--green2);color:var(--green)}
+.cd b{display:block;font-size:20px;line-height:1.05;font-weight:800;font-variant-numeric:tabular-nums}
+.cd small{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.warn .cd{background:var(--amber2);color:var(--amber)}.hot .cd{background:var(--red2);color:var(--red)}.past .cd{background:var(--line);color:var(--muted)}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv span:first-child{color:var(--muted);flex:none}
+.kv span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.tc .kvs{margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:12px;border-radius:999px;padding:3px 10px;background:var(--card2);border:1px solid var(--line)}
+.chip.ok{background:var(--green2);border-color:transparent;color:var(--green);font-weight:700}
+.tc .acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.tc .acts .btn{flex:1}
+.done{color:var(--green);font-weight:700}
+/* sheet */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:20;display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex}
+.sheet .panel{background:var(--bg);width:100%;max-width:760px;max-height:94vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(28px + env(safe-area-inset-bottom));border-top:1px solid var(--line);animation:up .28s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ph h2{margin:0;font-size:19px;font-weight:800}
+.x{width:36px;height:36px;border-radius:10px;border:0;background:rgba(241,237,226,.08);color:var(--ink);font-size:16px;cursor:pointer}
+.elig{margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-size:13px}
+.elig .row{display:flex;justify-content:space-between;gap:8px;padding:4px 0}
+.co{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.co:last-child{border-bottom:0}
+.co b{display:block;font-size:14px}
+.code{font:700 15px ui-monospace,Menlo,monospace;background:var(--card2);padding:10px;border-radius:8px;text-align:center;letter-spacing:1px;word-break:break-all;margin:8px 0}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 0;gap:12px;font-size:14px}
+.toggle input{width:auto;min-height:0;transform:scale(1.3);accent-color:var(--green)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted);margin-right:6px}
+.dot.on{background:var(--green)}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:30;display:none;max-width:90%;text-align:center}
+.al{border-radius:10px;padding:10px 12px;margin:0 0 8px;font-size:13px;background:var(--amber2);border-left:3px solid var(--amber)}
+.al.hot{background:var(--red2);border-left-color:var(--red)}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <div class="logo">📋</div>
-    <div><h1>ProTender</h1><small>by ProKuiz · Peringatan Tender</small></div>
-  </div>
-  <button class="hbtn" onclick="openSettings()" title="Tetapan">⚙️</button>
+  <div class="mark">📋</div>
+  <h1>ProTender<span>by ProKuiz</span></h1>
+  <button class="hb first" id="bell" onclick="openAlerts()" aria-label="Amaran">🔔<span id="bellN"></span></button>
+  <button class="hb add" id="addB" onclick="openForm()" aria-label="Tambah tender">+</button>
 </header>
 
-<div class="stats">
-  <div class="stat r" data-tab="register" onclick="setTab('register')"><b id="cReg">0</b><span>Register</span></div>
-  <div class="stat y" data-tab="buy" onclick="setTab('buy')"><b id="cBuy">0</b><span>Buy</span></div>
-  <div class="stat c" data-tab="close" onclick="setTab('close')"><b id="cClose">0</b><span>Close</span></div>
-</div>
+<main id="main"></main>
 
-<div class="tabs">
-  <button data-tab="register" onclick="setTab('register')">Register</button>
-  <button data-tab="buy" onclick="setTab('buy')">Buy</button>
-  <button data-tab="close" onclick="setTab('close')">Close</button>
-</div>
-
-<div class="toolbar">
-  <input id="q" placeholder="🔍 Cari no. tender / tajuk / agensi" oninput="render()">
-  <select id="sort" onchange="render()">
-    <option value="tutup">Ikut tarikh tutup</option>
-    <option value="baru">Terbaru</option>
-  </select>
-</div>
-
-<div id="list"></div>
-
-<button class="fab" id="fab" onclick="openForm()">+</button>
+<nav id="nav">
+  <button data-t="register" onclick="go('register')"><span class="ic">📝</span>Register<i id="nRegister"></i></button>
+  <button data-t="briefing" onclick="go('briefing')"><span class="ic">🗣️</span>Briefing<i id="nBriefing"></i></button>
+  <button data-t="buy" onclick="go('buy')"><span class="ic">🛒</span>Buy<i id="nBuy"></i></button>
+  <button data-t="closing" onclick="go('closing')"><span class="ic">⏳</span>Closing<i id="nClosing"></i></button>
+  <button data-t="setting" onclick="go('setting')"><span class="ic">⚙️</span>Setting</button>
+</nav>
 
 <!-- Borang tender -->
-<div class="modal" id="mForm" onclick="if(event.target===this)closeM('mForm')">
-  <div class="sheet">
-    <h2><span id="fTitle">Tambah Tender</span><button onclick="closeM('mForm')">✕</button></h2>
+<div class="sheet" id="sForm" onclick="if(event.target===this)closeS('sForm')">
+  <div class="panel">
+    <div class="ph"><h2 id="fTitle">Tambah Tender</h2><button class="x" onclick="closeS('sForm')">✕</button></div>
     <input type="hidden" id="fId">
-    <div class="fld"><label>No. Tender / Sebut Harga <span class="req">*</span></label><input id="fNo" placeholder="cth: JKR/T/2026/015"></div>
-    <div class="fld"><label>Tajuk <span class="req">*</span></label><textarea id="fTajuk" placeholder="Tajuk tender"></textarea></div>
-    <div class="fld"><label>Agensi / Jabatan</label><input id="fAgensi" placeholder="cth: JKR Daerah"></div>
-    <div class="row">
-      <div class="fld"><label>Jenis</label><select id="fJenis"><option>Tender</option><option>Sebut Harga</option><option>Rundingan Terus</option></select></div>
-      <div class="fld"><label>Kategori</label><select id="fKat"><option>Kerja</option><option>Bekalan</option><option>Perkhidmatan</option></select></div>
-    </div>
-    <div class="row">
-      <div class="fld"><label>Tarikh Tutup <span class="req">*</span></label><input type="date" id="fTutup"></div>
-      <div class="fld"><label>Masa Tutup</label><input type="time" id="fMasa" value="12:00"></div>
-    </div>
-    <div class="row">
-      <div class="fld"><label>Tarikh Iklan</label><input type="date" id="fIklan"></div>
-      <div class="fld"><label>Taklimat / Lawatan Tapak</label><input type="datetime-local" id="fTaklimat"></div>
-    </div>
-    <div class="fld"><label>Catatan</label><textarea id="fCatatan" placeholder="Syarat, lokasi hantar, dll."></textarea></div>
-    <button class="save" onclick="saveTender()">💾 Simpan</button>
-  </div>
-</div>
+    <label>Nama Tender <b>*</b></label>
+    <textarea id="fNama" rows="2" placeholder="cth: SCADA AND ICC IMPROVEMENT: MODERNIZATION OF M2M COMMUNICATION"></textarea>
 
-<!-- Beli dokumen -->
-<div class="modal" id="mBuy" onclick="if(event.target===this)closeM('mBuy')">
-  <div class="sheet">
-    <h2><span>Beli Dokumen Tender</span><button onclick="closeM('mBuy')">✕</button></h2>
-    <input type="hidden" id="bId">
-    <p class="note" id="bInfo"></p>
-    <div class="row">
-      <div class="fld"><label>Tarikh Beli</label><input type="date" id="bTarikh"></div>
-      <div class="fld"><label>Harga Dokumen (RM)</label><input type="number" id="bHarga" step="0.01" placeholder="0.00"></div>
+    <label>Tender Type</label>
+    <select id="fType" onchange="typeUI()">
+      <option value="website">Website</option>
+      <option value="invite">Invite</option>
+    </select>
+    <div id="formLinkBox" style="display:none">
+      <label>Link Google Form</label>
+      <input id="fLink" type="url" placeholder="https://forms.gle/...">
     </div>
-    <div class="fld"><label>No. Resit</label><input id="bResit"></div>
-    <button class="save" onclick="saveBuy()">🛒 Sahkan Beli</button>
-  </div>
-</div>
 
-<!-- Tutup -->
-<div class="modal" id="mClose" onclick="if(event.target===this)closeM('mClose')">
-  <div class="sheet">
-    <h2><span>Tutup Tender</span><button onclick="closeM('mClose')">✕</button></h2>
-    <input type="hidden" id="xId">
-    <p class="note" id="xInfo"></p>
-    <div class="fld"><label>Status</label>
-      <select id="xStatus"><option>Dihantar</option><option>Menang</option><option>Kalah</option><option>Tidak Hantar</option><option>Dibatalkan</option></select>
+    <label>Document Registration Period</label>
+    <div class="grid2 dt">
+      <div><small>Mula</small><input type="datetime-local" id="fRegS"></div>
+      <div><small>Tamat</small><input type="datetime-local" id="fRegE"></div>
     </div>
-    <div class="row">
-      <div class="fld"><label>Tarikh</label><input type="date" id="xTarikh"></div>
-      <div class="fld"><label>Harga Ditawar (RM)</label><input type="number" id="xHarga" step="0.01" placeholder="0.00"></div>
+
+    <label>Company Code</label>
+    <input id="fCodes" placeholder="cth: 222301, 221001 (asingkan dengan koma)" oninput="eligUI()">
+    <div class="elig" id="eligBox"></div>
+
+    <label>Site Briefing</label>
+    <input type="datetime-local" id="fBrief">
+
+    <label>Document Sales Period</label>
+    <div class="grid2 dt">
+      <div><small>Mula</small><input type="datetime-local" id="fSaleS"></div>
+      <div><small>Tamat</small><input type="datetime-local" id="fSaleE"></div>
     </div>
-    <div class="fld"><label>Catatan</label><textarea id="xCatatan"></textarea></div>
-    <button class="save" onclick="saveClose()">✅ Tutup</button>
+
+    <label>Tender Closing Date <b>*</b></label>
+    <input type="datetime-local" id="fClose">
+
+    <label>Catatan</label>
+    <textarea id="fNote" placeholder="Pilihan"></textarea>
+
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn red" id="fDel" onclick="delTender()">🗑️</button>
+      <button class="btn gold full" onclick="saveTender()">Simpan Tender</button>
+    </div>
   </div>
 </div>
 
 <!-- Butiran -->
-<div class="modal" id="mDetail" onclick="if(event.target===this)closeM('mDetail')">
-  <div class="sheet">
-    <h2><span>Butiran Tender</span><button onclick="closeM('mDetail')">✕</button></h2>
-    <div class="detail" id="dBody"></div>
+<div class="sheet" id="sDetail" onclick="if(event.target===this)closeS('sDetail')">
+  <div class="panel" id="dPanel"></div>
+</div>
+
+<!-- Syarikat -->
+<div class="sheet" id="sCo" onclick="if(event.target===this)closeS('sCo')">
+  <div class="panel">
+    <div class="ph"><h2 id="cTitle">Tambah Syarikat</h2><button class="x" onclick="closeS('sCo')">✕</button></div>
+    <input type="hidden" id="cId">
+    <label>Nama Syarikat <b>*</b></label>
+    <input id="cNama" placeholder="cth: KUKUSAN LEGACY">
+    <label>Company Code yang dimiliki</label>
+    <textarea id="cCodes" rows="3" placeholder="cth: 222301, 221001, 210103 (asingkan dengan koma)"></textarea>
+    <p class="muted">Syarikat akan dikira <b>layak</b> untuk sesuatu tender bila ia ada semua code yang tender itu minta.</p>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn red" id="cDel" onclick="delCo()">🗑️</button>
+      <button class="btn gold full" onclick="saveCo()">Simpan Syarikat</button>
+    </div>
   </div>
 </div>
 
-<!-- Tetapan -->
-<div class="modal" id="mSet" onclick="if(event.target===this)closeM('mSet')">
-  <div class="sheet">
-    <h2><span>Tetapan</span><button onclick="closeM('mSet')">✕</button></h2>
-    <div class="sec" style="border:0;padding-top:0;margin-top:0">🔔 Peringatan</div>
-    <p class="note">Ingatkan saya sebelum tarikh tutup: 7 hari, 3 hari, 1 hari dan pada hari tutup.</p>
-    <button class="sbtn" onclick="askNotif()">Benarkan Notifikasi</button>
-
-    <div class="sec">☁️ Sync Antara Telefon</div>
-    <p class="note"><span class="sync-dot" id="syncDot"></span><span id="syncTxt">Belum disambung</span></p>
-    <div id="syncBox"></div>
-
-    <div class="sec">💾 Backup</div>
-    <button class="sbtn" onclick="exportJSON()">Eksport Backup (JSON)</button>
-    <button class="sbtn" onclick="exportCSV()">Eksport ke Excel (CSV)</button>
-    <button class="sbtn" onclick="document.getElementById('imp').click()">Import Backup</button>
-    <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
-    <p class="note" style="text-align:center;margin-top:14px">ProTender v1.0 · ProKuiz</p>
-  </div>
-</div>
-
-<!-- Amaran hampir tutup -->
-<div class="modal" id="mAlert" onclick="if(event.target===this)closeM('mAlert')">
-  <div class="alert">
-    <h2>⏰ Tender Hampir Tutup</h2>
-    <ul id="alertList"></ul>
-    <button class="save" onclick="closeM('mAlert')">OK, Faham</button>
+<!-- Amaran -->
+<div class="sheet" id="sAlert" onclick="if(event.target===this)closeS('sAlert')">
+  <div class="panel">
+    <div class="ph"><h2>🔔 Peringatan</h2><button class="x" onclick="closeS('sAlert')">✕</button></div>
+    <p class="muted">Tarikh penting dalam 3 hari akan datang.</p>
+    <div id="alertList"></div>
   </div>
 </div>
 
@@ -220,257 +226,368 @@ header{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;padd
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 // ================== DATA ==================
-const KEY='protender_data_v1', SKEY='protender_sync_code', NKEY='protender_notified';
-let tenders=[]; let tab='register';
+const KEY='protender_v2', SKEY='protender_sync_code';
+let S={tenders:[],companies:[]};
+let tab='register', regView='aktif', closeView='akan';
 const $=id=>document.getElementById(id);
-
-function load(){ try{tenders=JSON.parse(localStorage.getItem(KEY))||[]}catch(e){tenders=[]} }
-function persist(push=true){ localStorage.setItem(KEY,JSON.stringify(tenders)); render(); scheduleNative(); if(push) pushSync(); }
-const live=()=>tenders.filter(t=>!t.deleted);
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmtD=s=>{if(!s)return '-';const d=new Date(s.length<=10?s+'T00:00':s);return d.toLocaleDateString('ms-MY',{day:'numeric',month:'short',year:'numeric'})+(s.length>10?' '+d.toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'}):'')};
-const rm=v=>v?'RM '+Number(v).toLocaleString('ms-MY',{minimumFractionDigits:2}):'-';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 
-function daysLeft(t){
-  const now=new Date(); now.setHours(0,0,0,0);
-  const d=new Date(t.tutup+'T00:00');
-  return Math.round((d-now)/86400000);
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.tenders)S=d}catch(e){} S.companies=S.companies||[];}
+function persist(push=true){localStorage.setItem(KEY,JSON.stringify(S));render();scheduleNative();if(push)pushSync()}
+const T=()=>S.tenders.filter(t=>!t.deleted);
+const C=()=>S.companies.filter(c=>!c.deleted);
+const findT=id=>S.tenders.find(t=>t.id===id);
+const findC=id=>S.companies.find(c=>c.id===id);
+
+// ================== TARIKH ==================
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const D=s=>s?new Date(s):null;
+const p2=n=>String(n).padStart(2,'0');
+function fmt(s){const d=D(s);if(!d||isNaN(d))return '-';return `${p2(d.getDate())}-${MON[d.getMonth()]}-${d.getFullYear()} ${p2(d.getHours())}:${p2(d.getMinutes())}`}
+function fmtClose(s){const d=D(s);if(!d||isNaN(d))return '-';let h=d.getHours(),ap=h>=12?'pm':'am';h=h%12||12;return `${p2(d.getDate())}-${MON[d.getMonth()]}-${d.getFullYear()} (${h}.${p2(d.getMinutes())}${ap})`}
+function fmtRange(a,b){if(!a&&!b)return '-';return `${fmt(a)} to ${fmt(b)}`}
+// kiraan masa berbaki
+function left(s){
+  const d=D(s); if(!d) return null;
+  const ms=d-Date.now();
+  const days=Math.floor(ms/86400000), hrs=Math.floor(ms/3600000);
+  let cls=ms<0?'past':ms<=3*86400000?'hot':ms<=7*86400000?'warn':'';
+  let big,small;
+  if(ms<0){big='✓';small='Lepas'}
+  else if(hrs<24){big=hrs<1?'<1':hrs;small='jam lagi'}
+  else{big=days;small='hari lagi'}
+  return {ms,cls,big,small};
 }
-function closeDT(t){return new Date(t.tutup+'T'+(t.masa||'12:00'))}
+const isPast=s=>s&&D(s)<new Date();
+
+// ================== CODE & SYARIKAT ==================
+const parseCodes=s=>[...new Set(String(s||'').split(/[,;\n]+/).map(x=>x.trim().toUpperCase().replace(/\s+/g,' ')).filter(Boolean))];
+function eligible(codes){
+  if(!codes||!codes.length) return {ok:[],part:[]};
+  const ok=[],part=[];
+  C().forEach(c=>{
+    const have=parseCodes(c.codes);
+    const miss=codes.filter(k=>!have.includes(k));
+    if(!miss.length) ok.push(c); else if(miss.length<codes.length) part.push({c,miss});
+  });
+  return {ok,part};
+}
 
 // ================== RENDER ==================
-function setTab(t){tab=t;render()}
-function render(){
-  document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
-  const L=live();
-  $('cReg').textContent=L.filter(t=>t.stage==='register').length;
-  $('cBuy').textContent=L.filter(t=>t.stage==='buy').length;
-  $('cClose').textContent=L.filter(t=>t.stage==='close').length;
-  $('fab').style.display=tab==='register'?'block':'none';
-
-  const q=$('q').value.toLowerCase().trim();
-  let arr=L.filter(t=>t.stage===tab).filter(t=>!q||[t.no,t.tajuk,t.agensi].join(' ').toLowerCase().includes(q));
-  if($('sort').value==='baru') arr.sort((a,b)=>b.created-a.created);
-  else arr.sort((a,b)=>tab==='close'?closeDT(b)-closeDT(a):closeDT(a)-closeDT(b));
-
-  if(!arr.length){
-    const msg={register:['📝','Tiada tender didaftar.<br>Tekan <b>+</b> untuk tambah tender.'],buy:['🛒','Tiada dokumen tender dibeli lagi.<br>Tekan <b>Beli</b> pada tender di tab Register.'],close:['📁','Tiada tender ditutup lagi.']}[tab];
-    $('list').innerHTML=`<div class="empty"><div>${msg[0]}</div>${msg[1]}</div>`;return;
-  }
-  $('list').innerHTML=arr.map(card).join('');
+function go(t){tab=t;window.scrollTo(0,0);render()}
+function hero(tag,title,sub,stats,hc){
+  return `<section class="hero" style="--hc:${hc||'#0f5a45'}">
+    <div class="tag">✦ <b>${tag}</b></div><h2>${title}</h2><p class="sub">${sub}</p>
+    ${stats?`<div class="stats">${stats.map(s=>`<div><b>${s[0]}</b>${s[1]}</div>`).join('')}</div>`:''}
+  </section>`;
 }
-function card(t){
-  const dl=daysLeft(t); let cls='', badge='';
-  if(t.stage==='close'){cls='closed';badge=`<b>✓</b><small>${esc(t.close?.status||'Tutup')}</small>`}
-  else{
-    cls=dl<0?'over':dl<=3?'urgent':dl<=7?'warn':'';
-    badge=dl<0?`<b>!</b><small>Lepas tutup</small>`:dl===0?`<b>HARI</b><small>INI</small>`:`<b>${dl}</b><small>hari lagi</small>`;
+function lists(){
+  const all=T(), now=new Date();
+  const notClosed=t=>!isPast(t.closing);
+  return {
+    regAktif: all.filter(t=>notClosed(t)&&!(t.regEnd&&isPast(t.regEnd))).sort((a,b)=>(D(a.regEnd)||D(a.closing))-(D(b.regEnd)||D(b.closing))),
+    regAll: [...all].sort((a,b)=>b.created-a.created),
+    brief: all.filter(t=>t.briefing).sort((a,b)=>D(a.briefing)-D(b.briefing)),
+    buy: all.filter(t=>t.regEnd&&isPast(t.regEnd)&&notClosed(t)).sort((a,b)=>(D(a.saleEnd)||D(a.closing))-(D(b.saleEnd)||D(b.closing))),
+    close: all.filter(t=>t.closing).sort((a,b)=>D(a.closing)-D(b.closing)),
+  };
+}
+function render(){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+  $('addB').style.display=tab==='register'?'grid':'none';
+  const L=lists();
+  const upBrief=L.brief.filter(t=>!isPast(t.briefing)), upClose=L.close.filter(t=>!isPast(t.closing));
+  const badge=(id,n)=>{$(id).textContent=n||'';$(id).style.display=n?'block':'none'};
+  badge('nRegister',L.regAktif.length);badge('nBriefing',upBrief.length);badge('nBuy',L.buy.length);badge('nClosing',upClose.length);
+  const al=alerts(); $('bellN').textContent=al.length; $('bellN').style.display=al.length?'grid':'none';
+
+  let h='';
+  if(tab==='register'){
+    h+=hero('Register','Daftar tender.','Tekan <b>+</b> di atas untuk tambah tender baru.',[[L.regAktif.length,'Dalam pendaftaran'],[T().length,'Jumlah tender'],[C().length,'Syarikat']]);
+    h+=`<div class="search"><input id="q" placeholder="Cari nama tender" value="${esc(window._q||'')}" oninput="window._q=this.value;renderList()"></div>`;
+    h+=`<div class="seg"><button class="${regView==='aktif'?'on':''}" onclick="regView='aktif';render()">Aktif</button><button class="${regView==='semua'?'on':''}" onclick="regView='semua';render()">Semua</button></div>`;
+    h+=`<div id="lst"></div>`;
+  }else if(tab==='briefing'){
+    h+=hero('Site Briefing','Taklimat tapak.','Senarai tender yang ada site briefing / lawatan tapak.',[[upBrief.length,'Akan datang'],[L.brief.length-upBrief.length,'Sudah lepas']],'#1d3f6b');
+    h+=`<div id="lst"></div>`;
+  }else if(tab==='buy'){
+    h+=hero('Document Sales','Beli dokumen.','Tender yang tempoh pendaftaran sudah tamat — masa untuk beli dokumen.',[[L.buy.length,'Perlu tindakan'],[L.buy.filter(t=>t.bought).length,'Sudah beli']],'#5a3d0f');
+    h+=`<div id="lst"></div>`;
+  }else if(tab==='closing'){
+    h+=hero('Closing Date','Tarikh tutup.','Semua tender ikut tarikh tutup.',[[upClose.length,'Belum tutup'],[upClose.filter(t=>left(t.closing).cls==='hot').length,'≤ 3 hari'],[L.close.length-upClose.length,'Sudah tutup']],'#5a1f1a');
+    h+=`<div class="seg"><button class="${closeView==='akan'?'on':''}" onclick="closeView='akan';render()">Akan Tutup</button><button class="${closeView==='lepas'?'on':''}" onclick="closeView='lepas';render()">Sudah Tutup</button></div>`;
+    h+=`<div id="lst"></div>`;
+  }else{
+    h+=settingsHTML();
   }
-  let chips=`<span class="chip">📅 Tutup: ${fmtD(t.tutup)} ${t.masa?esc(t.masa):''}</span><span class="chip k">${esc(t.jenis)} · ${esc(t.kat)}</span>`;
-  if(t.taklimat) chips+=`<span class="chip">🗣️ Taklimat: ${fmtD(t.taklimat)}</span>`;
-  if(t.buy) chips+=`<span class="chip">🛒 Beli ${fmtD(t.buy.tarikh)} · ${rm(t.buy.harga)}</span>`;
-  if(t.close?.harga) chips+=`<span class="chip">💰 Tawaran ${rm(t.close.harga)}</span>`;
+  $('main').innerHTML=h;
+  if(tab!=='setting') renderList();
+}
+function renderList(){
+  const L=lists(); let arr=[], key='closing', empty='';
+  if(tab==='register'){
+    arr=regView==='aktif'?L.regAktif:L.regAll; key='regEnd';
+    const q=(window._q||'').toLowerCase().trim(); if(q) arr=arr.filter(t=>t.nama.toLowerCase().includes(q));
+    empty=T().length?'Tiada tender dalam tempoh pendaftaran. Lihat <b>Semua</b>.':'Belum ada tender.<br>Tekan <b>+</b> di kanan atas untuk tambah.';
+  }else if(tab==='briefing'){
+    const up=L.brief.filter(t=>!isPast(t.briefing)), past=L.brief.filter(t=>isPast(t.briefing)).reverse();
+    if(!L.brief.length){$('lst').innerHTML=`<div class="emptyrail">Tiada tender dengan site briefing.</div>`;return}
+    $('lst').innerHTML=(up.length?up.map(t=>card(t,'briefing')).join(''):`<div class="emptyrail">Tiada briefing akan datang.</div>`)
+      +(past.length?`<div class="sec-h">Sudah lepas</div>`+past.map(t=>card(t,'briefing')).join(''):'');
+    return;
+  }else if(tab==='buy'){
+    arr=L.buy; key='saleEnd'; empty='Tiada tender dalam fasa beli dokumen.<br>Tender akan muncul di sini bila tempoh pendaftaran tamat.';
+  }else if(tab==='closing'){
+    arr=closeView==='akan'?L.close.filter(t=>!isPast(t.closing)):L.close.filter(t=>isPast(t.closing)).reverse();
+    empty=closeView==='akan'?'Tiada tender yang akan tutup.':'Tiada tender yang sudah tutup.';
+  }
+  $('lst').innerHTML=arr.length?arr.map(t=>card(t,key)).join(''):`<div class="emptyrail">${empty}</div>`;
+}
+function card(t,key){
+  // tarikh utama untuk kiraan
+  let ref=t[key]||t.closing, refLbl={regEnd:'Tamat daftar',briefing:'Briefing',saleEnd:'Tamat jualan',closing:'Tutup'}[t[key]?key:'closing'];
+  if(key==='saleEnd'&&t.saleEnd&&isPast(t.saleEnd)){ref=t.closing;refLbl='Tutup'}
+  const l=left(ref)||{cls:'',big:'-',small:''};
+  const typ=t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>';
+  let rows='';
+  const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
+  if(key==='regEnd'){ rows+=kv('Registration',fmtRange(t.regStart,t.regEnd)); rows+=kv('Closing',fmtClose(t.closing)); }
+  else if(key==='briefing'){ rows+=kv('Site Briefing','<b>'+fmt(t.briefing)+'</b>'); rows+=kv('Closing',fmtClose(t.closing)); }
+  else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',fmtClose(t.closing)); }
+  else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
+  const el=eligible(t.codes);
+  const chips=t.codes&&t.codes.length?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):'<span class="chip">Tiada syarikat layak</span>'}</div>`:'';
   let acts='';
-  if(t.stage==='register') acts=`<button class="b-main" onclick="openBuy('${t.id}')">🛒 Beli</button><button class="b-soft" onclick="openForm('${t.id}')">✏️ Edit</button>`;
-  else if(t.stage==='buy') acts=`<button class="b-main" onclick="openClose('${t.id}')">✅ Tutup</button><button class="b-soft" onclick="openForm('${t.id}')">✏️ Edit</button><button class="b-soft" onclick="moveBack('${t.id}')">↩️</button>`;
-  else acts=`<button class="b-soft" onclick="openDetail('${t.id}')">📄 Butiran</button><button class="b-soft" onclick="moveBack('${t.id}')">↩️ Buka Semula</button>`;
-  acts+=`<button class="b-del" onclick="delTender('${t.id}')">🗑️</button>`;
-  return `<div class="card ${cls}">
-    <div class="top" onclick="openDetail('${t.id}')">
-      <div><div class="no">${esc(t.no)}</div><h3>${esc(t.tajuk)}</h3><div class="ag">🏢 ${esc(t.agensi||'-')}</div></div>
-      <div class="badge">${badge}</div>
-    </div>
-    <div class="meta">${chips}</div>
-    <div class="acts">${acts}</div>
+  if(t.type==='invite'&&t.link&&key==='regEnd') acts+=`<a class="btn sec sm" href="${esc(t.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📝 Google Form</a>`;
+  if(key==='regEnd') acts+=flagBtn(t,'registered','✓ Sudah Daftar','Tanda Sudah Daftar');
+  if(key==='saleEnd') acts+=flagBtn(t,'bought','✓ Sudah Beli','Tanda Sudah Beli');
+  if(key==='briefing'&&!isPast(t.briefing)) acts+=flagBtn(t,'briefed','✓ Akan Hadir','Tanda Akan Hadir');
+  if(key==='closing'&&!isPast(t.closing)) acts+=flagBtn(t,'submitted','✓ Sudah Hantar','Tanda Sudah Hantar');
+  return `<div class="tc ${l.cls}" onclick="openDetail('${t.id}')">
+    <div class="t1"><div>${typ}<h3>${esc(t.nama)}</h3></div>
+      <div class="cd"><b>${l.big}</b><small>${l.small}</small></div></div>
+    <div class="kvs">${rows}</div>${chips}
+    ${acts?`<div class="acts">${acts}</div>`:''}
   </div>`;
 }
+function flagBtn(t,f,on,off){return `<button class="btn ${t[f]?'sec':'gold'} sm" onclick="event.stopPropagation();toggleFlag('${t.id}','${f}')">${t[f]?on:off}</button>`}
+function toggleFlag(id,f){const t=findT(id);t[f]=!t[f];t.updated=Date.now();persist()}
+function saleStatus(t){
+  if(!t.saleStart&&!t.saleEnd) return '<span class="badge b-na">Tiada tarikh</span>';
+  if(t.saleStart&&!isPast(t.saleStart)) return '<span class="badge b-blue">Belum buka</span>';
+  if(t.saleEnd&&isPast(t.saleEnd)) return '<span class="badge b-no">Jualan tamat</span>';
+  return '<span class="badge b-ok">Sedang dijual</span>';
+}
 
-// ================== MODALS ==================
-function openM(id){$(id).classList.add('show')}
-function closeM(id){$(id).classList.remove('show')}
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200)}
-const find=id=>tenders.find(t=>t.id===id);
+// ================== SHEET ==================
+function openS(id){$(id).classList.add('on')}
+function closeS(id){$(id).classList.remove('on')}
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2200)}
 
+// ================== BORANG TENDER ==================
+function typeUI(){$('formLinkBox').style.display=$('fType').value==='invite'?'block':'none'}
+function eligUI(){
+  const codes=parseCodes($('fCodes').value);
+  if(!codes.length){$('eligBox').innerHTML='<span class="muted">Masukkan code dari client — syarikat yang layak akan keluar di sini.</span>';return}
+  if(!C().length){$('eligBox').innerHTML='<span class="muted">Belum ada syarikat. Tambah syarikat & code di tab <b>Setting</b>.</span>';return}
+  const el=eligible(codes);
+  let h=`<div class="muted" style="margin-bottom:4px">Syarikat layak (${el.ok.length})</div>`;
+  h+=el.ok.length?el.ok.map(c=>`<div class="row"><span class="done">✓ ${esc(c.nama)}</span></div>`).join(''):'<div class="row"><span style="color:var(--red)">✗ Tiada syarikat yang ada semua code</span></div>';
+  if(el.part.length) h+=`<div class="muted" style="margin:8px 0 4px">Hampir layak</div>`+el.part.map(p=>`<div class="row"><span>${esc(p.c.nama)}</span><span class="muted">kurang: ${esc(p.miss.join(', '))}</span></div>`).join('');
+  $('eligBox').innerHTML=h;
+}
 function openForm(id){
-  const t=id?find(id):null;
+  const t=id?findT(id):null;
   $('fTitle').textContent=t?'Edit Tender':'Tambah Tender';
-  $('fId').value=t?.id||'';
-  $('fNo').value=t?.no||''; $('fTajuk').value=t?.tajuk||''; $('fAgensi').value=t?.agensi||'';
-  $('fJenis').value=t?.jenis||'Tender'; $('fKat').value=t?.kat||'Kerja';
-  $('fTutup').value=t?.tutup||''; $('fMasa').value=t?.masa||'12:00';
-  $('fIklan').value=t?.iklan||''; $('fTaklimat').value=t?.taklimat||''; $('fCatatan').value=t?.catatan||'';
-  openM('mForm');
+  $('fId').value=t?.id||''; $('fNama').value=t?.nama||''; $('fType').value=t?.type||'website'; $('fLink').value=t?.link||'';
+  $('fRegS').value=t?.regStart||''; $('fRegE').value=t?.regEnd||''; $('fCodes').value=(t?.codes||[]).join(', ');
+  $('fBrief').value=t?.briefing||''; $('fSaleS').value=t?.saleStart||''; $('fSaleE').value=t?.saleEnd||'';
+  $('fClose').value=t?.closing||''; $('fNote').value=t?.note||'';
+  $('fDel').style.display=t?'inline-flex':'none';
+  typeUI(); eligUI(); closeS('sDetail'); openS('sForm');
 }
 function saveTender(){
-  const no=$('fNo').value.trim(), tajuk=$('fTajuk').value.trim(), tutup=$('fTutup').value;
-  if(!no||!tajuk||!tutup){toast('Sila isi No. Tender, Tajuk dan Tarikh Tutup');return}
-  const data={no,tajuk,agensi:$('fAgensi').value.trim(),jenis:$('fJenis').value,kat:$('fKat').value,tutup,masa:$('fMasa').value,iklan:$('fIklan').value,taklimat:$('fTaklimat').value,catatan:$('fCatatan').value.trim(),updated:Date.now()};
+  const nama=$('fNama').value.trim(), closing=$('fClose').value;
+  if(!nama){toast('Sila isi Nama Tender');return}
+  if(!closing){toast('Sila isi Tender Closing Date');return}
+  const v={nama,type:$('fType').value,link:$('fType').value==='invite'?$('fLink').value.trim():'',
+    regStart:$('fRegS').value,regEnd:$('fRegE').value,codes:parseCodes($('fCodes').value),
+    briefing:$('fBrief').value,saleStart:$('fSaleS').value,saleEnd:$('fSaleE').value,closing,note:$('fNote').value.trim(),updated:Date.now()};
+  if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast('Tarikh tamat pendaftaran sebelum tarikh mula');return}
+  if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast('Tarikh tamat jualan sebelum tarikh mula');return}
   const id=$('fId').value;
-  if(id) Object.assign(find(id),data);
-  else tenders.push({id:uid(),stage:'register',created:Date.now(),...data});
-  closeM('mForm'); persist(); toast(id?'Tender dikemas kini':'Tender didaftar ✓');
+  if(id) Object.assign(findT(id),v); else S.tenders.push({id:uid(),created:Date.now(),...v});
+  closeS('sForm'); persist(); toast(id?'Tender dikemas kini':'Tender ditambah ✓');
 }
-function openBuy(id){
-  const t=find(id); $('bId').value=id; $('bInfo').innerHTML=`<b>${esc(t.no)}</b><br>${esc(t.tajuk)}`;
-  $('bTarikh').value=t.buy?.tarikh||todayStr(); $('bHarga').value=t.buy?.harga||''; $('bResit').value=t.buy?.resit||'';
-  openM('mBuy');
-}
-function saveBuy(){
-  const t=find($('bId').value);
-  t.buy={tarikh:$('bTarikh').value,harga:$('bHarga').value,resit:$('bResit').value.trim()};
-  t.stage='buy'; t.updated=Date.now();
-  closeM('mBuy'); persist(); toast('Dipindah ke tab Buy 🛒');
-}
-function openClose(id){
-  const t=find(id); $('xId').value=id; $('xInfo').innerHTML=`<b>${esc(t.no)}</b><br>${esc(t.tajuk)}`;
-  $('xStatus').value=t.close?.status||'Dihantar'; $('xTarikh').value=t.close?.tarikh||todayStr();
-  $('xHarga').value=t.close?.harga||''; $('xCatatan').value=t.close?.catatan||'';
-  openM('mClose');
-}
-function saveClose(){
-  const t=find($('xId').value);
-  t.close={status:$('xStatus').value,tarikh:$('xTarikh').value,harga:$('xHarga').value,catatan:$('xCatatan').value.trim()};
-  t.stage='close'; t.updated=Date.now();
-  closeM('mClose'); persist(); toast('Dipindah ke tab Close ✅');
-}
-function moveBack(id){
-  const t=find(id); const prev=t.stage==='close'?'buy':'register';
-  if(!confirm(`Pindah semula ke tab ${prev==='buy'?'Buy':'Register'}?`))return;
-  t.stage=prev; t.updated=Date.now(); persist(); toast('Dipindah semula');
-}
-function delTender(id){
-  const t=find(id); if(!confirm(`Padam tender ${t.no}?`))return;
-  t.deleted=true; t.updated=Date.now(); persist(); toast('Tender dipadam');
+function delTender(){
+  const t=findT($('fId').value); if(!t||!confirm('Padam tender ini?'))return;
+  t.deleted=true;t.updated=Date.now();closeS('sForm');persist();toast('Tender dipadam');
 }
 function openDetail(id){
-  const t=find(id);
-  const p=(k,v)=>`<p><span>${k}</span><span>${v}</span></p>`;
-  let h=p('No. Tender','<b>'+esc(t.no)+'</b>')+p('Tajuk',esc(t.tajuk))+p('Agensi',esc(t.agensi||'-'))+p('Jenis / Kategori',esc(t.jenis)+' · '+esc(t.kat))
-    +p('Tarikh Iklan',fmtD(t.iklan))+p('Taklimat / Lawatan',fmtD(t.taklimat))+p('Tarikh Tutup','<b>'+fmtD(t.tutup)+' '+esc(t.masa||'')+'</b>')+p('Catatan',esc(t.catatan||'-'));
-  if(t.buy) h+='<div class="sec">🛒 Pembelian Dokumen</div>'+p('Tarikh Beli',fmtD(t.buy.tarikh))+p('Harga',rm(t.buy.harga))+p('No. Resit',esc(t.buy.resit||'-'));
-  if(t.close) h+='<div class="sec">✅ Penutupan</div>'+p('Status','<b>'+esc(t.close.status)+'</b>')+p('Tarikh',fmtD(t.close.tarikh))+p('Harga Ditawar',rm(t.close.harga))+p('Catatan',esc(t.close.catatan||'-'));
-  $('dBody').innerHTML=h; openM('mDetail');
+  const t=findT(id); const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
+  const el=eligible(t.codes);
+  $('dPanel').innerHTML=`<div class="ph"><h2>Butiran Tender</h2><button class="x" onclick="closeS('sDetail')">✕</button></div>
+    <div class="card"><div style="margin-bottom:6px">${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'}</div>
+      <h2>${esc(t.nama)}</h2>
+      ${kv('Registration',fmtRange(t.regStart,t.regEnd))}
+      ${kv('Site Briefing',fmt(t.briefing))}
+      ${kv('Sales Period',fmtRange(t.saleStart,t.saleEnd))}
+      ${kv('Closing Date','<b>'+fmtClose(t.closing)+'</b>')}
+      ${t.type==='invite'?kv('Google Form',t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:var(--gold)">Buka link</a>`:'-'):''}
+      ${t.note?kv('Catatan',esc(t.note)):''}
+    </div>
+    <div class="card"><h2>Company Code</h2>
+      <div class="chips" style="margin:0 0 10px">${(t.codes||[]).map(c=>`<span class="chip">${esc(c)}</span>`).join('')||'<span class="muted">Tiada code</span>'}</div>
+      <div class="muted">Syarikat layak</div>
+      <div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):'<span class="chip">Tiada</span>'}</div>
+    </div>
+    <div class="card"><h2>Status</h2>
+      ${kv('Daftar',t.registered?'<span class="done">✓ Sudah</span>':'Belum')}
+      ${kv('Beli dokumen',t.bought?'<span class="done">✓ Sudah</span>':'Belum')}
+      ${kv('Hantar',t.submitted?'<span class="done">✓ Sudah</span>':'Belum')}
+    </div>
+    <button class="btn gold full" onclick="openForm('${t.id}')">✏️ Edit Tender</button>`;
+  openS('sDetail');
 }
+
+// ================== SETTING ==================
+function settingsHTML(){
+  const co=C().sort((a,b)=>a.nama.localeCompare(b.nama));
+  return hero('Setting','Tetapan.','Syarikat & code, peringatan, sync dan backup.',null,'#2b3a33')+`
+  <div class="pad">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 Syarikat & Code</h2><button class="btn gold sm" onclick="openCo()">+ Tambah</button></div>
+      <p class="muted">Code ini dipadankan dengan Company Code tender untuk tunjuk syarikat yang layak.</p>
+      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted">${esc(parseCodes(c.codes).join(', ')||'Tiada code')}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada syarikat.</div>'}
+    </div>
+    <div class="card">
+      <h2>🔔 Peringatan</h2>
+      <p class="muted">Bila app dibuka, loceng 🔔 tunjuk tarikh penting dalam 3 hari (tamat daftar, briefing, tamat jualan, closing).</p>
+      <button class="btn sec full" onclick="askNotif()">Benarkan Notifikasi</button>
+    </div>
+    <div class="card">
+      <h2>☁️ Sync Antara Telefon</h2>
+      <p class="muted"><span class="dot ${syncCode()?'on':''}" id="syncDot"></span><span id="syncTxt">${syncCode()?'Disambung':'Belum disambung'}</span></p>
+      ${syncCode()?`<p class="muted">Masukkan kod ini di telefon lain untuk kongsi data. Jangan kongsi dengan orang luar.</p>
+        <div class="code">${syncCode()}</div>
+        <div style="display:flex;gap:8px"><button class="btn sec full" onclick="copyCode()">📋 Salin Kod</button><button class="btn red" onclick="stopSync()">Putus</button></div>`
+      :`<button class="btn gold full" onclick="startSync()">✨ Cipta Kod Sync Baru</button>
+        <label>Atau sambung guna kod dari telefon lain</label>
+        <div style="display:flex;gap:8px"><input id="joinCode" placeholder="Kod 20 aksara"><button class="btn sec" onclick="joinSync()">Sambung</button></div>`}
+    </div>
+    <div class="card">
+      <h2>💾 Backup</h2>
+      <div style="display:grid;gap:8px">
+        <button class="btn sec full" onclick="exportJSON()">Eksport Backup (JSON)</button>
+        <button class="btn sec full" onclick="exportCSV()">Eksport ke Excel (CSV)</button>
+        <button class="btn sec full" onclick="$('imp').click()">Import Backup</button>
+        <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
+      </div>
+    </div>
+    <p class="muted" style="text-align:center">ProTender v2.0 · ProKuiz</p>
+  </div>`;
+}
+function openCo(id){
+  const c=id?findC(id):null;
+  $('cTitle').textContent=c?'Edit Syarikat':'Tambah Syarikat';
+  $('cId').value=c?.id||''; $('cNama').value=c?.nama||''; $('cCodes').value=c?parseCodes(c.codes).join(', '):'';
+  $('cDel').style.display=c?'inline-flex':'none'; openS('sCo');
+}
+function saveCo(){
+  const nama=$('cNama').value.trim(); if(!nama){toast('Sila isi nama syarikat');return}
+  const v={nama,codes:parseCodes($('cCodes').value).join(', '),updated:Date.now()};
+  const id=$('cId').value; if(id) Object.assign(findC(id),v); else S.companies.push({id:uid(),...v});
+  closeS('sCo'); persist(); toast('Syarikat disimpan ✓');
+}
+function delCo(){const c=findC($('cId').value);if(!c||!confirm('Padam syarikat '+c.nama+'?'))return;c.deleted=true;c.updated=Date.now();closeS('sCo');persist()}
 
 // ================== PERINGATAN ==================
+function alerts(){
+  const out=[], now=Date.now(), lim=3*86400000;
+  T().forEach(t=>{
+    [['regEnd','Tamat pendaftaran',!t.registered],['briefing','Site briefing',true],['saleEnd','Tamat jualan dokumen',!t.bought],['closing','Tender closing',!t.submitted]].forEach(([k,lbl,need])=>{
+      if(!t[k]||!need)return; const ms=D(t[k])-now; if(ms>=0&&ms<=lim) out.push({t,k,lbl,ms});
+    });
+  });
+  return out.sort((a,b)=>a.ms-b.ms);
+}
+function openAlerts(){
+  const a=alerts();
+  $('alertList').innerHTML=a.length?a.map(x=>{const l=left(x.t[x.k]);return `<div class="al ${x.ms<86400000?'hot':''}" onclick="closeS('sAlert');openDetail('${x.t.id}')"><b>${x.lbl} · ${l.big} ${l.small}</b><br>${esc(x.t.nama)}<br><span class="muted">${x.k==='closing'?fmtClose(x.t[x.k]):fmt(x.t[x.k])}</span></div>`}).join(''):'<div class="emptyrail" style="margin:0">Tiada tarikh penting dalam 3 hari. 👍</div>';
+  openS('sAlert');
+}
 const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const LN=()=>window.Capacitor?.Plugins?.LocalNotifications;
-
-function checkDue(){
-  const due=live().filter(t=>t.stage!=='close').map(t=>({t,d:daysLeft(t)})).filter(x=>x.d>=0&&x.d<=3).sort((a,b)=>a.d-b.d);
-  if(!due.length)return;
-  $('alertList').innerHTML=due.map(({t,d})=>`<li><b>${d===0?'HARI INI':d+' hari lagi'}</b> — ${esc(t.no)}<br>${esc(t.tajuk)}<br><small>Tutup: ${fmtD(t.tutup)} ${esc(t.masa||'')} · ${t.stage==='buy'?'Dokumen dah dibeli':'Belum beli dokumen'}</small></li>`).join('');
-  openM('mAlert');
-  // Notifikasi browser (sekali sehari setiap tender)
-  if(!isNative() && 'Notification' in window && Notification.permission==='granted'){
-    let sent={}; try{sent=JSON.parse(localStorage.getItem(NKEY))||{}}catch(e){}
-    const day=todayStr();
-    due.forEach(({t,d})=>{ const k=t.id+day; if(sent[k])return; sent[k]=1;
-      new Notification('ProTender: '+(d===0?'Tutup HARI INI':d+' hari lagi'),{body:t.no+' — '+t.tajuk}); });
-    localStorage.setItem(NKEY,JSON.stringify(sent));
-  }
-}
 async function askNotif(){
-  if(isNative()&&LN()){ const r=await LN().requestPermissions(); toast(r.display==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak'); scheduleNative(); return; }
+  if(isNative()&&LN()){const r=await LN().requestPermissions();toast(r.display==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');scheduleNative();return}
   if(!('Notification' in window)){toast('Browser ini tak sokong notifikasi');return}
-  const p=await Notification.requestPermission(); toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');
+  const p=await Notification.requestPermission();toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');
 }
-// APK: jadual notifikasi tempatan (7, 3, 1 hari & hari tutup, jam 8 pagi)
 function hashId(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)%100000}
-async function scheduleNative(){
+async function scheduleNative(){ // untuk APK nanti: 1 hari & 2 jam sebelum setiap tarikh
   if(!isNative()||!LN())return;
   try{
     const pend=await LN().getPending(); if(pend.notifications.length) await LN().cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
-    const list=[]; const now=Date.now();
-    live().filter(t=>t.stage!=='close').forEach(t=>{
-      [7,3,1,0].forEach((d,i)=>{
-        const at=new Date(t.tutup+'T08:00'); at.setDate(at.getDate()-d);
-        if(at.getTime()>now) list.push({id:hashId(t.id)*10+i,title:d?`ProTender: ${d} hari lagi`:'ProTender: Tutup HARI INI',body:`${t.no} — ${t.tajuk}`,schedule:{at,allowWhileIdle:true}});
+    const list=[],now=Date.now();
+    T().forEach(t=>[['regEnd','Tamat daftar'],['briefing','Site briefing'],['saleEnd','Tamat jualan'],['closing','Closing']].forEach(([k,lbl],i)=>{
+      if(!t[k])return; [[86400000,'esok'],[7200000,'2 jam lagi']].forEach(([off,txt],j)=>{
+        const at=new Date(D(t[k]).getTime()-off); if(at.getTime()>now) list.push({id:hashId(t.id)*10+i*2+j,title:`ProTender: ${lbl} ${txt}`,body:t.nama,schedule:{at,allowWhileIdle:true}});
       });
-    });
+    }));
     if(list.length) await LN().schedule({notifications:list.slice(0,60)});
   }catch(e){console.log(e)}
 }
 
 // ================== SYNC FIREBASE ==================
 const firebaseConfig={apiKey:"AIzaSyAi5O-7iD9E67Gc_mLLW726_ms5EkmV-5U",authDomain:"ar-trading-b246f.firebaseapp.com",projectId:"ar-trading-b246f",storageBucket:"ar-trading-b246f.firebasestorage.app",messagingSenderId:"252959184778",appId:"1:252959184778:web:f0eb94f71a56941ffb1a73"};
-let db=null, unsub=null, pushTimer=null;
-try{ firebase.initializeApp(firebaseConfig); db=firebase.firestore(); }catch(e){console.log('Firebase off',e)}
+let db=null,unsub=null,pushTimer=null;
+try{firebase.initializeApp(firebaseConfig);db=firebase.firestore()}catch(e){console.log('Firebase off',e)}
 const syncCode=()=>localStorage.getItem(SKEY)||'';
-function newCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';let s='';const a=crypto.getRandomValues(new Uint8Array(20));a.forEach(x=>s+=c[x%c.length]);return s}
-
-function merge(remote){
-  const map={}; tenders.forEach(t=>map[t.id]=t);
-  let changed=false;
-  (remote||[]).forEach(r=>{ const l=map[r.id]; if(!l||(r.updated||0)>(l.updated||0)){map[r.id]=r;changed=true} });
-  tenders=Object.values(map); return changed;
-}
+function newCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';let s='';crypto.getRandomValues(new Uint8Array(20)).forEach(x=>s+=c[x%c.length]);return s}
+function mergeArr(local,remote){const m={};local.forEach(x=>m[x.id]=x);(remote||[]).forEach(r=>{const l=m[r.id];if(!l||(r.updated||0)>(l.updated||0))m[r.id]=r});return Object.values(m)}
+function setSync(ok,msg){const d=$('syncDot'),t=$('syncTxt');if(d)d.classList.toggle('on',!!ok);if(t)t.textContent=msg||(ok?'Disambung · data disync':'Belum disambung')}
 function pushSync(){
-  if(!db||!syncCode())return;
-  clearTimeout(pushTimer);
-  pushTimer=setTimeout(()=>{
-    db.collection('ptender').doc(syncCode()).set({data:JSON.stringify(tenders),updated:Date.now()})
-      .then(()=>setSyncUI(true)).catch(e=>{setSyncUI(false,'Gagal sync: '+e.code)});
-  },800);
+  if(!db||!syncCode())return; clearTimeout(pushTimer);
+  pushTimer=setTimeout(()=>db.collection('ptender').doc(syncCode()).set({data:JSON.stringify({v:2,...S}),updated:Date.now()}).then(()=>setSync(true)).catch(e=>setSync(false,'Gagal sync: '+e.code)),800);
 }
 function listen(){
-  if(unsub){unsub();unsub=null}
-  if(!db||!syncCode())return;
+  if(unsub){unsub();unsub=null} if(!db||!syncCode())return;
   unsub=db.collection('ptender').doc(syncCode()).onSnapshot(s=>{
-    setSyncUI(true);
-    if(!s.exists){pushSync();return}
-    let r=[];try{r=JSON.parse(s.data().data)}catch(e){}
-    const before=JSON.stringify(tenders);
-    merge(r);
-    if(JSON.stringify(tenders)!==before){ localStorage.setItem(KEY,JSON.stringify(tenders)); render(); scheduleNative(); }
-    if(r.length!==tenders.length||JSON.stringify(r)!==JSON.stringify(tenders)) pushSync();
-  },e=>setSyncUI(false,'Gagal sync: '+e.code));
+    setSync(true); if(!s.exists){pushSync();return}
+    let r={};try{r=JSON.parse(s.data().data)}catch(e){} if(!r||!r.tenders){pushSync();return}
+    const before=JSON.stringify(S);
+    S.tenders=mergeArr(S.tenders,r.tenders); S.companies=mergeArr(S.companies,r.companies);
+    const after=JSON.stringify(S);
+    if(after!==before){localStorage.setItem(KEY,after);render();scheduleNative()}
+    if(after!==JSON.stringify({tenders:r.tenders,companies:r.companies||[]})) pushSync();
+  },e=>setSync(false,'Gagal sync: '+e.code));
 }
-function setSyncUI(ok,msg){
-  $('syncDot').classList.toggle('on',!!ok&&!!syncCode());
-  $('syncTxt').textContent=msg||(syncCode()?(ok?'Disambung · data disync':'Menyambung…'):'Belum disambung');
-}
-function syncBoxUI(){
-  const c=syncCode();
-  $('syncBox').innerHTML=c?`
-    <p class="note">Kod sync telefon ini. Masukkan kod yang sama di telefon lain untuk kongsi data. <b>Jangan kongsi dengan orang lain.</b></p>
-    <div class="code">${c}</div>
-    <button class="sbtn" onclick="copyCode()">📋 Salin Kod</button>
-    <button class="sbtn" onclick="stopSync()" style="background:#fee2e2;color:#ef4444">Putuskan Sync</button>`:`
-    <p class="note">Sync supaya data tender sama di semua telefon.</p>
-    <button class="sbtn" onclick="startSync()">✨ Cipta Kod Sync Baru</button>
-    <div class="fld"><input id="joinCode" placeholder="Atau tampal kod 20 aksara dari telefon lain"></div>
-    <button class="sbtn" onclick="joinSync()">🔗 Sambung Guna Kod</button>`;
-  setSyncUI(!!c);
-}
-function startSync(){ if(!db){toast('Tiada internet / Firebase');return} localStorage.setItem(SKEY,newCode()); syncBoxUI(); listen(); pushSync(); toast('Sync dihidupkan ✓'); }
-function joinSync(){ const c=$('joinCode').value.trim(); if(c.length!==20){toast('Kod mesti 20 aksara');return} localStorage.setItem(SKEY,c); syncBoxUI(); listen(); toast('Disambung ✓'); }
-function stopSync(){ if(!confirm('Putuskan sync? Data dalam telefon ini kekal.'))return; localStorage.removeItem(SKEY); if(unsub)unsub(); syncBoxUI(); }
-function copyCode(){ navigator.clipboard?.writeText(syncCode()).then(()=>toast('Kod disalin')).catch(()=>toast(syncCode())); }
-function openSettings(){ syncBoxUI(); openM('mSet'); }
+function startSync(){if(!db){toast('Tiada internet / Firebase');return}localStorage.setItem(SKEY,newCode());listen();pushSync();render();toast('Sync dihidupkan ✓')}
+function joinSync(){const c=$('joinCode').value.trim();if(c.length!==20){toast('Kod mesti 20 aksara');return}localStorage.setItem(SKEY,c);listen();render();toast('Disambung ✓')}
+function stopSync(){if(!confirm('Putuskan sync? Data dalam telefon ini kekal.'))return;localStorage.removeItem(SKEY);if(unsub)unsub();render()}
+function copyCode(){navigator.clipboard?.writeText(syncCode()).then(()=>toast('Kod disalin')).catch(()=>toast(syncCode()))}
 
 // ================== BACKUP ==================
-function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click()}
-function exportJSON(){ download(`ProTender-backup-${todayStr()}.json`,JSON.stringify(tenders,null,1),'application/json'); }
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
+function download(n,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()}
+function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.stringify({v:2,...S},null,1),'application/json')}
 function exportCSV(){
-  const h=['Tab','No Tender','Tajuk','Agensi','Jenis','Kategori','Tarikh Tutup','Masa','Taklimat','Tarikh Beli','Harga Dokumen','Status Tutup','Harga Ditawar','Catatan'];
+  const h=['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','Company Code','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=live().map(t=>[t.stage,t.no,t.tajuk,t.agensi,t.jenis,t.kat,t.tutup,t.masa,t.taklimat,t.buy?.tarikh,t.buy?.harga,t.close?.status,t.close?.harga,t.catatan].map(q).join(','));
+  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),(t.codes||[]).join(' / '),eligible(t.codes).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?'Ya':'',t.bought?'Ya':'',t.submitted?'Ya':'',t.note].map(q).join(','));
   download(`ProTender-${todayStr()}.csv`,'﻿'+h.join(',')+'\n'+rows.join('\n'),'text/csv');
 }
 function importJSON(inp){
-  const f=inp.files[0]; if(!f)return;
-  f.text().then(txt=>{ const arr=JSON.parse(txt); if(!Array.isArray(arr))throw 0; merge(arr); persist(); toast('Import berjaya ✓'); })
-   .catch(()=>toast('Fail tidak sah')); inp.value='';
+  const f=inp.files[0];if(!f)return;
+  f.text().then(x=>{const d=JSON.parse(x);if(!d.tenders)throw 0;S.tenders=mergeArr(S.tenders,d.tenders);S.companies=mergeArr(S.companies,d.companies||[]);persist();toast('Import berjaya ✓')}).catch(()=>toast('Fail tidak sah'));inp.value='';
 }
 
 // ================== MULA ==================
 load(); render();
 if(syncCode()) listen();
-setTimeout(checkDue,600);
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden){render()} });
+setInterval(()=>{if(tab!=='setting'&&!document.querySelector('.sheet.on'))render()},60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
 if(isNative()) scheduleNative();
 </script>
 </body>
