@@ -18,11 +18,9 @@ service cloud.firestore {
       return request.auth != null
         && request.auth.uid in ['7BtMVHkbk9aUmudtKPvM2vAuz9z2'];
     }
-    match /pt_tenders/{id} {
-      allow read, write: if isProTender();
-    }
-    match /pt_companies/{id} {
-      allow read, write: if isProTender();
+    // Semua koleksi ProTender bermula dengan "pt_" (pt_tenders, pt_companies, pt_span, ...)
+    match /{coll}/{id} {
+      allow read, write: if coll.matches('pt_.*') && isProTender();
     }
 
     // ---------- ProIklan ----------

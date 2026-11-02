@@ -35,6 +35,7 @@ header h1 span{font-weight:400;color:var(--muted);font-size:12px;letter-spacing:
 .hb.first{margin-left:auto}
 .instb{margin-left:auto;height:40px;border:0;border-radius:10px;padding:0 12px;background:var(--gold);color:#1b1503;font:800 13px var(--f);cursor:pointer;white-space:nowrap}
 .instb+.hb.first{margin-left:0}
+body.ins header h1{font-size:18px}
 ol.ins{padding-left:20px;margin:10px 0}ol.ins li{margin-bottom:8px}
 .hb.add{background:var(--gold);color:#1b1503;font:800 26px var(--f);line-height:1}
 .hb span{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font:800 11px var(--f);display:none;place-items:center}
@@ -163,11 +164,20 @@ label b{color:var(--red)}
 .sw span{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:.2s;cursor:pointer}
 .sw span:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:var(--ink);transition:.2s}
 .sw input:checked+span{background:var(--green)}.sw input:checked+span:before{transform:translateX(20px)}
+.r3{display:grid;gap:6px;margin-top:8px}
+.rt{display:flex;align-items:center;gap:10px;background:var(--card2);border-radius:10px;padding:6px 8px}
+.rt .rn{font-size:13px;color:var(--muted);flex:1}.rt input[type=time]{width:130px;min-height:38px;height:38px;padding:6px 8px;color-scheme:dark}
+.rt.dim input[type=time]{opacity:.4}
+.sw.sm{width:38px;height:22px}.sw.sm span:before{width:16px;height:16px}.sw.sm input:checked+span:before{transform:translateX(16px)}
+.rc.off .r3{opacity:.4;pointer-events:none}
 .rchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .rchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border-radius:999px;padding:5px 6px 5px 11px;background:var(--green2);color:var(--green)}
 .rchip button{border:0;background:rgba(0,0,0,.25);color:inherit;width:18px;height:18px;border-radius:50%;font-size:11px;line-height:18px;padding:0;cursor:pointer}
 .radd{display:flex;gap:6px;margin-top:8px}.radd select{flex:1.4}.radd input{flex:1}.radd .btn{flex:none}
 .rc.off .rchips,.rc.off .radd{opacity:.4;pointer-events:none}
+.hi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer}
+.hi h4{margin:4px 0 6px;font-size:14px;line-height:1.3}
+.hi .hm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 </style>
 </head>
@@ -194,7 +204,8 @@ label b{color:var(--red)}
   <img class="mark" src="icons/icon-192.png" alt="">
   <h1>ProTender<span>by ProKuiz</span></h1>
   <button class="instb" id="instB" onclick="installApp()" style="display:none">⬇ Pasang</button>
-  <button class="hb first" id="bell" onclick="openAlerts()" aria-label="Amaran">🔔<span id="bellN"></span></button>
+  <button class="hb first" id="histB" onclick="openHist()" aria-label="History">🗂️</button>
+  <button class="hb" id="bell" onclick="openAlerts()" aria-label="Amaran">🔔<span id="bellN"></span></button>
   <button class="hb add" id="addB" onclick="openForm()" aria-label="Tambah tender">+</button>
 </header>
 
@@ -209,7 +220,7 @@ label b{color:var(--red)}
 </nav>
 
 <!-- Borang tender -->
-<div class="sheet" id="sForm" onclick="if(event.target===this)closeS('sForm')">
+<div class="sheet" id="sForm" style="z-index:23" onclick="if(event.target===this)closeS('sForm')">
   <div class="panel">
     <div class="ph"><h2 id="fTitle">Tambah Tender</h2><button class="x" onclick="closeS('sForm')">✕</button></div>
     <input type="hidden" id="fId">
@@ -233,7 +244,7 @@ label b{color:var(--red)}
     </div>
 
     <label>Jenis Kod Bidang</label>
-    <div class="seg" style="margin:0" id="fKind"><button type="button" data-k="cidb" onclick="setKind('cidb')">CIDB</button><button type="button" data-k="mof" onclick="setKind('mof')">MOF</button></div>
+    <div class="seg" style="margin:0" id="fKind"><button type="button" data-k="cidb" onclick="setKind('cidb')">CIDB</button><button type="button" data-k="mof" onclick="setKind('mof')">MOF</button><button type="button" data-k="span" onclick="setKind('span')">SPAN</button></div>
     <div id="gredBox"><label>Gred CIDB Minimum</label>
     <select id="fGred" onchange="eligUI()"><option value="">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select></div>
     <label id="fCodesLbl">Company Code (Kod Pengkhususan CIDB)</label>
@@ -263,7 +274,7 @@ label b{color:var(--red)}
 </div>
 
 <!-- Butiran -->
-<div class="sheet" id="sDetail" onclick="if(event.target===this)closeS('sDetail')">
+<div class="sheet" id="sDetail" style="z-index:22" onclick="if(event.target===this)closeS('sDetail')">
   <div class="panel" id="dPanel"></div>
 </div>
 
@@ -280,10 +291,38 @@ label b{color:var(--red)}
     <div class="cpick" id="cCodesBox" onclick="openPick('c')"></div>
     <label>Kod Bidang MOF yang dimiliki</label>
     <div class="cpick" id="cMofBox" onclick="openPick('cm')"></div>
-    <p class="muted">Syarikat dikira <b>layak</b> bila ia ada <b>semua</b> kod (CIDB atau MOF) yang tender minta. Untuk tender CIDB, gred syarikat juga mesti sama atau lebih tinggi daripada gred minimum.</p>
+    <label>Jenis SPAN yang dimiliki</label>
+    <div class="cpick" id="cSpanBox" onclick="openPick('cs')"></div>
+    <p class="muted">Syarikat dikira <b>layak</b> bila ia ada <b>semua</b> kod (CIDB, MOF atau SPAN) yang tender minta. Untuk tender CIDB, gred syarikat juga mesti sama atau lebih tinggi daripada gred minimum.</p>
     <div style="display:flex;gap:10px;margin-top:14px">
       <button class="btn red" id="cDel" onclick="delCo()">🗑️</button>
       <button class="btn gold full" onclick="saveCo()">Simpan Syarikat</button>
+    </div>
+  </div>
+</div>
+
+<!-- History -->
+<div class="sheet" id="sHist" onclick="if(event.target===this)closeS('sHist')">
+  <div class="panel">
+    <div class="ph"><h2>🗂️ History</h2><button class="x" onclick="closeS('sHist')">✕</button></div>
+    <p class="muted" id="hSub">Tender yang tarikh closing sudah tamat.</p>
+    <input id="hQ" placeholder="Cari nama tender" oninput="histList()" style="margin-top:6px">
+    <div id="hList" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- Jenis SPAN -->
+<div class="sheet" id="sSpan" onclick="if(event.target===this)closeS('sSpan')">
+  <div class="panel">
+    <div class="ph"><h2 id="sTitle">Tambah Jenis SPAN</h2><button class="x" onclick="closeS('sSpan')">✕</button></div>
+    <input type="hidden" id="sId">
+    <label>Kod / Singkatan <b>*</b></label>
+    <input id="sCode" placeholder="cth: SPAN-A1">
+    <label>Nama / Keterangan <b>*</b></label>
+    <input id="sNama" placeholder="cth: Kontraktor Paip Air">
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn red" id="sDel" onclick="delSpan()">🗑️</button>
+      <button class="btn gold full" onclick="saveSpan()">Simpan</button>
     </div>
   </div>
 </div>
@@ -329,14 +368,14 @@ label b{color:var(--red)}
 // ================== DATA ==================
 const KEY='protender_v2';
 let USER=null;
-let S={tenders:[],companies:[]};
+let S={tenders:[],companies:[],span:[]};
 let tab='register', regView='aktif', closeView='akan';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 
 const cacheKey=()=>KEY+'_'+(USER?USER.uid:'');
-function load(){S={tenders:[],companies:[]};try{const d=JSON.parse(localStorage.getItem(cacheKey()));if(d&&d.tenders)S=d}catch(e){} S.companies=S.companies||[];}
+function load(){S={tenders:[],companies:[]};try{const d=JSON.parse(localStorage.getItem(cacheKey()));if(d&&d.tenders)S=d}catch(e){} S.companies=S.companies||[];S.span=S.span||[];}
 function cache(){try{localStorage.setItem(cacheKey(),JSON.stringify(S))}catch(e){}}
 function persist(){cache();render();scheduleNative()}
 const T=()=>S.tenders.filter(t=>!t.deleted);
@@ -374,16 +413,21 @@ const MOF={"010101":["Bahan Bacaan Terbitan Luar Negara","Penerbitan"],"010102":
 const MOFB={"01": "Penerbitan & Penyiaran", "02": "Perabot, Alat Pejabat, Hiasan Dalaman & Domestik", "03": "Sukan, Rekreasi & Alat Muzik", "04": "Makanan, Minuman & Bahan Mentah", "05": "Peralatan & Ubat Hospital", "06": "Cecair & Serbuk Kimia", "07": "Pertanian, Perhutanan & Ternakan", "08": "Kejuruteraan Awam & Kemudahan Awam", "09": "Bahan Binaan & Keselamatan Jalan Raya", "10": "Peralatan Sukatan & Ukuran", "11": "Pengangkutan, Komponen & Aksesori", "12": "Pertahanan & Keselamatan", "13": "Peralatan Kejuruteraan & Mesin Pengeluaran", "14": "Kejuruteraan Elektrik & Elektronik", "21": "ICT", "22": "Perkhidmatan"};
 const isMof=c=>/^\d{6}$/.test(c);
 const ORDER=[...Object.keys(CIDB),...Object.keys(MOF)];
+const KINDS={cidb:'CIDB',mof:'MOF',span:'SPAN'};
+const kindOf=t=>t.kind||((t.codes||[]).length&&(t.codes||[]).every(isMof)?'mof':'cidb');
 const gNum=g=>g?parseInt(String(g).replace(/\D/g,''))||0:0;
-const codeName=c=>CIDB[c]||(MOF[c]?(MOF[c][0].startsWith('Pembuat')?MOF[c][0]+' – '+MOF[c][1]:MOF[c][0]):'');
+const SPN=()=>(S.span||[]).slice().sort((a,b)=>a.code.localeCompare(b.code,undefined,{numeric:true}));
+const spanName=c=>{const x=(S.span||[]).find(v=>v.code===c);return x?x.nama:''};
+const codeName=c=>spanName(c)&&!CIDB[c]&&!MOF[c]?spanName(c):CIDB[c]||(MOF[c]?(MOF[c][0].startsWith('Pembuat')?MOF[c][0]+' – '+MOF[c][1]:MOF[c][0]):'');
 const short=(t,n=34)=>t.length>n?t.slice(0,n-1)+'…':t;
-function eligible(codes,gred){
-  codes=codes||[];
+function eligible(codes,gred,kind){
+  codes=codes||[]; kind=kind||((codes.length&&codes.every(isMof))?'mof':'cidb');
   if(!codes.length&&!gred) return {ok:[],part:[]};
   const ok=[],part=[];
   C().forEach(c=>{
-    const have=[...parseCodes(c.codes),...parseCodes(c.mof)];
+    const have=parseCodes(kind==='mof'?c.mof:kind==='span'?c.span:c.codes);
     const miss=codes.filter(k=>!have.includes(k));
+    if(kind!=='cidb') gred='';
     const gOk=!gred||gNum(c.gred)>=gNum(gred);
     if(gred&&!gOk) miss.push(c.gred?'Gred '+gred+' (syarikat '+c.gred+')':'Gred '+gred+' (gred syarikat belum diisi)');
     if(!miss.length) ok.push(c); else if(miss.length<codes.length+(gred?1:0)) part.push({c,miss});
@@ -392,13 +436,14 @@ function eligible(codes,gred){
 }
 // ----- pemilih kod -----
 const PK={target:'t',sel:[],cat:''};
-let selT=[],selC=[],selCM=[],kindT='cidb';
+let selT=[],selC=[],selCM=[],selCS=[],kindT='cidb';
 function chipsHTML(arr,box,ph){
   return arr.length?arr.map(c=>`<span class="cc" title="${esc(codeName(c))}">${esc(c)} <small>${esc(short(codeName(c)))}</small><button onclick="event.stopPropagation();rmCode('${box}','${c}')">✕</button></span>`).join('')
     :`<span class="ph0">${ph}</span>`;
 }
 function drawCodes(){
-  $('fCodesBox').innerHTML=chipsHTML(selT,'t',kindT==='mof'?'Tekan untuk pilih kod bidang MOF…':'Tekan untuk pilih kod CIDB…');
+  $('fCodesBox').innerHTML=chipsHTML(selT,'t',{cidb:'Tekan untuk pilih kod CIDB…',mof:'Tekan untuk pilih kod bidang MOF…',span:'Tekan untuk pilih jenis SPAN…'}[kindT]);
+  $('cSpanBox').innerHTML=chipsHTML(selCS,'cs','Tekan untuk pilih jenis SPAN…');
   $('cCodesBox').innerHTML=chipsHTML(selC,'c','Tekan untuk pilih kod CIDB…');
   $('cMofBox').innerHTML=chipsHTML(selCM,'cm','Tekan untuk pilih kod MOF…');
 }
@@ -407,22 +452,23 @@ function setKind(k){
   if(k!==kindT) selT=[];
   kindT=k;
   document.querySelectorAll('#fKind button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
-  $('gredBox').style.display=k==='cidb'?'block':'none'; if(k==='mof') $('fGred').value='';
-  $('fCodesLbl').textContent=k==='mof'?'Company Code (Kod Bidang MOF)':'Company Code (Kod Pengkhususan CIDB)';
+  $('gredBox').style.display=k==='cidb'?'block':'none'; if(k!=='cidb') $('fGred').value='';
+  $('fCodesLbl').textContent={cidb:'Company Code (Kod Pengkhususan CIDB)',mof:'Company Code (Kod Bidang MOF)',span:'Company Code (Jenis SPAN)'}[k];
   drawCodes(); eligUI();
 }
-const pickArr=t=>t==='t'?selT:t==='c'?selC:selCM;
-function rmCode(box,c){ if(box==='t'){selT=selT.filter(x=>x!==c);eligUI()}else if(box==='c')selC=selC.filter(x=>x!==c);else selCM=selCM.filter(x=>x!==c); drawCodes(); }
+const pickArr=t=>t==='t'?selT:t==='c'?selC:t==='cs'?selCS:selCM;
+function rmCode(box,c){ if(box==='t'){selT=selT.filter(x=>x!==c);eligUI()}else if(box==='c')selC=selC.filter(x=>x!==c);else if(box==='cs')selCS=selCS.filter(x=>x!==c);else selCM=selCM.filter(x=>x!==c); drawCodes(); }
 function openPick(t){
-  PK.target=t; PK.type=(t==='cm'||(t==='t'&&kindT==='mof'))?'mof':'cidb';
+  PK.target=t; PK.type=t==='cm'?'mof':t==='cs'?'span':t==='c'?'cidb':kindT;
   PK.sel=[...pickArr(t)]; PK.cat=''; $('pQ').value='';
-  $('pTitle').textContent=PK.type==='mof'?'Kod Bidang MOF':'Kod Pengkhususan CIDB';
-  $('pQ').placeholder=PK.type==='mof'?'Cari kod atau bidang, cth: 210104 / ICT':'Cari kod atau bidang, cth: CE21 / SCADA';
-  $('pCats').style.display=PK.type==='mof'?'none':'flex'; $('pCatSel').style.display=PK.type==='mof'?'block':'none';
+  $('pTitle').textContent={mof:'Kod Bidang MOF',cidb:'Kod Pengkhususan CIDB',span:'Jenis SPAN'}[PK.type];
+  $('pQ').placeholder={mof:'Cari kod atau bidang, cth: 210104 / ICT',cidb:'Cari kod atau bidang, cth: CE21 / SCADA',span:'Cari jenis SPAN'}[PK.type];
+  $('pCats').style.display=PK.type==='cidb'?'flex':'none'; $('pCatSel').style.display=PK.type==='mof'?'block':'none';
   pickList(); openS('sPick'); setTimeout(()=>$('pList').scrollTop=0,0);
 }
 function pickList(){
   if(PK.type==='mof') return pickListMof();
+  if(PK.type==='span') return pickListSpan();
   const q=$('pQ').value.toLowerCase().trim();
   $('pCats').innerHTML=[['','Semua'],...Object.entries(CAT).map(([k,v])=>[k,k])].map(([k,v])=>{
     const n=PK.sel.filter(c=>!k||catOf(c)===k).length;
@@ -457,10 +503,20 @@ function pickListMof(){
   $('pList').innerHTML=h||'<div class="emptyrail" style="margin:10px 0">Tiada kod sepadan.</div>';
   $('pDone').textContent=`Selesai (${PK.sel.length} dipilih)`;
 }
+function pickListSpan(){
+  const q=$('pQ').value.toLowerCase().trim(), all=SPN();
+  const rows=all.filter(x=>!q||x.code.toLowerCase().includes(q)||x.nama.toLowerCase().includes(q));
+  let h=rows.map(x=>{const on=PK.sel.includes(x.code);return `<label class="pi ${on?'on':''}" style="margin:0;color:var(--ink)"><input type="checkbox" ${on?'checked':''} onchange="togPick('${esc(x.code)}')"><b>${esc(x.code)}</b><span>${esc(x.nama)}</span></label>`}).join('');
+  const extra=PK.sel.filter(c=>!all.some(x=>x.code===c));
+  if(extra.length) h=`<div class="pcat">Jenis lama (sudah dipadam)</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">Tiada dalam senarai</span></label>`).join('')+h;
+  $('pList').innerHTML=h||`<div class="emptyrail" style="margin:10px 0">${all.length?'Tiada jenis sepadan.':'Belum ada jenis SPAN.<br>Tambah di <b>Setting → Jenis SPAN</b>.'}</div>`;
+  $('pDone').textContent=`Selesai (${PK.sel.length} dipilih)`;
+}
 function togPick(c){ PK.sel=PK.sel.includes(c)?PK.sel.filter(x=>x!==c):[...PK.sel,c]; const st=$('pList').scrollTop; pickList(); $('pList').scrollTop=st; }
 function pickDone(){
-  const sorted=[...PK.sel].sort((a,b)=>ORDER.indexOf(a)-ORDER.indexOf(b));
-  if(PK.target==='t'){selT=sorted;eligUI()}else if(PK.target==='c')selC=sorted;else selCM=sorted;
+  const ord=PK.type==='span'?SPN().map(x=>x.code):ORDER;
+  const sorted=[...PK.sel].sort((a,b)=>ord.indexOf(a)-ord.indexOf(b));
+  if(PK.target==='t'){selT=sorted;eligUI()}else if(PK.target==='c')selC=sorted;else if(PK.target==='cs')selCS=sorted;else selCM=sorted;
   drawCodes(); closeS('sPick');
 }
 
@@ -477,7 +533,7 @@ function lists(){
   const notClosed=t=>!isPast(t.closing);
   return {
     regAktif: all.filter(t=>notClosed(t)&&!(t.regEnd&&isPast(t.regEnd))).sort((a,b)=>(D(a.regEnd)||D(a.closing))-(D(b.regEnd)||D(b.closing))),
-    regAll: [...all].sort((a,b)=>b.created-a.created),
+    regAll: all.filter(notClosed).sort((a,b)=>b.created-a.created),
     brief: all.filter(t=>t.briefing).sort((a,b)=>D(a.briefing)-D(b.briefing)),
     buy: all.filter(t=>t.regEnd&&isPast(t.regEnd)&&notClosed(t)).sort((a,b)=>(D(a.saleEnd)||D(a.closing))-(D(b.saleEnd)||D(b.closing))),
     close: all.filter(t=>t.closing).sort((a,b)=>D(a.closing)-D(b.closing)),
@@ -505,8 +561,7 @@ function render(){
     h+=hero('Document Sales','Beli dokumen.','Tender yang tempoh pendaftaran sudah tamat — masa untuk beli dokumen.',[[L.buy.length,'Perlu tindakan'],[L.buy.filter(t=>t.bought).length,'Sudah beli']],'#5a3d0f');
     h+=`<div id="lst"></div>`;
   }else if(tab==='closing'){
-    h+=hero('Closing Date','Tarikh tutup.','Semua tender ikut tarikh tutup.',[[upClose.length,'Belum tutup'],[upClose.filter(t=>left(t.closing).cls==='hot').length,'≤ 3 hari'],[L.close.length-upClose.length,'Sudah tutup']],'#5a1f1a');
-    h+=`<div class="seg"><button class="${closeView==='akan'?'on':''}" onclick="closeView='akan';render()">Akan Tutup</button><button class="${closeView==='lepas'?'on':''}" onclick="closeView='lepas';render()">Sudah Tutup</button></div>`;
+    h+=hero('Closing Date','Tarikh tutup.','Tender yang belum tutup. Tender yang sudah tamat ada dalam 🗂️ History.',[[upClose.length,'Belum tutup'],[upClose.filter(t=>left(t.closing).cls==='hot').length,'≤ 3 hari'],[L.close.length-upClose.length,'Dalam History']],'#5a1f1a');
     h+=`<div id="lst"></div>`;
   }else{
     h+=settingsHTML();
@@ -529,8 +584,8 @@ function renderList(){
   }else if(tab==='buy'){
     arr=L.buy; key='saleEnd'; empty='Tiada tender dalam fasa beli dokumen.<br>Tender akan muncul di sini bila tempoh pendaftaran tamat.';
   }else if(tab==='closing'){
-    arr=closeView==='akan'?L.close.filter(t=>!isPast(t.closing)):L.close.filter(t=>isPast(t.closing)).reverse();
-    empty=closeView==='akan'?'Tiada tender yang akan tutup.':'Tiada tender yang sudah tutup.';
+    arr=L.close.filter(t=>!isPast(t.closing));
+    empty='Tiada tender yang akan tutup.';
   }
   $('lst').innerHTML=arr.length?arr.map(t=>card(t,key)).join(''):`<div class="emptyrail">${empty}</div>`;
 }
@@ -546,7 +601,7 @@ function card(t,key){
   else if(key==='briefing'){ rows+=kv('Site Briefing','<b>'+fmt(t.briefing)+'</b>'); rows+=kv('Closing',fmtClose(t.closing)); }
   else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',fmtClose(t.closing)); }
   else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
-  const el=eligible(t.codes,t.gred);
+  const el=eligible(t.codes,t.gred,kindOf(t));
   const chips=(t.codes&&t.codes.length)||t.gred?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):'<span class="chip">Tiada syarikat layak</span>'}</div>`:'';
   let acts='';
   if(t.type==='invite'&&t.link&&key==='regEnd') acts+=`<a class="btn sec sm" href="${esc(t.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📝 Google Form</a>`;
@@ -581,7 +636,7 @@ function eligUI(){
   const codes=selT, gred=$('fGred').value;
   if(!codes.length&&!gred){$('eligBox').innerHTML='<span class="muted">Pilih kod dari client — syarikat yang layak akan keluar di sini.</span>';return}
   if(!C().length){$('eligBox').innerHTML='<span class="muted">Belum ada syarikat. Tambah syarikat & code di tab <b>Setting</b>.</span>';return}
-  const el=eligible(codes,gred);
+  const el=eligible(codes,gred,kindT);
   let h=`<div class="muted" style="margin-bottom:4px">Syarikat layak (${el.ok.length})</div>`;
   h+=el.ok.length?el.ok.map(c=>`<div class="row"><span class="done">✓ ${esc(c.nama)}</span></div>`).join(''):'<div class="row"><span style="color:var(--red)">✗ Tiada syarikat yang memenuhi semua syarat</span></div>';
   if(el.part.length) h+=`<div class="muted" style="margin:8px 0 4px">Hampir layak</div>`+el.part.map(p=>`<div class="row"><span>${esc(p.c.nama)}</span><span class="muted">kurang: ${esc(p.miss.join(', '))}</span></div>`).join('');
@@ -591,7 +646,7 @@ function openForm(id){
   const t=id?findT(id):null;
   $('fTitle').textContent=t?'Edit Tender':'Tambah Tender';
   $('fId').value=t?.id||''; $('fNama').value=t?.nama||''; $('fType').value=t?.type||'website'; $('fLink').value=t?.link||'';
-  $('fRegS').value=t?.regStart||''; $('fRegE').value=t?.regEnd||''; selT=[...(t?.codes||[])]; kindT=t?.kind||'cidb'; selT.length&&selT.every(isMof)&&(kindT='mof'); $('fGred').value=t?.gred||''; setKind(kindT);
+  $('fRegS').value=t?.regStart||''; $('fRegE').value=t?.regEnd||''; selT=[...(t?.codes||[])]; kindT=t?kindOf(t):'cidb'; $('fGred').value=t?.gred||''; setKind(kindT);
   $('fBrief').value=t?.briefing||''; $('fSaleS').value=t?.saleStart||''; $('fSaleE').value=t?.saleEnd||'';
   $('fClose').value=t?.closing||''; $('fNote').value=t?.note||'';
   $('fDel').style.display=t?'inline-flex':'none';
@@ -616,7 +671,7 @@ function delTender(){
 }
 function openDetail(id){
   const t=findT(id); const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
-  const el=eligible(t.codes,t.gred);
+  const el=eligible(t.codes,t.gred,kindOf(t));
   $('dPanel').innerHTML=`<div class="ph"><h2>Butiran Tender</h2><button class="x" onclick="closeS('sDetail')">✕</button></div>
     <div class="card"><div style="margin-bottom:6px">${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'}</div>
       <h2>${esc(t.nama)}</h2>
@@ -627,7 +682,7 @@ function openDetail(id){
       ${t.type==='invite'?kv('Google Form',t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:var(--gold)">Buka link</a>`:'-'):''}
       ${t.note?kv('Catatan',esc(t.note)):''}
     </div>
-    <div class="card"><h2>Company Code · ${(t.kind||((t.codes||[]).length&&(t.codes||[]).every(isMof)?'mof':'cidb'))==='mof'?'MOF':'CIDB'}</h2>
+    <div class="card"><h2>Company Code · ${KINDS[kindOf(t)]}</h2>
       ${t.gred?`<div class="kv"><span>Gred minimum</span><span><b>${esc(t.gred)}</b></span></div>`:''}
       <div class="chips" style="margin:6px 0 10px">${(t.codes||[]).map(c=>`<span class="cc ro">${esc(c)} <small>${esc(short(codeName(c),40))}</small></span>`).join('')||'<span class="muted">Tiada kod</span>'}</div>
       <div class="muted">Syarikat layak</div>
@@ -649,8 +704,13 @@ function settingsHTML(){
   <div class="pad">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 Syarikat & Kod</h2><button class="btn gold sm" onclick="openCo()">+ Tambah</button></div>
-      <p class="muted">Gred & kod CIDB serta kod bidang MOF setiap syarikat. Dipadankan dengan syarat tender untuk tunjuk syarikat yang layak.</p>
-      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada syarikat.</div>'}
+      <p class="muted">Gred & kod CIDB, kod bidang MOF dan jenis SPAN setiap syarikat. Dipadankan dengan syarat tender untuk tunjuk syarikat yang layak.</p>
+      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span><span class="muted" style="display:block">SPAN: ${esc(parseCodes(c.span).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada syarikat.</div>'}
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">💧 Jenis SPAN</h2><button class="btn gold sm" onclick="openSpan()">+ Tambah</button></div>
+      <p class="muted">Senarai jenis pendaftaran SPAN. Dipilih dalam tender (Jenis Kod: SPAN) dan dalam syarikat.</p>
+      ${SPN().length?SPN().map(x=>`<div class="co" onclick="openSpan('${x.id}')" style="cursor:pointer"><div><b>${esc(x.code)}</b><span class="muted">${esc(x.nama)}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada jenis SPAN.</div>'}
     </div>
     ${remCardHTML()}
     <div class="card">
@@ -668,21 +728,36 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.1 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v3.2 · ProKuiz</p>
   </div>`;
 }
 function openCo(id){
   const c=id?findC(id):null;
   $('cTitle').textContent=c?'Edit Syarikat':'Tambah Syarikat';
-  $('cId').value=c?.id||''; $('cNama').value=c?.nama||''; selC=c?parseCodes(c.codes):[]; selCM=c?parseCodes(c.mof):[]; $('cGred').value=c?.gred||''; drawCodes();
+  $('cId').value=c?.id||''; $('cNama').value=c?.nama||''; selC=c?parseCodes(c.codes):[]; selCM=c?parseCodes(c.mof):[]; selCS=c?parseCodes(c.span):[]; $('cGred').value=c?.gred||''; drawCodes();
   $('cDel').style.display=c?'inline-flex':'none'; openS('sCo');
 }
 function saveCo(){
   const nama=$('cNama').value.trim(); if(!nama){toast('Sila isi nama syarikat');return}
-  const v={nama,gred:$('cGred').value,codes:selC.join(', '),mof:selCM.join(', '),updated:Date.now()};
+  const v={nama,gred:$('cGred').value,codes:selC.join(', '),mof:selCM.join(', '),span:selCS.join(', '),updated:Date.now()};
   const id=$('cId').value; let c; if(id){c=findC(id);Object.assign(c,v)} else {c={id:uid(),...v};S.companies.push(c)}
   putDoc('pt_companies',c); closeS('sCo'); persist(); toast('Syarikat disimpan ✓');
 }
+function openSpan(id){
+  const x=id?(S.span||[]).find(v=>v.id===id):null;
+  $('sTitle').textContent=x?'Edit Jenis SPAN':'Tambah Jenis SPAN';
+  $('sId').value=x?.id||''; $('sCode').value=x?.code||''; $('sNama').value=x?.nama||'';
+  $('sDel').style.display=x?'inline-flex':'none'; openS('sSpan');
+}
+function saveSpan(){
+  const code=$('sCode').value.trim().toUpperCase(), nama=$('sNama').value.trim();
+  if(!code||!nama){toast('Sila isi kod dan nama');return}
+  const id=$('sId').value;
+  if((S.span||[]).some(v=>v.code===code&&v.id!==id)){toast('Kod '+code+' sudah ada');return}
+  let x; if(id){x=S.span.find(v=>v.id===id);Object.assign(x,{code,nama})} else {x={id:uid(),code,nama};S.span.push(x)}
+  putDoc('pt_span',x); closeS('sSpan'); persist(); toast('Jenis SPAN disimpan ✓');
+}
+function delSpan(){const x=(S.span||[]).find(v=>v.id===$('sId').value);if(!x||!confirm('Padam jenis SPAN '+x.code+'?'))return;S.span=S.span.filter(v=>v.id!==x.id);delDoc('pt_span',x.id);closeS('sSpan');persist()}
 function delCo(){const c=findC($('cId').value);if(!c||!confirm('Padam syarikat '+c.nama+'?'))return;S.companies=S.companies.filter(x=>x.id!==c.id);delDoc('pt_companies',c.id);closeS('sCo');persist()}
 
 // ================== PERINGATAN ==================
@@ -694,6 +769,18 @@ function alerts(){
     });
   });
   return out.sort((a,b)=>a.ms-b.ms);
+}
+function openHist(){ $('hQ').value=''; histList(); openS('sHist'); }
+function histList(){
+  const q=$('hQ').value.toLowerCase().trim();
+  const all=T().filter(t=>t.closing&&isPast(t.closing)).sort((a,b)=>D(b.closing)-D(a.closing));
+  const arr=all.filter(t=>!q||t.nama.toLowerCase().includes(q));
+  $('hSub').textContent=`Tender yang tarikh closing sudah tamat (${all.length}).`;
+  $('hList').innerHTML=arr.length?arr.map(t=>`<div class="hi" onclick="openDetail('${t.id}')">
+    ${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'} <span class="badge b-na">${KINDS[kindOf(t)]}</span>
+    <h4>${esc(t.nama)}</h4>
+    <div class="hm">⏳ ${fmtClose(t.closing)} ${t.submitted?'<span class="badge b-ok">✓ Dihantar</span>':'<span class="badge b-no">Tidak dihantar</span>'}</div>
+  </div>`).join(''):`<div class="emptyrail" style="margin:0">${all.length?'Tiada tender sepadan.':'Belum ada tender yang tamat closing.'}</div>`;
 }
 function openAlerts(){
   $('alertSub').textContent='Tarikh penting dalam 3 hari akan datang.';
@@ -709,26 +796,26 @@ async function askNotif(){
   const p=await Notification.requestPermission();toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');render();
 }
 // ================== PERINGATAN BERBUNYI ==================
-const REMKEY='protender_rem';
+const REMKEY='protender_rem2';
 const RCATS={register:['📝','Register','Tamat pendaftaran','regEnd','registered'],buy:['🛒','Buy','Tamat jualan dokumen','saleEnd','bought'],briefing:['🗣️','Briefing','Site briefing','briefing',''],closing:['⏳','Closing','Tender closing','closing','submitted']};
 const SOUNDS={pt_chime:'Chime',pt_bell:'Loceng',pt_alarm:'Alarm'};
-const REM_DEF={sound:'pt_chime',cats:{register:{on:true,list:[{d:1,t:'09:00'},{d:0,t:'09:00'}]},buy:{on:true,list:[{d:1,t:'09:00'},{d:0,t:'09:00'}]},briefing:{on:false,list:[{d:1,t:'09:00'}]},closing:{on:true,list:[{d:7,t:'09:00'},{d:3,t:'09:00'},{d:1,t:'09:00'},{d:0,t:'09:00'}]}}};
-function getRem(){let r;try{r=JSON.parse(localStorage.getItem(REMKEY))}catch(e){} r=r||JSON.parse(JSON.stringify(REM_DEF)); for(const k in REM_DEF.cats) r.cats[k]=r.cats[k]||JSON.parse(JSON.stringify(REM_DEF.cats[k])); return r}
+const T3=()=>[{t:'09:00',on:true},{t:'11:00',on:true},{t:'13:00',on:true}];
+const REM_DEF={sound:'pt_chime',cats:{register:{on:true,times:T3()},buy:{on:true,times:T3()},briefing:{on:true,times:[{t:'08:00',on:true},{t:'09:00',on:false},{t:'10:00',on:false}]},closing:{on:true,times:T3()}}};
+function getRem(){let r;try{r=JSON.parse(localStorage.getItem(REMKEY))}catch(e){} r=r||JSON.parse(JSON.stringify(REM_DEF)); for(const k in REM_DEF.cats) if(!r.cats[k]||!r.cats[k].times) r.cats[k]=JSON.parse(JSON.stringify(REM_DEF.cats[k])); return r}
 function setRem(r){localStorage.setItem(REMKEY,JSON.stringify(r));scheduleNative();render()}
 const dLbl=d=>d==0?'Pada hari tamat':d==1?'1 hari sebelum':d+' hari sebelum';
 function remCardHTML(){
-  const R=getRem(), dOpts=[0,1,2,3,4,5,7,10,14,21,30];
+  const R=getRem();
   const notifOk=isNative()?true:('Notification' in window&&Notification.permission==='granted');
   return `<div class="card">
     <h2>🔔 Peringatan & Bunyi</h2>
-    <p class="muted">Notifikasi ikut <b>tarikh tamat</b> setiap tab. Tetapkan berapa hari sebelum dan pukul berapa.</p>
+    <p class="muted">Notifikasi berbunyi <b>pada hari tarikh tamat</b> setiap tab. Setiap tab ada 3 masa — boleh ubah atau matikan.</p>
     <label>Bunyi notifikasi</label>
     <div style="display:flex;gap:8px"><select id="rSound" onchange="const r=getRem();r.sound=this.value;setRem(r);playSound(this.value)">${Object.entries(SOUNDS).map(([k,v])=>`<option value="${k}" ${R.sound===k?'selected':''}>${v}</option>`).join('')}</select><button class="btn sec" onclick="playSound($('rSound').value)">▶ Uji</button></div>
     <div style="margin-top:12px">
     ${Object.entries(RCATS).map(([k,[ic,nm,lbl]])=>{const c=R.cats[k];return `<div class="rc ${c.on?'':'off'}">
-      <div class="rh"><b>${ic} ${nm}<small>${lbl}</small></b><label class="sw" style="margin:0"><input type="checkbox" ${c.on?'checked':''} onchange="remToggle('${k}',this.checked)"><span></span></label></div>
-      <div class="rchips">${c.list.length?c.list.sort((a,b)=>b.d-a.d||a.t.localeCompare(b.t)).map((r,i)=>`<span class="rchip">${dLbl(r.d)} · ${r.t}<button onclick="remDel('${k}',${i})">✕</button></span>`).join(''):'<span class="muted">Tiada peringatan</span>'}</div>
-      <div class="radd"><select id="rd_${k}">${dOpts.map(d=>`<option value="${d}">${dLbl(d)}</option>`).join('')}</select><input type="time" id="rt_${k}" value="09:00"><button class="btn gold sm" onclick="remAdd('${k}')">+</button></div>
+      <div class="rh"><b>${ic} ${nm}<small>Hari ${lbl.toLowerCase()}</small></b><label class="sw" style="margin:0"><input type="checkbox" ${c.on?'checked':''} onchange="remToggle('${k}',this.checked)"><span></span></label></div>
+      <div class="r3">${c.times.map((x,i)=>`<div class="rt ${x.on?'':'dim'}"><label class="sw sm" style="margin:0"><input type="checkbox" ${x.on?'checked':''} onchange="remTime('${k}',${i},null,this.checked)"><span></span></label><span class="rn">Masa ${i+1}</span><input type="time" value="${x.t}" onchange="remTime('${k}',${i},this.value,null)"></div>`).join('')}</div>
     </div>`}).join('')}
     </div>
     ${isNative()?'':'<a class="btn gold full" style="margin-top:12px" href="https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk">⬇ Muat Turun APK Android</a>'}
@@ -738,8 +825,7 @@ function remCardHTML(){
   </div>`;
 }
 function remToggle(k,on){const r=getRem();r.cats[k].on=on;setRem(r)}
-function remDel(k,i){const r=getRem();r.cats[k].list.sort((a,b)=>b.d-a.d||a.t.localeCompare(b.t));r.cats[k].list.splice(i,1);setRem(r)}
-function remAdd(k){const r=getRem(),d=+$('rd_'+k).value,t=$('rt_'+k).value||'09:00';if(r.cats[k].list.some(x=>x.d===d&&x.t===t)){toast('Sudah ada');return}r.cats[k].list.push({d,t});setRem(r);toast('Peringatan ditambah ✓')}
+function remTime(k,i,t,on){const r=getRem(),x=r.cats[k].times[i];if(t!==null&&t)x.t=t;if(on!==null)x.on=on;setRem(r);if(t)toast('Masa disimpan ✓')}
 // senarai semua peringatan yang dijadualkan
 function remEvents(){
   const R=getRem(),out=[];
@@ -748,12 +834,12 @@ function remEvents(){
     T().forEach(t=>{
       if(!t[field]||(flag&&t[flag]))return;
       const end=D(t[field]); if(isNaN(end))return;
-      c.list.forEach(r=>{
-        const at=new Date(end); at.setDate(at.getDate()-r.d); const [h,m]=r.t.split(':'); at.setHours(+h,+m,0,0);
+      c.times.forEach(r=>{
+        if(!r.on||!r.t)return;
+        const at=new Date(end); const [h,m]=r.t.split(':'); at.setHours(+h,+m,0,0);
         if(at>end)return;
-        const when=r.d==0?'hari ini':r.d==1?'esok':r.d+' hari lagi';
-        out.push({key:[t.id,k,r.d,r.t,t[field]].join('|'),at,cat:k,t,
-          title:`${ic} ${lbl} ${when} (${p2(end.getHours())}:${p2(end.getMinutes())})`,body:t.nama});
+        out.push({key:[t.id,k,r.t,t[field]].join('|'),at,cat:k,t,
+          title:`${ic} ${lbl} hari ini · ${p2(end.getHours())}:${p2(end.getMinutes())}`,body:t.nama});
       });
     });
   });
@@ -839,7 +925,8 @@ function listen(){
     if(e.code==='permission-denied'){stopListen();showDenied();return}
     fbErr(e);
   });
-  unsubs=[on('pt_tenders','tenders'),on('pt_companies','companies')];
+  unsubs=[on('pt_tenders','tenders'),on('pt_companies','companies'),
+    db.collection('pt_span').onSnapshot(snap=>{S.span=snap.docs.map(d=>d.data());persist()},e=>{console.log('pt_span',e);if(e.code==='permission-denied'&&!window._spanWarn){window._spanWarn=1;toast('Jenis SPAN: kemas kini Firestore Rules dahulu')}})];
 }
 // Data lama (sebelum log masuk) dalam telefon ini → naik ke Firebase sekali sahaja
 function migrateOld(){
@@ -883,7 +970,7 @@ function startAuth(){
   if(!auth){$('lSub').textContent='Tiada sambungan ke Firebase. Semak internet dan buka semula.';$('lForm').style.display='none';return}
   auth.onAuthStateChanged(u=>{
     USER=u;
-    if(!u){stopListen();S={tenders:[],companies:[]};$('lPass').value='';$('lPass').type='password';$('pwEye').textContent='👁️';$('pwEye').classList.remove('on');showLogin();return}
+    if(!u){stopListen();S={tenders:[],companies:[],span:[]};$('lPass').value='';$('lPass').type='password';$('pwEye').textContent='👁️';$('pwEye').classList.remove('on');showLogin();return}
     $('login').classList.add('off');
     load(); render(); listen(); setTimeout(webTick,2500);
   });
@@ -896,7 +983,7 @@ function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.string
 function exportCSV(){
   const h=['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','Jenis Kod','Gred Min','Kod','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),(t.kind||'cidb').toUpperCase(),t.gred,(t.codes||[]).join(' / '),eligible(t.codes,t.gred).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?'Ya':'',t.bought?'Ya':'',t.submitted?'Ya':'',t.note].map(q).join(','));
+  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),kindOf(t).toUpperCase(),t.gred,(t.codes||[]).join(' / '),eligible(t.codes,t.gred,kindOf(t)).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?'Ya':'',t.bought?'Ya':'',t.submitted?'Ya':'',t.note].map(q).join(','));
   download(`ProTender-${todayStr()}.csv`,'﻿'+h.join(',')+'\n'+rows.join('\n'),'text/csv');
 }
 function importJSON(inp){
@@ -905,6 +992,7 @@ function importJSON(inp){
     const b=db.batch();let n=0;
     d.tenders.filter(t=>!t.deleted).forEach(t=>{b.set(db.collection('pt_tenders').doc(t.id),clean(t));n++});
     (d.companies||[]).filter(c=>!c.deleted).forEach(c=>{b.set(db.collection('pt_companies').doc(c.id),clean(c));n++});
+    (d.span||[]).forEach(x=>{b.set(db.collection('pt_span').doc(x.id),clean(x));n++});
     return b.commit().then(()=>toast(n+' rekod diimport ✓'));
   }).catch(e=>toast(e&&e.code?'Gagal import: '+e.code:'Fail tidak sah'));inp.value='';
 }
