@@ -179,6 +179,16 @@ label b{color:var(--red)}
 .hi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer}
 .hi h4{margin:4px 0 6px;font-size:14px;line-height:1.3}
 .hi .hm{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.dtw{position:relative}
+.dtw input.emp{color:transparent}
+.dtw input.emp::-webkit-datetime-edit{color:transparent}
+.dtw::after{content:attr(data-show);position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none;white-space:nowrap;overflow:hidden;max-width:calc(100% - 50px)}
+.dtw.has::after{display:none}
+textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
+.lang{display:flex;gap:0}
+.lang button{border:1px solid var(--line);background:none;color:var(--muted);padding:6px 14px;font:700 12px var(--f);cursor:pointer}
+.lang button:first-child{border-radius:10px 0 0 10px}.lang button:last-child{border-radius:0 10px 10px 0;border-left:0}
+.lang button.on{background:var(--ink);color:var(--bg)}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 </style>
 </head>
@@ -186,17 +196,18 @@ label b{color:var(--red)}
 
 <div id="login" class="login">
   <div class="lbox">
+    <div class="lang" style="justify-content:center;margin-bottom:10px"></div>
     <img src="icons/icon-192.png" alt="" class="llogo">
     <h2 class="lh">ProTender</h2>
-    <p class="muted" id="lSub">Log masuk untuk teruskan</p>
+    <p class="muted" id="lSub" data-l="Log masuk untuk teruskan|Sign in to continue">Log masuk untuk teruskan</p>
     <div id="lForm" style="display:none">
       <label>Email</label>
-      <input id="lEmail" type="email" autocomplete="username" placeholder="email@contoh.com">
-      <label>Kata Laluan</label>
-      <div class="pw"><input id="lPass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"><button type="button" id="pwEye" onclick="togglePw()" aria-label="Tunjuk kata laluan">👁️</button></div>
+      <input id="lEmail" type="email" autocomplete="username" data-ph="cth: nama@syarikat.com|e.g. name@company.com">
+      <label data-l="Kata Laluan|Password">Kata Laluan</label>
+      <div class="pw"><input id="lPass" type="password" autocomplete="current-password" data-ph="Kata laluan anda|Your password" onkeydown="if(event.key==='Enter')doLogin()"><button type="button" id="pwEye" onclick="togglePw()" aria-label="👁">👁️</button></div>
       <p id="lErr" class="lerr"></p>
-      <button class="btn gold full" id="lBtn" onclick="doLogin()" style="margin-top:6px">Log Masuk</button>
-      <button class="btn sec full" onclick="forgotPass()" style="margin-top:8px">Lupa kata laluan?</button>
+      <button class="btn gold full" id="lBtn" onclick="doLogin()" style="margin-top:6px" data-l="Log Masuk|Sign In">Log Masuk</button>
+      <button class="btn sec full" onclick="forgotPass()" style="margin-top:8px" data-l="Lupa kata laluan?|Forgot password?">Lupa kata laluan?</button>
     </div>
   </div>
 </div>
@@ -204,10 +215,10 @@ label b{color:var(--red)}
 <header>
   <img class="mark" src="icons/icon-192.png" alt="">
   <h1>ProTender<span>by ProKuiz</span></h1>
-  <button class="instb" id="instB" onclick="installApp()" style="display:none">⬇ Pasang</button>
+  <button class="instb" id="instB" onclick="installApp()" style="display:none" data-l="⬇ Pasang|⬇ Install">⬇ Pasang</button>
   <button class="hb first" id="histB" onclick="openHist()" aria-label="History">🗂️</button>
-  <button class="hb" id="bell" onclick="openAlerts()" aria-label="Amaran">🔔<span id="bellN"></span></button>
-  <button class="hb add" id="addB" onclick="openForm()" aria-label="Tambah tender">+</button>
+  <button class="hb" id="bell" onclick="openAlerts()" aria-label="Alerts">🔔<span id="bellN"></span></button>
+  <button class="hb add" id="addB" onclick="openForm()" aria-label="Add">+</button>
 </header>
 
 <main id="main"></main>
@@ -225,8 +236,8 @@ label b{color:var(--red)}
   <div class="panel">
     <div class="ph"><h2 id="fTitle">Tambah Tender</h2><button class="x" onclick="closeS('sForm')">✕</button></div>
     <input type="hidden" id="fId">
-    <label>Nama Tender <b>*</b></label>
-    <textarea id="fNama" rows="2" placeholder="cth: SCADA AND ICC IMPROVEMENT: MODERNIZATION OF M2M COMMUNICATION"></textarea>
+    <label><span data-l="Nama Tender|Tender Name">Nama Tender</span> <b>*</b></label>
+    <textarea id="fNama" rows="2" data-ph="cth: Nama tender|e.g. Tender name"></textarea>
 
     <label>Tender Type</label>
     <select id="fType" onchange="typeUI()">
@@ -234,42 +245,42 @@ label b{color:var(--red)}
       <option value="invite">Invite</option>
     </select>
     <div id="formLinkBox" style="display:none">
-      <label>Link Google Form</label>
-      <input id="fLink" type="url" placeholder="https://forms.gle/...">
+      <label data-l="Link Google Form|Google Form Link">Link Google Form</label>
+      <input id="fLink" type="url" data-ph="cth: https://forms.gle/abc123|e.g. https://forms.gle/abc123">
     </div>
 
     <label>Document Registration Period</label>
     <div class="grid2 dt">
-      <div><small>Mula</small><input type="datetime-local" id="fRegS"></div>
-      <div><small>Tamat</small><input type="datetime-local" id="fRegE"></div>
+      <div><small data-l="Mula|Start">Mula</small><div class="dtw" data-ph="cth: 15-Oct-2026 07:00|e.g. 15-Oct-2026 07:00"><input type="datetime-local" id="fRegS"></div></div>
+      <div><small data-l="Tamat|End">Tamat</small><div class="dtw" data-ph="cth: 27-Oct-2026 15:00|e.g. 27-Oct-2026 15:00"><input type="datetime-local" id="fRegE"></div></div>
     </div>
 
-    <label>Jenis Kod Bidang</label>
+    <label data-l="Jenis Kod Bidang|Code Type">Jenis Kod Bidang</label>
     <div class="seg" style="margin:0" id="fKind"><button type="button" data-k="cidb" onclick="setKind('cidb')">CIDB</button><button type="button" data-k="mof" onclick="setKind('mof')">MOF</button><button type="button" data-k="span" onclick="setKind('span')">SPAN</button></div>
-    <div id="gredBox"><label>Gred CIDB Minimum</label>
-    <select id="fGred" onchange="eligUI()"><option value="">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select></div>
-    <label id="fCodesLbl">Company Code (Kod Pengkhususan CIDB)</label>
+    <div id="gredBox"><label data-l="Gred CIDB Minimum|Minimum CIDB Grade">Gred CIDB Minimum</label>
+    <select id="fGred" onchange="eligUI()"><option value="" data-l="Tiada / tidak dinyatakan|None / not stated">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select></div>
+    <label id="fCodesLbl">Company Code</label>
     <div class="cpick" id="fCodesBox" onclick="openPick('t')"></div>
     <div class="elig" id="eligBox"></div>
 
     <label>Site Briefing</label>
-    <input type="datetime-local" id="fBrief">
+    <div class="dtw" data-ph="cth: 30-Oct-2026 10:00|e.g. 30-Oct-2026 10:00"><input type="datetime-local" id="fBrief"></div>
 
     <label>Document Sales Period</label>
     <div class="grid2 dt">
-      <div><small>Mula</small><input type="datetime-local" id="fSaleS"></div>
-      <div><small>Tamat</small><input type="datetime-local" id="fSaleE"></div>
+      <div><small data-l="Mula|Start">Mula</small><div class="dtw" data-ph="cth: 02-Nov-2026 07:00|e.g. 02-Nov-2026 07:00"><input type="datetime-local" id="fSaleS"></div></div>
+      <div><small data-l="Tamat|End">Tamat</small><div class="dtw" data-ph="cth: 09-Nov-2026 23:00|e.g. 09-Nov-2026 23:00"><input type="datetime-local" id="fSaleE"></div></div>
     </div>
 
     <label>Tender Closing Date <b>*</b></label>
-    <input type="datetime-local" id="fClose">
+    <div class="dtw" data-ph="cth: 18-Nov-2026 15:00|e.g. 18-Nov-2026 15:00"><input type="datetime-local" id="fClose"></div>
 
-    <label>Catatan</label>
-    <textarea id="fNote" placeholder="Pilihan"></textarea>
+    <label data-l="Catatan|Notes">Catatan</label>
+    <textarea id="fNote" data-ph="cth: Lokasi hantar, syarat tambahan|e.g. Submission location, extra requirements"></textarea>
 
     <div style="display:flex;gap:10px;margin-top:18px">
       <button class="btn red" id="fDel" onclick="delTender()">🗑️</button>
-      <button class="btn gold full" onclick="saveTender()">Simpan Tender</button>
+      <button class="btn gold full" onclick="saveTender()" data-l="Simpan Tender|Save Tender">Simpan Tender</button>
     </div>
   </div>
 </div>
@@ -284,20 +295,20 @@ label b{color:var(--red)}
   <div class="panel">
     <div class="ph"><h2 id="cTitle">Tambah Syarikat</h2><button class="x" onclick="closeS('sCo')">✕</button></div>
     <input type="hidden" id="cId">
-    <label>Nama Syarikat <b>*</b></label>
-    <input id="cNama" placeholder="cth: KUKUSAN LEGACY">
-    <label>Gred CIDB</label>
-    <select id="cGred"><option value="">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select>
-    <label>Kod Pengkhususan CIDB yang dimiliki</label>
+    <label><span data-l="Nama Syarikat|Company Name">Nama Syarikat</span> <b>*</b></label>
+    <input id="cNama" data-ph="cth: Nama syarikat|e.g. Company name">
+    <label data-l="Gred CIDB|CIDB Grade">Gred CIDB</label>
+    <select id="cGred"><option value="" data-l="Tiada / tidak dinyatakan|None / not stated">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select>
+    <label data-l="Kod Pengkhususan CIDB yang dimiliki|CIDB specialisation codes held">Kod Pengkhususan CIDB yang dimiliki</label>
     <div class="cpick" id="cCodesBox" onclick="openPick('c')"></div>
-    <label>Kod Bidang MOF yang dimiliki</label>
+    <label data-l="Kod Bidang MOF yang dimiliki|MOF field codes held">Kod Bidang MOF yang dimiliki</label>
     <div class="cpick" id="cMofBox" onclick="openPick('cm')"></div>
-    <label>Jenis SPAN yang dimiliki</label>
+    <label data-l="Jenis SPAN yang dimiliki|SPAN types held">Jenis SPAN yang dimiliki</label>
     <div class="cpick" id="cSpanBox" onclick="openPick('cs')"></div>
-    <p class="muted">Syarikat dikira <b>layak</b> bila ia ada <b>semua</b> kod (CIDB, MOF atau SPAN) yang tender minta. Untuk tender CIDB, gred syarikat juga mesti sama atau lebih tinggi daripada gred minimum.</p>
+    <p class="muted" data-l="Syarikat dikira <b>layak</b> bila ia ada <b>semua</b> kod (CIDB, MOF atau SPAN) yang tender minta. Untuk tender CIDB, gred syarikat juga mesti sama atau lebih tinggi daripada gred minimum.|A company is <b>eligible</b> when it holds <b>all</b> codes (CIDB, MOF or SPAN) the tender requires. For CIDB tenders, the company grade must also be equal to or higher than the minimum grade."></p>
     <div style="display:flex;gap:10px;margin-top:14px">
       <button class="btn red" id="cDel" onclick="delCo()">🗑️</button>
-      <button class="btn gold full" onclick="saveCo()">Simpan Syarikat</button>
+      <button class="btn gold full" onclick="saveCo()" data-l="Simpan Syarikat|Save Company">Simpan Syarikat</button>
     </div>
   </div>
 </div>
@@ -306,8 +317,8 @@ label b{color:var(--red)}
 <div class="sheet" id="sHist" onclick="if(event.target===this)closeS('sHist')">
   <div class="panel">
     <div class="ph"><h2>🗂️ History</h2><button class="x" onclick="closeS('sHist')">✕</button></div>
-    <p class="muted" id="hSub">Tender yang tarikh closing sudah tamat.</p>
-    <input id="hQ" placeholder="Cari nama tender" oninput="histList()" style="margin-top:6px">
+    <p class="muted" id="hSub"></p>
+    <input id="hQ" data-ph="Cari nama tender|Search tender name" oninput="histList()" style="margin-top:6px">
     <div id="hList" style="margin-top:12px"></div>
   </div>
 </div>
@@ -317,28 +328,28 @@ label b{color:var(--red)}
   <div class="panel">
     <div class="ph"><h2 id="sTitle">Tambah Jenis SPAN</h2><button class="x" onclick="closeS('sSpan')">✕</button></div>
     <input type="hidden" id="sId">
-    <label>Kod / Singkatan <b>*</b></label>
-    <input id="sCode" placeholder="cth: SPAN-A1">
-    <label>Nama / Keterangan <b>*</b></label>
-    <input id="sNama" placeholder="cth: Kontraktor Paip Air">
+    <label><span data-l="Kod / Singkatan|Code / Short name">Kod / Singkatan</span> <b>*</b></label>
+    <input id="sCode" data-ph="cth: SPAN-A1|e.g. SPAN-A1">
+    <label><span data-l="Nama / Keterangan|Name / Description">Nama / Keterangan</span> <b>*</b></label>
+    <input id="sNama" data-ph="cth: Kontraktor Paip Air|e.g. Water Pipe Contractor">
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn red" id="sDel" onclick="delSpan()">🗑️</button>
-      <button class="btn gold full" onclick="saveSpan()">Simpan</button>
+      <button class="btn gold full" onclick="saveSpan()" data-l="Simpan|Save">Simpan</button>
     </div>
   </div>
 </div>
 
-<!-- Pemilih kod CIDB -->
+<!-- Pemilih kod -->
 <div class="sheet" id="sPick" onclick="if(event.target===this)closeS('sPick')" style="z-index:25">
   <div class="panel">
-    <div class="ph"><h2 id="pTitle">Kod Pengkhususan CIDB</h2><button class="x" onclick="closeS('sPick')">✕</button></div>
-    <input id="pQ" placeholder="Cari kod atau bidang" oninput="pickList()">
+    <div class="ph"><h2 id="pTitle"></h2><button class="x" onclick="closeS('sPick')">✕</button></div>
+    <input id="pQ" oninput="pickList()">
     <div class="segs" id="pCats"></div>
     <select id="pCatSel" style="margin-top:10px;display:none" onchange="PK.cat=this.value;pickList()"></select>
     <div class="plist" id="pList"></div>
     <div style="display:flex;gap:10px;margin-top:12px">
-      <button class="btn sec" onclick="PK.sel=[];pickList()">Kosongkan</button>
-      <button class="btn gold full" id="pDone" onclick="pickDone()">Selesai</button>
+      <button class="btn sec" onclick="PK.sel=[];pickList()" data-l="Kosongkan|Clear">Kosongkan</button>
+      <button class="btn gold full" id="pDone" onclick="pickDone()"></button>
     </div>
   </div>
 </div>
@@ -346,17 +357,17 @@ label b{color:var(--red)}
 <!-- Amaran -->
 <div class="sheet" id="sAlert" onclick="if(event.target===this)closeS('sAlert')">
   <div class="panel">
-    <div class="ph"><h2>🔔 Peringatan</h2><button class="x" onclick="closeS('sAlert')">✕</button></div>
-    <p class="muted" id="alertSub">Tarikh penting dalam 3 hari akan datang.</p>
+    <div class="ph"><h2 data-l="🔔 Peringatan|🔔 Reminders">🔔 Peringatan</h2><button class="x" onclick="closeS('sAlert')">✕</button></div>
+    <p class="muted" id="alertSub"></p>
     <div id="alertList"></div>
   </div>
 </div>
 
 <div class="sheet" id="sInstall" onclick="if(event.target===this)closeS('sInstall')">
   <div class="panel">
-    <div class="ph"><h2>Pasang ProTender</h2><button class="x" onclick="closeS('sInstall')">✕</button></div>
+    <div class="ph"><h2 data-l="Pasang ProTender|Install ProTender">Pasang ProTender</h2><button class="x" onclick="closeS('sInstall')">✕</button></div>
     <div id="insBody"></div>
-    <p class="muted">App dibuka dalam tetingkap sendiri tanpa bar alamat, ada ikon di skrin utama dan boleh dibuka walaupun tiada internet.</p>
+    <p class="muted" data-l="App dibuka dalam tetingkap sendiri tanpa bar alamat, ada ikon di skrin utama dan boleh dibuka walaupun tiada internet.|The app opens in its own window without an address bar, has a home-screen icon and works offline."></p>
   </div>
 </div>
 
@@ -366,6 +377,23 @@ label b{color:var(--red)}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
+// ================== BAHASA ==================
+let LANG=(()=>{try{return localStorage.getItem('protender_lang')||'bm'}catch(e){return 'bm'}})();
+const L=(bm,en)=>LANG==='en'?en:bm;
+const pick2=v=>{const i=v.indexOf('|');return i<0?v:(LANG==='en'?v.slice(i+1):v.slice(0,i))};
+function langHTML(){return `<button class="${LANG==='bm'?'on':''}" onclick="setLang('bm')">BM</button><button class="${LANG==='en'?'on':''}" onclick="setLang('en')">EN</button>`}
+function applyLang(){
+  document.documentElement.lang=LANG==='en'?'en':'ms';
+  document.querySelectorAll('[data-l]').forEach(e=>e.innerHTML=pick2(e.dataset.l));
+  document.querySelectorAll('[data-ph]').forEach(e=>{const v=pick2(e.dataset.ph);if(e.classList.contains('dtw'))e.dataset.show=v;else e.placeholder=v});
+  document.querySelectorAll('.lang').forEach(e=>e.innerHTML=langHTML());
+}
+function setLang(l){LANG=l;try{localStorage.setItem('protender_lang',l)}catch(e){}applyLang();if(USER)render();scheduleNative()}
+// contoh dalam kotak tarikh
+function dtSync(){document.querySelectorAll('.dtw input').forEach(i=>{const h=!!i.value;i.classList.toggle('emp',!h);i.parentNode.classList.toggle('has',h)})}
+document.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('.dtw'))dtSync()});
+document.addEventListener('change',e=>{if(e.target.closest&&e.target.closest('.dtw'))dtSync()});
+
 // ================== DATA ==================
 const KEY='protender_v2';
 let USER=null;
@@ -398,9 +426,9 @@ function left(s){
   const days=Math.floor(ms/86400000), hrs=Math.floor(ms/3600000);
   let cls=ms<0?'past':ms<=3*86400000?'hot':ms<=7*86400000?'warn':'';
   let big,small;
-  if(ms<0){big='✓';small='Lepas'}
-  else if(hrs<24){big=hrs<1?'<1':hrs;small='jam lagi'}
-  else{big=days;small='hari lagi'}
+  if(ms<0){big='✓';small=L('Lepas','Past')}
+  else if(hrs<24){big=hrs<1?'<1':hrs;small=L('jam lagi','hrs left')}
+  else{big=days;small=L('hari lagi','days left')}
   return {ms,cls,big,small};
 }
 const isPast=s=>s&&D(s)<new Date();
@@ -408,7 +436,8 @@ const isPast=s=>s&&D(s)<new Date();
 // ================== CODE & SYARIKAT ==================
 const parseCodes=s=>[...new Set(String(s||'').split(/[,;\n]+/).map(x=>x.trim().toUpperCase().replace(/\s+/g,' ')).filter(Boolean))];
 const CIDB={"B01": "IBS: Sistem Konkrit Pasang Siap", "B02": "IBS: Sistem Kerangka Keluli", "B03": "Pemulihan dan Pemuliharaan", "B04": "Kerja Pembinaan Bangunan", "B05": "Kerja Cerucuk", "B06": "Pembaikan Struktur Konkrit", "B07": "Hiasan Dalaman", "B08": "Pemasangan Kalis Air", "B09": "Lanskap Dalam Bangunan", "B10": "Sistem Paip Air Dalaman", "B11": "Papan Tanda Bangunan", "B12": "Pemasangan Kaca", "B13": "Pemasangan Jubin", "B14": "Kerja-kerja Cat", "B15": "Pemasangan Bumbung", "B16": "Kolam Renang", "B17": "Prestressing & Post-Tensioning", "B18": "Kerja-kerja Logam", "B19": "IBS: Sistem Formwork", "B20": "Sistem Paip Gas Dalaman", "B21": "Pemasangan Perancah", "B22": "IBS: Sistem Blok", "B23": "IBS: Kerangka Kayu", "B24": "Penyenggaraan Bangunan", "B25": "Sambungan Paip Kumbahan", "B26": "Kerja-kerja Meroboh", "B27": "Penyenggaraan Air/Kumbahan", "B28": "Kerja-kerja Ubahsuai", "B29": "Kerja Bangunan Kesihatan", "CE01": "Jalan dan Pavmen", "CE02": "Jambatan dan Jeti", "CE03": "Struktur Marin", "CE04": "Empangan", "CE05": "Terowong & Sokong Bawah", "CE06": "Saliran & Kawalan Banjir", "CE07": "Landasan Rel", "CE08": "Perlindungan Cerun", "CE09": "Paip Utama Minyak/Gas", "CE10": "Kerja Cerucuk", "CE11": "Pembaikan Struktur Konkrit", "CE12": "Penyiasatan Tanah", "CE13": "Pemasangan Papan Iklan", "CE14": "Lanskap Luar Bangunan", "CE15": "Pelantar Minyak dan Gas", "CE16": "Penyenggaraan Struktur Bawah Air", "CE17": "Lapangan Terbang", "CE18": "Tebusguna Tanah", "CE19": "Sistem Pembetungan", "CE20": "Sistem Bekalan Air", "CE21": "Pembinaan Kejuruteraan Awam", "CE22": "Padang Permainan Sintetik", "CE23": "Prestressing & Post-Tensioning", "CE24": "Struktur Menara", "CE25": "Kerja-kerja Meletup", "CE26": "Struktur Berukir", "CE27": "Penebatan Haba/Refractory", "CE28": "Acuan Konkrit Khusus", "CE29": "Pemasangan Perancah", "CE30": "Penstabilan Tanah", "CE31": "Laluan Kabel Bawah Tanah", "CE32": "Penyenggaraan Awam", "CE33": "Telaga Tiub", "CE34": "Pemasangan Konkrit Pratuang", "CE35": "Ujian Konkrit", "CE36": "Kerja-kerja Tanah", "CE37": "Cerobong Stesen Kuasa", "CE38": "Penyenggaraan Pembetungan", "CE39": "Penyenggaraan Bekalan Air", "CE40": "Korekan & Kawalan Hakisan", "CE41": "Takungan Air", "CE42": "Mengecat Jalan", "CE43": "Perabot Jalan", "M01": "Hawa Dingin & Pengedaran Udara", "M02": "Pencegahan Kebakaran", "M03": "Lif dan Eskalator", "M04": "Sistem Automasi Bangunan", "M05": "Sistem Bengkel, Kilang & Kuari", "M06": "Sistem Peralatan Perubatan", "M07": "Sistem Peralatan Dapur", "M08": "Dandang & Tekanan Berapi", "M09": "Pemampatan & Penjanaan", "M10": "Sistem Pendingin Kuasa", "M11": "Rawatan Khusus", "M12": "Loji Khusus", "M13": "Pengerudian Luar Pantai", "M14": "Kawalan Pencemaran", "M15": "Kelengkapan Mekanikal Pelbagai", "M16": "Kren Menara", "M17": "Sistem Peralatan Dobi", "M18": "Sistem Air Panas", "M19": "Pemasangan Kelengkapan Loji", "M20": "Penyenggaraan Mekanikal Am", "M21": "Kerja-kerja Kimpalan", "M22": "Sistem Pam", "M23": "SCADA dan Telemetri", "E01": "Sistem Bunyi", "E02": "Pengawasan & Keselamatan", "E03": "Sistem Automasi Bangunan", "E04": "Voltan Rendah", "E05": "Voltan Tinggi (sehingga 11KV)", "E06": "Sistem Pencahayaan Khas", "E07": "Telekomunikasi Dalaman", "E08": "Telekomunikasi Luaran", "E09": "Peralatan Perubatan", "E10": "Bekalan Kuasa Tanpa Gangguan", "E11": "Kerja Am Elektrik", "E12": "Papan Tanda Elektrik", "E13": "Telekomunikasi Rel", "E14": "Kabel Rangkaian Komputer", "E15": "Lampu Landasan Terbang", "E16": "Lampu Jalan & Isyarat", "E17": "Kabel Bawah Tanah LV", "E18": "Kabel Bawah Tanah (11KV)", "E19": "Kabel Bawah Tanah (33KV)", "E20": "Kabel Bawah Tanah (>33KV)", "E21": "Talian Atas LV", "E22": "Talian Atas (33KV)", "E23": "Talian Atas (>33KV)", "E24": "Pemasangan HV (11-33KV)", "E25": "Pemasangan HV (>33KV)", "E26": "Camtum Kabel LV (1KV)", "E27": "Camtum Kabel (11KV)", "E28": "Camtum Kabel (33KV)", "E29": "Camtum Kabel (66KV)", "E30": "Camtum Kabel (132KV)", "E31": "Camtum Kabel (Tiada Sekatan)", "E32": "Janakuasa LV", "E33": "Janakuasa HV (33KV)", "E34": "Solar PV (sehingga 72kW)", "E35": "Solar PV (>72kW)", "F01": "Fasiliti Bangunan & Infrastruktur Am", "F02": "Fasiliti Bangunan Penjagaan Kesihatan"};
-const CAT={B:'Pembinaan Bangunan (B)',CE:'Kejuruteraan Awam (CE)',M:'Mekanikal (M)',E:'Elektrikal (E)',F:'Fasiliti (F)'};
+const CATBM={B:'Pembinaan Bangunan (B)',CE:'Kejuruteraan Awam (CE)',M:'Mekanikal (M)',E:'Elektrikal (E)',F:'Fasiliti (F)'},CATEN={B:'Building (B)',CE:'Civil Engineering (CE)',M:'Mechanical (M)',E:'Electrical (E)',F:'Facility (F)'};
+const CAT=CATBM;const catName=k=>(LANG==='en'?CATEN:CATBM)[k];
 const catOf=c=>c.startsWith('CE')?'CE':c[0];
 const MOF={"010101":["Bahan Bacaan Terbitan Luar Negara","Penerbitan"],"010102":["Bahan Bacaan","Penerbitan"],"010103":["Penerbitan Elektronik Atas Talian","Penerbitan"],"010104":["Bahan Penerbitan Elektronik Dan Muzik/Lagu (siap cetak)","Penerbitan"],"010201":["Kertas","Kertas"],"010299":["Pembuat","Kertas"],"010301":["Peralatan Percetakan Serta Aksesori","Peralatan Penerbitan / Percetakan"],"010302":["Peralatan Sistem Bunyi, Pembesar Suara dan Projektor","Peralatan Penerbitan / Percetakan"],"010303":["Peralatan / Perkakasan Penyuntingan / Persembahan","Peralatan Penerbitan / Percetakan"],"010304":["Medium Penyimpanan","Peralatan Penerbitan / Percetakan"],"010399":["Pembuat","Peralatan Penerbitan / Percetakan"],"020101":["Perabot, Perabot Makmal & Kelengkapan (Kayu/Rotan/Fabrik/Logam/Plastik)","Perabot, Kelengkapan Dan Aksesori"],"020102":["Barangan Hiasan Dalaman Dan Aksesori","Perabot, Kelengkapan Dan Aksesori"],"020103":["Permaidani/Ambal","Perabot, Kelengkapan Dan Aksesori"],"020199":["Pembuat","Perabot, Kelengkapan Dan Aksesori"],"020201":["Mesin-Mesin Pejabat & Aksesori","Mesin-Mesin Pejabat & Aksesori"],"020301":["Perkakas Elektrik & Aksesori","Perkakas Elektrik & Elektronik"],"020302":["Perkakas Elektronik & Aksesori","Perkakas Elektrik & Elektronik"],"020399":["Pembuat","Perkakas Elektrik & Elektronik"],"020401":["Peralatan & Perkakas Domestik","Peralatan & Perkakas Domestik"],"020402":["Perkakasan & Bahan Kebersihan Diri, Kelengkapan Bilik Air & Aksesori","Peralatan & Perkakas Domestik"],"020403":["Bahan Pencuci & Pembersihan","Peralatan & Perkakas Domestik"],"020404":["Bahan & Peralatan Solekan dan Andaman","Peralatan & Perkakas Domestik"],"020499":["Pembuat","Peralatan & Perkakas Domestik"],"020501":["Bahan Pembungkusan/Bekas/Kotak/Palet","Bahan Pembungkusan/Bekas"],"020599":["Pembuat","Bahan Pembungkusan/Bekas"],"020601":["Alatulis (tidak termasuk borang & kertas)","Bekalan Pejabat & Alatulis"],"020602":["Bahan Surih, Drafting & Alat Lukis","Bekalan Pejabat & Alatulis"],"020603":["Organiser, Diari, Kalendar, Buku Alamat, Resit, Memo","Bekalan Pejabat & Alatulis"],"020604":["Tag/Label/Tanda & Stiker","Bekalan Pejabat & Alatulis"],"020699":["Pembuat","Bekalan Pejabat & Alatulis"],"020701":["Tekstil","Tekstil"],"020799":["Pembuat","Tekstil"],"020801":["Pakaian","Pakaian & Kelengkapan"],"020802":["Kelengkapan Pakaian","Pakaian & Kelengkapan"],"020803":["Bagasi & Beg","Pakaian & Kelengkapan"],"020804":["Pakaian Keselamatan, Kelengkapan & Aksesori","Pakaian & Kelengkapan"],"020899":["Pembuat","Pakaian & Kelengkapan"],"020901":["Bahan Tarpaulin & Kanvas","Bahan Tarpaulin & Kanvas"],"020999":["Pembuat","Bahan Tarpaulin & Kanvas"],"021001":["Butang & Bekalan Jahitan (kits)","Aksesori & Bekalan Jahitan"],"021099":["Pembuat","Aksesori & Bekalan Jahitan"],"030101":["Pakaian Sukan & Aksesori","Pakaian Sukan & Aksesori"],"030199":["Pembuat","Pakaian Sukan & Aksesori"],"030201":["Cenderamata & Hadiah","Cenderamata & Hadiah"],"030299":["Pembuat","Cenderamata & Hadiah"],"030301":["Alat Muzik & Aksesori","Alat Muzik"],"030399":["Pembuat","Alat Muzik"],"030401":["Peralatan Perkhemahan & Aktiviti Luar","Perkhemahan & Aktiviti Luar"],"030402":["Peralatan Memancing","Perkhemahan & Aktiviti Luar"],"030403":["Peralatan Memburu","Perkhemahan & Aktiviti Luar"],"030499":["Pembuat","Perkhemahan & Aktiviti Luar"],"030501":["Peralatan Sukan","Peralatan Sukan, Rekreasi & Kecergasan"],"030599":["Pembuat","Peralatan Sukan, Rekreasi & Kecergasan"],"040101":["Makanan & Bahan Mentah Kering/Basah","Makanan, Minuman & Bahan Mentah"],"040102":["Makanan & Minuman (tin, botol dan bungkus)","Makanan, Minuman & Bahan Mentah"],"040103":["Makanan Bermasak (Islam)","Makanan, Minuman & Bahan Mentah"],"040104":["Makanan Bermasak (bukan Islam)","Makanan, Minuman & Bahan Mentah"],"040199":["Pembuat","Makanan, Minuman & Bahan Mentah"],"050101":["Peralatan & Kelengkapan Hospital","Peralatan Hospital & Perubatan"],"050102":["Peralatan & Kelengkapan Perubatan","Peralatan Hospital & Perubatan"],"050103":["Peralatan Untuk OKU & Pemulihan","Peralatan Hospital & Perubatan"],"050199":["Pembuat","Peralatan Hospital & Perubatan"],"050202":["Racun Berjadual (perlu lesen farmasi Type A)","Ubat & Bahan Ubatan"],"050203":["Ubat Tidak Berjadual","Ubat & Bahan Ubatan"],"050204":["Makanan/Minuman Tambahan (Food Supplement)","Ubat & Bahan Ubatan"],"050299":["Pembuat (perlu lesen pengilang KKM)","Ubat & Bahan Ubatan"],"050301":["Perkakas Perubatan Pakai Buang","Perkakas, Tekstil & Pakaian Perubatan"],"050302":["Pakaian/Tekstil Pakai Buang Kakitangan/Pesakit","Perkakas, Tekstil & Pakaian Perubatan"],"050303":["Pakaian/Tekstil Guna Semula Kakitangan/Pesakit","Perkakas, Tekstil & Pakaian Perubatan"],"050399":["Pembuat","Perkakas, Tekstil & Pakaian Perubatan"],"060101":["Kimia Makmal","Kimia"],"060102":["Kimia Industri","Kimia"],"060103":["Kimia Memproses Air","Kimia"],"060104":["Kimia Memproses Filem/Fotografi","Kimia"],"060199":["Pembuat","Kimia"],"060201":["Bahan Peledak","Bahan Biokimia & Gas"],"060202":["Bunga Api & Mercun","Bahan Biokimia & Gas"],"060203":["Pencucuh/Alat Penghasil Nyalaan","Bahan Biokimia & Gas"],"060204":["Gas (industri dan domestik)","Bahan Biokimia & Gas"],"060205":["Pewarna/Pencelup/Lilin","Bahan Biokimia & Gas"],"060299":["Pembuat","Bahan Biokimia & Gas"],"060301":["Bahan Bakar","Bahan Bakar & Pelincir"],"060302":["Bahan Pelincir","Bahan Bakar & Pelincir"],"060303":["Bahan Api Nuklear","Bahan Bakar & Pelincir"],"060399":["Pembuat","Bahan Bakar & Pelincir"],"060401":["Cat","Cat, Anti Kakis & Bahan Tambah"],"060402":["Anti Kakis/Bahan Tambah","Cat, Anti Kakis & Bahan Tambah"],"060499":["Pembuat","Cat, Anti Kakis & Bahan Tambah"],"060501":["Peralatan Makmal serta Aksesori","Peralatan Makmal"],"060502":["Peralatan Makmal Pengukuran, Pencerapan & Sukat","Peralatan Makmal"],"060599":["Pembuat","Peralatan Makmal"],"070101":["Baja & Nutrien Tumbuhan","Baja & Racun"],"070102":["Racun Serangga/Perosak, Rumpai/Tumbuhan","Baja & Racun"],"070199":["Pembuat","Baja & Racun"],"070201":["Tanaman/Baka/Benih Semaian","Tanaman, Ternakan, Baka & Sampel"],"070202":["Haiwan Ternakan, Bukan Ternakan & Akuatik","Tanaman, Ternakan, Baka & Sampel"],"070203":["Sampel & Sampel Awetan","Tanaman, Ternakan, Baka & Sampel"],"070301":["Ubat Haiwan/Akuatik","Ubat, Makanan Ternakan & Peralatan"],"070302":["Makanan Haiwan/Akuatik","Ubat, Makanan Ternakan & Peralatan"],"070303":["Peralatan & Kelengkapan Pertanian/Ternakan/Akuatik","Ubat, Makanan Ternakan & Peralatan"],"070304":["Hasil Sampingan & Sisa Perladangan","Ubat, Makanan Ternakan & Peralatan"],"070305":["Habitat & Tempat Kurungan Haiwan","Ubat, Makanan Ternakan & Peralatan"],"070306":["Peralatan Pengawalan Perosak Tanaman","Ubat, Makanan Ternakan & Peralatan"],"070399":["Pembuat","Ubat, Makanan Ternakan & Peralatan"],"080101":["Kelengkapan/Kemudahan Awam","Kelengkapan/Kemudahan Awam"],"080102":["Kontena","Kelengkapan/Kemudahan Awam"],"080199":["Pembuat","Kelengkapan/Kemudahan Awam"],"090101":["Bahan Binaan","Bahan Binaan"],"090102":["Paip & Kelengkapan","Bahan Binaan"],"090199":["Pembuat","Bahan Binaan"],"090201":["Peralatan Keselamatan/Perabot Jalan Raya","Peralatan Keselamatan Jalan Raya"],"090299":["Pembuat","Peralatan Keselamatan Jalan Raya"],"100101":["Semua Peralatan Sukatan/Ukuran","Peralatan Sukatan Dan Ukuran"],"100199":["Pembuat","Peralatan Sukatan Dan Ukuran"],"110101":["Basikal","Kenderaan Bermotor & Tidak Bermotor"],"110102":["Motosikal","Kenderaan Bermotor & Tidak Bermotor"],"110103":["Kereta","Kenderaan Bermotor & Tidak Bermotor"],"110104":["Lori","Kenderaan Bermotor & Tidak Bermotor"],"110105":["Bas","Kenderaan Bermotor & Tidak Bermotor"],"110106":["Kenderaan Kegunaan Khusus","Kenderaan Bermotor & Tidak Bermotor"],"110199":["Pembuat","Kenderaan Bermotor & Tidak Bermotor"],"110201":["Jentera Berat","Jentera Berat"],"110202":["Kren","Jentera Berat"],"110203":["Trailer Dan Aksesori","Jentera Berat"],"110299":["Pembuat","Jentera Berat"],"110301":["Alat Ganti/Aksesori Kenderaan","Alat Ganti Kenderaan/Jentera Berat"],"110302":["Alat Ganti/Aksesori Jentera Berat","Alat Ganti Kenderaan/Jentera Berat"],"110303":["Enjin Kenderaan/Jentera Berat","Alat Ganti Kenderaan/Jentera Berat"],"110304":["Peralatan Servis Dan Selenggara","Alat Ganti Kenderaan/Jentera Berat"],"110399":["Pembuat","Alat Ganti Kenderaan/Jentera Berat"],"110401":["Kenderaan Ber Rel Dan Kereta Kabel","Kenderaan Ber Rel"],"110402":["Lokomotif Dan Troli Elektrik","Kenderaan Ber Rel"],"110403":["Sistem, Peralatan, Alat Ganti Kereta Api Dan Aksesori","Kenderaan Ber Rel"],"110499":["Pembuat","Kenderaan Ber Rel"],"110501":["Pesawat Udara","Pesawat, Kapal Angkasa, Satelit, Radar"],"110502":["Helikopter","Pesawat, Kapal Angkasa, Satelit, Radar"],"110503":["Alat Ganti Dan Kelengkapan Pesawat/Helikopter","Pesawat, Kapal Angkasa, Satelit, Radar"],"110504":["Kapal Angkasa Dan Alat Ganti","Pesawat, Kapal Angkasa, Satelit, Radar"],"110505":["Satelit Dan Alat Ganti","Pesawat, Kapal Angkasa, Satelit, Radar"],"110506":["Radar Dan Alat Ganti","Pesawat, Kapal Angkasa, Satelit, Radar"],"110507":["Simulator","Pesawat, Kapal Angkasa, Satelit, Radar"],"110599":["Pembuat","Pesawat, Kapal Angkasa, Satelit, Radar"],"110601":["Bot","Bot dan Kapal"],"110602":["Kapal Laut/Kapal Selam","Bot dan Kapal"],"110603":["Alat Ganti Dan Kelengkapan Bot/Kapal/Kapal Selam","Bot dan Kapal"],"110604":["Simulator Bot/Kapal/Kapal Selam","Bot dan Kapal"],"110699":["Pembuat","Bot dan Kapal"],"110701":["Peralatan Marin","Peralatan Marin"],"110799":["Pembuat","Peralatan Marin"],"120101":["Senjata Api","Senjata, Peluru & Bahan Letupan"],"120102":["Peluru Dan Bom","Senjata, Peluru & Bahan Letupan"],"120103":["Aksesori Senjata Api","Senjata, Peluru & Bahan Letupan"],"120104":["Bahan Letupan/Complete Rounds","Senjata, Peluru & Bahan Letupan"],"120199":["Pembuat","Senjata, Peluru & Bahan Letupan"],"120201":["Kelengkapan Sasaran","Kelengkapan Sasaran"],"120299":["Pembuat","Kelengkapan Sasaran"],"120301":["Peluru Berpandu","Misil, Roket & Sub-Sistem"],"120302":["Sub Sistem Roket","Misil, Roket & Sub-Sistem"],"120303":["Pelancar Misil Dan Roket","Misil, Roket & Sub-Sistem"],"120399":["Pembuat","Misil, Roket & Sub-Sistem"],"120401":["Alat Keselamatan, Perlindungan Dan Kawalan","Peralatan Keselamatan & Penguatkuasaan"],"120402":["Alat Forensik Dan Aksesori","Peralatan Keselamatan & Penguatkuasaan"],"120499":["Pembuat","Peralatan Keselamatan & Penguatkuasaan"],"120501":["Kunci, Perkakasan Perlindungan Dan Aksesori","Pengesanan, Pemantauan & Perlindungan"],"120502":["Peralatan Pemantauan Dan Pengesanan","Pengesanan, Pemantauan & Perlindungan"],"120503":["Lesen/Pengenalan Dan Pas Keselamatan Bersalut","Pengesanan, Pemantauan & Perlindungan"],"120599":["Pembuat","Pengesanan, Pemantauan & Perlindungan"],"120601":["Sistem Pencegah Kebakaran","Perlindungan Kebakaran"],"120602":["Peralatan Kawalan Api","Perlindungan Kebakaran"],"120699":["Pembuat","Perlindungan Kebakaran"],"130101":["Mesin Dan Kelengkapan Bengkel","Mesin, Kelengkapan Bengkel & Pengeluaran"],"130102":["Mesin dan Kelengkapan Khusus","Mesin, Kelengkapan Bengkel & Pengeluaran"],"130199":["Pembuat","Mesin, Kelengkapan Bengkel & Pengeluaran"],"130201":["Janakuasa, Peralatan/Alat Ganti/Aksesori (Secondary)","Janakuasa Elektrik & Generator"],"130202":["Mesin dan Kelengkapan Khusus (Janakuasa)","Janakuasa Elektrik & Generator"],"130299":["Pembuat","Janakuasa Elektrik & Generator"],"130301":["Peralatan Sistem Kumbahan Dan Aksesori","Sistem Kumbahan"],"130399":["Pembuat","Sistem Kumbahan"],"130401":["Peralatan Perindustrian Huluan","Peralatan Perindustrian Minyak"],"130402":["Peralatan Perindustrian Hiliran","Peralatan Perindustrian Minyak"],"130499":["Pembuat","Peralatan Perindustrian Minyak"],"140101":["Motor Dan Alat Ubah/Alat Ganti","Jentera Penjanaan & Pengagihan Elektrik"],"140102":["Enjin, Komponen Enjin Dan Aksesori","Jentera Penjanaan & Pengagihan Elektrik"],"140103":["Komponen Enjin Pembakaran Dalaman/Gas Turbine","Jentera Penjanaan & Pengagihan Elektrik"],"140199":["Pembuat","Jentera Penjanaan & Pengagihan Elektrik"],"140201":["Stesen Janakuasa, Peralatan/Alat Ganti/Aksesori (Primary)","Stesen Janakuasa & Generator"],"140202":["Penjana Kuasa","Stesen Janakuasa & Generator"],"140203":["Alat Penyimpan Tenaga Dan Aksesori","Stesen Janakuasa & Generator"],"140299":["Pembuat","Stesen Janakuasa & Generator"],"140301":["Kabel Elektrik Dan Aksesori","Kabel, Wayar Elektrik & Aksesori"],"140302":["Wayar Elektrik Dan Aksesori","Kabel, Wayar Elektrik & Aksesori"],"140399":["Pembuat","Kabel, Wayar Elektrik & Aksesori"],"140401":["Reaktor dan Instrumen Nuklear","Tenaga Atom & Nuklear"],"140499":["Pembuat","Tenaga Atom & Nuklear"],"140501":["Sistem Elektronik","Sistem, Komponen Elektrik/Elektronik & Lampu"],"140502":["Komponen Dan Aksesori Elektrik/Elektronik","Sistem, Komponen Elektrik/Elektronik & Lampu"],"140503":["Lampu, Komponen Lampu Dan Aksesori","Sistem, Komponen Elektrik/Elektronik & Lampu"],"140599":["Pembuat","Sistem, Komponen Elektrik/Elektronik & Lampu"],"210101":["Hardware (low end) – PC, notebook, printer, scanner, peripherals & maintenance","Komputer, Perkakasan & Komponen"],"210102":["Hardware (high end) – server, mainframe, storage (SAN/NAS) & maintenance","Komputer, Perkakasan & Komponen"],"210103":["Software – OS, database, off-the-shelf packages & maintenance","Komputer, Perkakasan & Komponen"],"210104":["Software/System Development, Customization & Maintenance","Komputer, Perkakasan & Komponen"],"210105":["Telecommunication/Networking (LAN/WAN/Internet/Wireless/Satellite)","Komputer, Perkakasan & Komponen"],"210106":["Data Management incl. Disaster Recovery","Komputer, Perkakasan & Komponen"],"210107":["ICT Security & Firewall, Encryption, PKI, Anti-Virus","Komputer, Perkakasan & Komponen"],"210108":["Multimedia – Video Conferencing, Web Cast, Graphic Design, Animation","Komputer, Perkakasan & Komponen"],"210109":["Hardware & Software Leasing/Renting","Komputer, Perkakasan & Komponen"],"210110":["Geographic Information System (GIS) & Services","Komputer, Perkakasan & Komponen"],"210111":["Independent Verification & Validation (IV&V)","Komputer, Perkakasan & Komponen"],"210199":["Pembuat","Komputer, Perkakasan & Komponen"],"210201":["Alat Perhubungan","Peralatan Telekomunikasi"],"210202":["Sistem Perhubungan/Telekomunikasi","Peralatan Telekomunikasi"],"210203":["Aksesori Penghubung Dan Telekomunikasi","Peralatan Telekomunikasi"],"210204":["Pembuat","Peralatan Telekomunikasi"],"220101":["Basikal","Penyelenggaraan Kenderaan"],"220102":["Motosikal","Penyelenggaraan Kenderaan"],"220103":["Kenderaan Kegunaan Khusus","Penyelenggaraan Kenderaan"],"220104":["Kenderaan Bawah 3 Tan","Penyelenggaraan Kenderaan"],"220105":["Kenderaan Melebihi 3 Tan","Penyelenggaraan Kenderaan"],"220106":["Jentera Berat (Lori Pelarik Tanah, Roller, Forklift)","Penyelenggaraan Kenderaan"],"220107":["Kerja-Kerja Khusus (baik pulih enjin)","Penyelenggaraan Kenderaan"],"220108":["Kerja-kerja Mengetuk dan Mengecat","Penyelenggaraan Kenderaan"],"220109":["Alat Hawa Dingin Kenderaan","Penyelenggaraan Kenderaan"],"220110":["Membaik Pulih Tempat Duduk/Kusyen dan Bumbung","Penyelenggaraan Kenderaan"],"220111":["Pembaikan Kenderaan Ber Rel Dan Kereta Kabel","Penyelenggaraan Kenderaan"],"220112":["Penyelenggaraan Sistem Kenderaan","Penyelenggaraan Kenderaan"],"220113":["Membaik Pulih Tayar","Penyelenggaraan Kenderaan"],"220114":["Membaik Pulih Bateri","Penyelenggaraan Kenderaan"],"220201":["Mesin-Mesin Pejabat/Kediaman","Penyelenggaraan Mesin & Perabot"],"220202":["Perabot Pejabat/Kediaman","Penyelenggaraan Mesin & Perabot"],"220203":["Alat Muzik, Kesenian dan Aksesori","Penyelenggaraan Mesin & Perabot"],"220301":["Alat Hawa Dingin (window/split/berpusat)","Penyelenggaraan Hawa Dingin"],"220401":["Alat Kebombaan/Alat Penyelamat/Pemadam Api","Penyelenggaraan Alat Keselamatan"],"220402":["Peralatan Kawalan Keselamatan","Penyelenggaraan Alat Keselamatan"],"220403":["Mesin Pengimbas","Penyelenggaraan Alat Keselamatan"],"220501":["Alat Semboyan/Perhubungan/Penyiaran","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220502":["Kontena/Tangki","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220503":["Perkakas/Sistem Elektrik","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220504":["Mesin dan Peralatan Woksyop","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220505":["Mechanisation System","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220506":["Membaiki Buff Fuel Tank","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220507":["Pump/Paip Air Dan Komponen","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220508":["Baik Pulih Barang-Barang Logam","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220509":["Production Testing, Surface Well Testing & Wireline Services","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220510":["Faksimili","Penyelenggaraan Alat Kejuruteraan & Komunikasi"],"220601":["Alat Kelengkapan Perubatan/Makmal","Penyelenggaraan Peralatan Perubatan & Makmal"],"220602":["Mesin dan Peralatan Makmal","Penyelenggaraan Peralatan Perubatan & Makmal"],"220701":["Bot/Kapal/Barge/Kapal Selam/Jet Ski/Sampan","Penyelenggaraan Bot, Kapal & Pesawat"],"220702":["Sandblasting Dan Mengecat Untuk Kapal","Penyelenggaraan Bot, Kapal & Pesawat"],"220703":["Penyelenggaraan Kapal Terbang","Penyelenggaraan Bot, Kapal & Pesawat"],"220704":["Penyelenggaraan Helikopter","Penyelenggaraan Bot, Kapal & Pesawat"],"220705":["Penyelenggaraan Simulator Kapal","Penyelenggaraan Bot, Kapal & Pesawat"],"220706":["Penyelenggaraan Simulator Kapal Terbang","Penyelenggaraan Bot, Kapal & Pesawat"],"220707":["Penyelenggaraan Simulator Helikopter","Penyelenggaraan Bot, Kapal & Pesawat"],"220708":["Pembaikan Kenderaan Yang Tidak Berenjin","Penyelenggaraan Bot, Kapal & Pesawat"],"220709":["Pembaikan Kapal Angkasa/Satelit","Penyelenggaraan Bot, Kapal & Pesawat"],"220710":["Alat-Alat Marin (tidak termasuk bot/kapal)","Penyelenggaraan Bot, Kapal & Pesawat"],"220801":["Kawalan Keselamatan (perlu lesen KDN)","Pertahanan & Keselamatan"],"220802":["Penyiasat Persendirian (perlu lesen KDN)","Pertahanan & Keselamatan"],"220803":["Penyelenggaraan dan Pembaikan Senjata","Pertahanan & Keselamatan"],"220804":["Penyelenggaraan Misil/Roket, Sub Sistem & Pelancar","Pertahanan & Keselamatan"],"220901":["Kawalan Serangga Perosak, Anti Termite","Pengawalan & Pengawasan"],"220902":["Menangkap/Menembak Haiwan","Pengawalan & Pengawasan"],"221001":["Pembersihan Bangunan Dan Pejabat","Kebersihan & Rawatan"],"221002":["Membersih Kawasan","Kebersihan & Rawatan"],"221003":["Mengangkat Sampah","Kebersihan & Rawatan"],"221004":["Membersih Kenderaan","Kebersihan & Rawatan"],"221005":["Mencuci Kolam Renang","Kebersihan & Rawatan"],"221006":["Membersih Pantai/Sungai/Terusan/Empangan/Tasik","Kebersihan & Rawatan"],"221007":["Pelupusan & Perawatan Sisa Berbahaya","Kebersihan & Rawatan"],"221008":["Pelupusan & Perawatan Sisa Tidak Berbahaya","Kebersihan & Rawatan"],"221009":["Pelupusan & Rawatan Sisa Radioaktif dan Nuklear","Kebersihan & Rawatan"],"221010":["Kolam Kumbahan/Sisa Perawatan/Talian Paip/Salur","Kebersihan & Rawatan"],"221011":["Pembersihan Tumpahan Minyak","Kebersihan & Rawatan"],"221101":["Kakitangan Ikhtisas (profesional)","Guna Tenaga"],"221102":["Kakitangan Separa Ikhtisas","Guna Tenaga"],"221103":["Khidmat Guaman","Guna Tenaga"],"221104":["Tenaga Buruh","Guna Tenaga"],"221105":["Pemungut Hutang/Penghantar Notis","Guna Tenaga"],"221106":["Stevedor","Guna Tenaga"],"221107":["Tally Clerk","Guna Tenaga"],"221108":["Mengikat Dan Melepas Tali Kapal (Mooring)","Guna Tenaga"],"221109":["Menyelam (Diving Service)","Guna Tenaga"],"221110":["Khidmat Latihan, Tenaga Pengajar & Moderator/Negosiator","Guna Tenaga"],"221111":["Salvage Boat/Kapal","Guna Tenaga"],"221112":["Malim Kapal","Guna Tenaga"],"221203":["Cloud Seeding","Khidmat Udara / Laut / Darat"],"221204":["Hidrografi","Khidmat Udara / Laut / Darat"],"221205":["Oseanografi","Khidmat Udara / Laut / Darat"],"221206":["Pemetaan/Pemetaan Utiliti Bawah Tanah","Khidmat Udara / Laut / Darat"],"221207":["Geologi","Khidmat Udara / Laut / Darat"],"221301":["Pengeluaran Filem","Kesenian, Hiburan & Pelancongan"],"221302":["Rakaman","Kesenian, Hiburan & Pelancongan"],"221303":["Fotografi","Kesenian, Hiburan & Pelancongan"],"221304":["Audio Visual","Kesenian, Hiburan & Pelancongan"],"221305":["Penyediaan Pentas/Pameran, Taman Hiburan & Karnival","Kesenian, Hiburan & Pelancongan"],"221306":["Artis Dan Penghibur Profesional","Kesenian, Hiburan & Pelancongan"],"221307":["Agen Pengembaraan","Kesenian, Hiburan & Pelancongan"],"221308":["Dokumentasi Dan Pandu Arah","Kesenian, Hiburan & Pelancongan"],"221309":["Pemeliharaan Bahan & Tempat Bersejarah","Kesenian, Hiburan & Pelancongan"],"221310":["Penyimpanan Rekod","Kesenian, Hiburan & Pelancongan"],"221311":["Membaik Pulih Bahan Terbitan Dan Manuskrip","Kesenian, Hiburan & Pelancongan"],"221401":["Bangunan/Hiasan Dalaman","Pengindahan"],"221402":["Hiasan Jalan/Kawasan","Pengindahan"],"221501":["Perabot/Kelengkapan","Penyewaan & Pengurusan"],"221502":["Mesin dan Peralatan Pejabat","Penyewaan & Pengurusan"],"221503":["Kenderaan/Jentera/Kenderaan Rekreasi","Penyewaan & Pengurusan"],"221504":["Kapal/Bot/Bot Tunda/Feri/Barge/Jet Ski","Penyewaan & Pengurusan"],"221505":["Kapal Terbang/Helikopter/Pesawat/Simulator","Penyewaan & Pengurusan"],"221506":["Bangunan/Pejabat/Stor/Ruang Niaga/Rumah Kediaman","Penyewaan & Pengurusan"],"221507":["Kemudahan Awam/Sukan","Penyewaan & Pengurusan"],"221508":["Peralatan/Kelengkapan Hospital Dan Makmal","Penyewaan & Pengurusan"],"221509":["Peralatan Keselamatan dan Senjata","Penyewaan & Pengurusan"],"221510":["Tempat Letak Kereta","Penyewaan & Pengurusan"],"221511":["P.A Sistem Dan Alat Muzik","Penyewaan & Pengurusan"],"221512":["Bantuan Kecemasan Dan Ambulans/Kenderaan Jenazah","Penyewaan & Pengurusan"],"221513":["Pakaian/Kelengkapan Dan Aksesori","Penyewaan & Pengurusan"],"221601":["Mencetak Buku, Majalah, Laporan Akhbar","Percetakan"],"221602":["Mencetak Fail, Kad Perniagaan Dan Kad Ucapan","Percetakan"],"221603":["Mencetak Label, Poster, Pelekat dan Iron On","Percetakan"],"221604":["Mencetak Label, Poster dan Pelekat (plastik)","Percetakan"],"221605":["Mencetak Continuous Stationery Forms","Percetakan"],"221606":["Mencetak Borang/Kertas Komputer","Percetakan"],"221607":["Cetakan Keselamatan","Percetakan"],"221608":["Cetakan Hologram","Percetakan"],"221609":["Pisah Warna (colour separation)","Percetakan"],"221610":["Menjilid Kulit Keras","Percetakan"],"221611":["Varnishing","Percetakan"],"221612":["Laminating","Percetakan"],"221613":["Menjilid Kulit Lembut","Percetakan"],"221614":["Pengatur Huruf (type setting)","Percetakan"],"221615":["Reka Bentuk Percetakan","Percetakan"],"221701":["Pemilik Kapal","Pengangkutan, Penyimpanan & Pos"],"221702":["Broker Perkapalan","Pengangkutan, Penyimpanan & Pos"],"221703":["Agen Perkapalan","Pengangkutan, Penyimpanan & Pos"],"221704":["Pengangkutan Lori","Pengangkutan, Penyimpanan & Pos"],"221705":["Agen Penghantaran","Pengangkutan, Penyimpanan & Pos"],"221706":["Pembungkusan Dan Penyimpanan","Pengangkutan, Penyimpanan & Pos"],"221707":["Pembungkusan","Pengangkutan, Penyimpanan & Pos"],"221708":["Penghantaran Dokumen","Pengangkutan, Penyimpanan & Pos"],"221709":["Multimodal Transport Operator (MTO)","Pengangkutan, Penyimpanan & Pos"],"221710":["Perkhidmatan Mel Pukal","Pengangkutan, Penyimpanan & Pos"],"221711":["Pengurusan Pelabuhan","Pengangkutan, Penyimpanan & Pos"],"221712":["Ship Chandling","Pengangkutan, Penyimpanan & Pos"],"221713":["Ship Trimming","Pengangkutan, Penyimpanan & Pos"],"221801":["Syarikat Insurans","Kewangan & Insurans"],"221802":["Broker Insurans","Kewangan & Insurans"],"221803":["Penyediaan Akaun dan Pengauditan","Kewangan & Insurans"],"221804":["Pengurusan Kewangan Dan Korporat","Kewangan & Insurans"],"221806":["Syarikat Pelelong Awam","Kewangan & Insurans"],"221901":["Membeli Barang Lusuh Tanpa Permit","Barang Lusuh"],"221902":["Membeli Barang Lusuh Perlu Permit PDRM","Barang Lusuh"],"222001":["Media Elektronik","Editorial, Grafik, Seni Halus & Harta Intelek"],"222002":["Media Cetak","Editorial, Grafik, Seni Halus & Harta Intelek"],"222003":["Billboard","Editorial, Grafik, Seni Halus & Harta Intelek"],"222004":["Penulisan – Semua Jenis Penulisan","Editorial, Grafik, Seni Halus & Harta Intelek"],"222005":["Mereka Cipta Dan Seni Halus","Editorial, Grafik, Seni Halus & Harta Intelek"],"222006":["Penterjemahan","Editorial, Grafik, Seni Halus & Harta Intelek"],"222007":["Pengkomersialan","Editorial, Grafik, Seni Halus & Harta Intelek"],"222008":["Hak Harta Intelek (paten)","Editorial, Grafik, Seni Halus & Harta Intelek"],"222009":["Lain-lain Media Pengiklanan","Editorial, Grafik, Seni Halus & Harta Intelek"],"222010":["Perkhidmatan Fotostat","Editorial, Grafik, Seni Halus & Harta Intelek"],"222101":["Perikanan Dan Akuakultur","Perladangan, Perikanan & Hidupan Liar"],"222102":["Hortikultur","Perladangan, Perikanan & Hidupan Liar"],"222103":["Ternakan","Perladangan, Perikanan & Hidupan Liar"],"222104":["Pertanian/Tanaman/Ladang/Taman/Hutan","Perladangan, Perikanan & Hidupan Liar"],"222105":["Rawatan Hutan","Perladangan, Perikanan & Hidupan Liar"],"222106":["Sumber Air","Perladangan, Perikanan & Hidupan Liar"],"222107":["Tatahias Haiwan","Perladangan, Perikanan & Hidupan Liar"],"222108":["Tukun Tiruan","Perladangan, Perikanan & Hidupan Liar"],"222202":["Bantuan Kemanusiaan","Hal Ehwal Sosial & Politik"],"222203":["Dasar Dan Peraturan","Hal Ehwal Sosial & Politik"],"222301":["Solekan","Perkhidmatan Domestik"],"222302":["Dobi","Perkhidmatan Domestik"],"222303":["Membekal Air","Perkhidmatan Domestik"],"222304":["Pengurusan Jenazah Dan Kelengkapan","Perkhidmatan Domestik"],"222305":["Mengangkut Mayat","Perkhidmatan Domestik"],"222401":["Menjahit Pakaian Dan Kelengkapan","Menjahit & Baik Pulih"],"222402":["Menjahit Bukan Pakaian","Menjahit & Baik Pulih"],"222403":["Baik Pulih Kasut Dan Barangan Kulit","Menjahit & Baik Pulih"],"222404":["Barangan PVC/Kanvas","Menjahit & Baik Pulih"],"222405":["Barangan Logam","Menjahit & Baik Pulih"],"222501":["Hotel/Resort","Hotel, Rumah Tumpangan & Pusat Latihan"],"222502":["Motel/Chalet/Rumah Tumpangan","Hotel, Rumah Tumpangan & Pusat Latihan"],"222503":["Homestay","Hotel, Rumah Tumpangan & Pusat Latihan"],"222504":["Pusat Latihan","Hotel, Rumah Tumpangan & Pusat Latihan"],"222601":["Akustik Dan Gelombang","Kejuruteraan Elektronik"],"222602":["Pencahayaan (illumination)","Kejuruteraan Elektronik"],"222701":["Kajian Telekomunikasi","Perkhidmatan Lain"],"222702":["Marker/DNA","Perkhidmatan Lain"],"222703":["Bioteknologi","Perkhidmatan Lain"],"222704":["Pensijilan dan Pengiktirafan","Perkhidmatan Lain"],"222705":["Ujian Makmal","Perkhidmatan Lain"],"222706":["Kodifikasi","Perkhidmatan Lain"],"222801":["Teknologi Hijau","Teknologi Hijau"],"222901":["Ukiran Berasaskan Kayu","Seni Ukir"]};
 const MOFB={"01": "Penerbitan & Penyiaran", "02": "Perabot, Alat Pejabat, Hiasan Dalaman & Domestik", "03": "Sukan, Rekreasi & Alat Muzik", "04": "Makanan, Minuman & Bahan Mentah", "05": "Peralatan & Ubat Hospital", "06": "Cecair & Serbuk Kimia", "07": "Pertanian, Perhutanan & Ternakan", "08": "Kejuruteraan Awam & Kemudahan Awam", "09": "Bahan Binaan & Keselamatan Jalan Raya", "10": "Peralatan Sukatan & Ukuran", "11": "Pengangkutan, Komponen & Aksesori", "12": "Pertahanan & Keselamatan", "13": "Peralatan Kejuruteraan & Mesin Pengeluaran", "14": "Kejuruteraan Elektrik & Elektronik", "21": "ICT", "22": "Perkhidmatan"};
@@ -430,7 +459,7 @@ function eligible(codes,gred,kind){
     const miss=codes.filter(k=>!have.includes(k));
     if(kind!=='cidb') gred='';
     const gOk=!gred||gNum(c.gred)>=gNum(gred);
-    if(gred&&!gOk) miss.push(c.gred?'Gred '+gred+' (syarikat '+c.gred+')':'Gred '+gred+' (gred syarikat belum diisi)');
+    if(gred&&!gOk) miss.push(c.gred?L('Gred ','Grade ')+gred+L(' (syarikat ',' (company ')+c.gred+')':L('Gred ','Grade ')+gred+L(' (gred syarikat belum diisi)',' (company grade not set)'));
     if(!miss.length) ok.push(c); else if(miss.length<codes.length+(gred?1:0)) part.push({c,miss});
   });
   return {ok,part};
@@ -443,18 +472,18 @@ function chipsHTML(arr,box,ph){
     :`<span class="ph0">${ph}</span>`;
 }
 function drawCodes(){
-  $('fCodesBox').innerHTML=chipsHTML(selT,'t',{cidb:'Tekan untuk pilih kod CIDB…',mof:'Tekan untuk pilih kod bidang MOF…',span:'Tekan untuk pilih jenis SPAN…'}[kindT]);
-  $('cSpanBox').innerHTML=chipsHTML(selCS,'cs','Tekan untuk pilih jenis SPAN…');
-  $('cCodesBox').innerHTML=chipsHTML(selC,'c','Tekan untuk pilih kod CIDB…');
-  $('cMofBox').innerHTML=chipsHTML(selCM,'cm','Tekan untuk pilih kod MOF…');
+  $('fCodesBox').innerHTML=chipsHTML(selT,'t',{cidb:L('Tekan untuk pilih kod CIDB…','Tap to choose CIDB codes…'),mof:L('Tekan untuk pilih kod bidang MOF…','Tap to choose MOF codes…'),span:L('Tekan untuk pilih jenis SPAN…','Tap to choose SPAN types…')}[kindT]);
+  $('cSpanBox').innerHTML=chipsHTML(selCS,'cs',L('Tekan untuk pilih jenis SPAN…','Tap to choose SPAN types…'));
+  $('cCodesBox').innerHTML=chipsHTML(selC,'c',L('Tekan untuk pilih kod CIDB…','Tap to choose CIDB codes…'));
+  $('cMofBox').innerHTML=chipsHTML(selCM,'cm',L('Tekan untuk pilih kod MOF…','Tap to choose MOF codes…'));
 }
 function setKind(k){
-  if(k!==kindT&&selT.length&&!confirm('Tukar jenis kod? Kod yang dipilih akan dikosongkan.'))return;
+  if(k!==kindT&&selT.length&&!confirm(L('Tukar jenis kod? Kod yang dipilih akan dikosongkan.','Change code type? Selected codes will be cleared.')))return;
   if(k!==kindT) selT=[];
   kindT=k;
   document.querySelectorAll('#fKind button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
   $('gredBox').style.display=k==='cidb'?'block':'none'; if(k!=='cidb') $('fGred').value='';
-  $('fCodesLbl').textContent={cidb:'Company Code (Kod Pengkhususan CIDB)',mof:'Company Code (Kod Bidang MOF)',span:'Company Code (Jenis SPAN)'}[k];
+  $('fCodesLbl').textContent={cidb:L('Company Code (Kod Pengkhususan CIDB)','Company Code (CIDB Specialisation)'),mof:L('Company Code (Kod Bidang MOF)','Company Code (MOF Field Code)'),span:L('Company Code (Jenis SPAN)','Company Code (SPAN Type)')}[k];
   drawCodes(); eligUI();
 }
 const pickArr=t=>t==='t'?selT:t==='c'?selC:t==='cs'?selCS:selCM;
@@ -462,8 +491,8 @@ function rmCode(box,c){ if(box==='t'){selT=selT.filter(x=>x!==c);eligUI()}else i
 function openPick(t){
   PK.target=t; PK.type=t==='cm'?'mof':t==='cs'?'span':t==='c'?'cidb':kindT;
   PK.sel=[...pickArr(t)]; PK.cat=''; $('pQ').value='';
-  $('pTitle').textContent={mof:'Kod Bidang MOF',cidb:'Kod Pengkhususan CIDB',span:'Jenis SPAN'}[PK.type];
-  $('pQ').placeholder={mof:'Cari kod atau bidang, cth: 210104 / ICT',cidb:'Cari kod atau bidang, cth: CE21 / SCADA',span:'Cari jenis SPAN'}[PK.type];
+  $('pTitle').textContent={mof:L('Kod Bidang MOF','MOF Field Codes'),cidb:L('Kod Pengkhususan CIDB','CIDB Specialisation Codes'),span:L('Jenis SPAN','SPAN Types')}[PK.type];
+  $('pQ').placeholder={mof:L('Cari kod atau bidang, cth: 210104 / ICT','Search code or field, e.g. 210104 / ICT'),cidb:L('Cari kod atau bidang, cth: CE21 / SCADA','Search code or field, e.g. CE21 / SCADA'),span:L('Cari jenis SPAN, cth: SPAN-A1','Search SPAN type, e.g. SPAN-A1')}[PK.type];
   $('pCats').style.display=PK.type==='cidb'?'flex':'none'; $('pCatSel').style.display=PK.type==='mof'?'block':'none';
   pickList(); openS('sPick'); setTimeout(()=>$('pList').scrollTop=0,0);
 }
@@ -471,7 +500,7 @@ function pickList(){
   if(PK.type==='mof') return pickListMof();
   if(PK.type==='span') return pickListSpan();
   const q=$('pQ').value.toLowerCase().trim();
-  $('pCats').innerHTML=[['','Semua'],...Object.entries(CAT).map(([k,v])=>[k,k])].map(([k,v])=>{
+  $('pCats').innerHTML=[['',L('Semua','All')],...Object.entries(CAT).map(([k,v])=>[k,k])].map(([k,v])=>{
     const n=PK.sel.filter(c=>!k||catOf(c)===k).length;
     return `<button class="${PK.cat===k?'on':''}" onclick="PK.cat='${k}';pickList()">${v}${n?' · '+n:''}</button>`}).join('');
   let h='';
@@ -479,18 +508,18 @@ function pickList(){
     if(PK.cat&&PK.cat!==cat)return;
     const rows=Object.keys(CIDB).filter(c=>catOf(c)===cat&&(!q||c.toLowerCase().includes(q)||CIDB[c].toLowerCase().includes(q)));
     if(!rows.length)return;
-    h+=`<div class="pcat">${CAT[cat]}</div>`+rows.map(c=>{const on=PK.sel.includes(c);
+    h+=`<div class="pcat">${catName(cat)}</div>`+rows.map(c=>{const on=PK.sel.includes(c);
       return `<label class="pi ${on?'on':''}" style="margin:0;color:var(--ink)"><input type="checkbox" ${on?'checked':''} onchange="togPick('${c}')"><b>${c}</b><span>${esc(CIDB[c])}</span></label>`}).join('');
   });
   // kod lama yang bukan dalam senarai CIDB
   const extra=PK.sel.filter(c=>!CIDB[c]);
-  if(extra.length&&!PK.cat) h=`<div class="pcat">Kod lain</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">Bukan kod CIDB</span></label>`).join('')+h;
-  $('pList').innerHTML=h||'<div class="emptyrail" style="margin:10px 0">Tiada kod sepadan.</div>';
-  $('pDone').textContent=`Selesai (${PK.sel.length} dipilih)`;
+  if(extra.length&&!PK.cat) h=`<div class="pcat">${L('Kod lain','Other codes')}</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">${L('Bukan kod CIDB','Not a CIDB code')}</span></label>`).join('')+h;
+  $('pList').innerHTML=h||`<div class="emptyrail" style="margin:10px 0">${L('Tiada kod sepadan.','No matching codes.')}</div>`;
+  $('pDone').textContent=L(`Selesai (${PK.sel.length} dipilih)`,`Done (${PK.sel.length} selected)`);
 }
 function pickListMof(){
   const q=$('pQ').value.toLowerCase().trim();
-  $('pCatSel').innerHTML=`<option value="">Semua bidang${PK.sel.length?' · '+PK.sel.length+' dipilih':''}</option>`+Object.entries(MOFB).map(([k,v])=>{const n=PK.sel.filter(c=>c.slice(0,2)===k).length;return `<option value="${k}" ${PK.cat===k?'selected':''}>${k} · ${v}${n?' ('+n+')':''}</option>`}).join('');
+  $('pCatSel').innerHTML=`<option value="">${L('Semua bidang','All fields')}${PK.sel.length?' · '+PK.sel.length+L(' dipilih',' selected'):''}</option>`+Object.entries(MOFB).map(([k,v])=>{const n=PK.sel.filter(c=>c.slice(0,2)===k).length;return `<option value="${k}" ${PK.cat===k?'selected':''}>${k} · ${v}${n?' ('+n+')':''}</option>`}).join('');
   let h='';
   Object.keys(MOFB).forEach(b=>{
     if(PK.cat&&PK.cat!==b)return;
@@ -500,18 +529,18 @@ function pickListMof(){
       return `<label class="pi ${on?'on':''}" style="margin:0;color:var(--ink)"><input type="checkbox" ${on?'checked':''} onchange="togPick('${c}')"><b>${c}</b><span>${esc(MOF[c][0])}<small>${esc(MOF[c][1])}</small></span></label>`}).join('');
   });
   const extra=PK.sel.filter(c=>!MOF[c]);
-  if(extra.length&&!PK.cat) h=`<div class="pcat">Kod lain</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">Bukan kod MOF</span></label>`).join('')+h;
-  $('pList').innerHTML=h||'<div class="emptyrail" style="margin:10px 0">Tiada kod sepadan.</div>';
-  $('pDone').textContent=`Selesai (${PK.sel.length} dipilih)`;
+  if(extra.length&&!PK.cat) h=`<div class="pcat">${L('Kod lain','Other codes')}</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">${L('Bukan kod MOF','Not a MOF code')}</span></label>`).join('')+h;
+  $('pList').innerHTML=h||`<div class="emptyrail" style="margin:10px 0">${L('Tiada kod sepadan.','No matching codes.')}</div>`;
+  $('pDone').textContent=L(`Selesai (${PK.sel.length} dipilih)`,`Done (${PK.sel.length} selected)`);
 }
 function pickListSpan(){
   const q=$('pQ').value.toLowerCase().trim(), all=SPN();
   const rows=all.filter(x=>!q||x.code.toLowerCase().includes(q)||x.nama.toLowerCase().includes(q));
   let h=rows.map(x=>{const on=PK.sel.includes(x.code);return `<label class="pi ${on?'on':''}" style="margin:0;color:var(--ink)"><input type="checkbox" ${on?'checked':''} onchange="togPick('${esc(x.code)}')"><b>${esc(x.code)}</b><span>${esc(x.nama)}</span></label>`}).join('');
   const extra=PK.sel.filter(c=>!all.some(x=>x.code===c));
-  if(extra.length) h=`<div class="pcat">Jenis lama (sudah dipadam)</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">Tiada dalam senarai</span></label>`).join('')+h;
-  $('pList').innerHTML=h||`<div class="emptyrail" style="margin:10px 0">${all.length?'Tiada jenis sepadan.':'Belum ada jenis SPAN.<br>Tambah di <b>Setting → Jenis SPAN</b>.'}</div>`;
-  $('pDone').textContent=`Selesai (${PK.sel.length} dipilih)`;
+  if(extra.length) h=`<div class="pcat">${L('Jenis lama (sudah dipadam)','Old types (deleted)')}</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">${L('Tiada dalam senarai','Not in list')}</span></label>`).join('')+h;
+  $('pList').innerHTML=h||`<div class="emptyrail" style="margin:10px 0">${all.length?L('Tiada jenis sepadan.','No matching types.'):L('Belum ada jenis SPAN.<br>Tambah di <b>Setting → Jenis SPAN</b>.','No SPAN types yet.<br>Add them in <b>Setting → SPAN Types</b>.')}</div>`;
+  $('pDone').textContent=L(`Selesai (${PK.sel.length} dipilih)`,`Done (${PK.sel.length} selected)`);
 }
 function togPick(c){ PK.sel=PK.sel.includes(c)?PK.sel.filter(x=>x!==c):[...PK.sel,c]; const st=$('pList').scrollTop; pickList(); $('pList').scrollTop=st; }
 function pickDone(){
@@ -543,26 +572,26 @@ function lists(){
 function render(){
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
   $('addB').style.display=tab==='register'?'grid':'none';
-  const L=lists();
-  const upBrief=L.brief.filter(t=>!isPast(t.briefing)), upClose=L.close.filter(t=>!isPast(t.closing));
+  const LS=lists();
+  const upBrief=LS.brief.filter(t=>!isPast(t.briefing)), upClose=LS.close.filter(t=>!isPast(t.closing));
   const badge=(id,n)=>{$(id).textContent=n||'';$(id).style.display=n?'block':'none'};
-  badge('nRegister',L.regAktif.length);badge('nBriefing',upBrief.length);badge('nBuy',L.buy.length);badge('nClosing',upClose.length);
+  badge('nRegister',LS.regAktif.length);badge('nBriefing',upBrief.length);badge('nBuy',LS.buy.length);badge('nClosing',upClose.length);
   const al=alerts(); $('bellN').textContent=al.length; $('bellN').style.display=al.length?'grid':'none';
 
   let h='';
   if(tab==='register'){
-    h+=hero('Register','Daftar tender.','Tekan <b>+</b> di atas untuk tambah tender baru.',[[L.regAktif.length,'Dalam pendaftaran'],[T().length,'Jumlah tender'],[C().length,'Syarikat']]);
-    h+=`<div class="search"><input id="q" placeholder="Cari nama tender" value="${esc(window._q||'')}" oninput="window._q=this.value;renderList()"></div>`;
-    h+=`<div class="seg"><button class="${regView==='aktif'?'on':''}" onclick="regView='aktif';render()">Aktif</button><button class="${regView==='semua'?'on':''}" onclick="regView='semua';render()">Semua</button></div>`;
+    h+=hero('Register',L('Daftar tender.','Register tenders.'),L('Tekan <b>+</b> di atas untuk tambah tender baru.','Tap <b>+</b> above to add a new tender.'),[[LS.regAktif.length,L('Dalam pendaftaran','In registration')],[T().length,L('Jumlah tender','Total tenders')],[C().length,L('Syarikat','Companies')]]);
+    h+=`<div class="search"><input id="q" placeholder="${L('Cari nama tender','Search tender name')}" value="${esc(window._q||'')}" oninput="window._q=this.value;renderList()"></div>`;
+    h+=`<div class="seg"><button class="${regView==='aktif'?'on':''}" onclick="regView='aktif';render()">${L('Aktif','Active')}</button><button class="${regView==='semua'?'on':''}" onclick="regView='semua';render()">${L('Semua','All')}</button></div>`;
     h+=`<div id="lst"></div>`;
   }else if(tab==='briefing'){
-    h+=hero('Site Briefing','Taklimat tapak.','Senarai tender yang ada site briefing / lawatan tapak.',[[upBrief.length,'Akan datang'],[L.brief.length-upBrief.length,'Sudah lepas']],'#1d3f6b');
+    h+=hero('Site Briefing',L('Taklimat tapak.','Site briefing.'),L('Senarai tender yang ada site briefing / lawatan tapak.','Tenders with a site briefing / site visit.'),[[upBrief.length,L('Akan datang','Upcoming')],[LS.brief.length-upBrief.length,L('Sudah lepas','Past')]],'#1d3f6b');
     h+=`<div id="lst"></div>`;
   }else if(tab==='buy'){
-    h+=hero('Document Sales','Beli dokumen.','Tender yang tempoh pendaftaran sudah tamat — masa untuk beli dokumen.',[[L.buy.length,'Perlu tindakan'],[L.buy.filter(t=>t.bought).length,'Sudah beli']],'#5a3d0f');
+    h+=hero('Document Sales',L('Beli dokumen.','Buy documents.'),L('Tender yang tempoh pendaftaran sudah tamat — masa untuk beli dokumen.','Registration has ended — time to buy the tender documents.'),[[LS.buy.length,L('Perlu tindakan','Need action')],[LS.buy.filter(t=>t.bought).length,L('Sudah beli','Bought')]],'#5a3d0f');
     h+=`<div id="lst"></div>`;
   }else if(tab==='closing'){
-    h+=hero('Closing Date','Tarikh tutup.','Tender yang belum tutup. Tender yang sudah tamat ada dalam 🗂️ History.',[[upClose.length,'Belum tutup'],[upClose.filter(t=>left(t.closing).cls==='hot').length,'≤ 3 hari'],[L.close.length-upClose.length,'Dalam History']],'#5a1f1a');
+    h+=hero('Closing Date',L('Tarikh tutup.','Closing date.'),L('Tender yang belum tutup. Tender yang sudah tamat ada dalam 🗂️ History.','Tenders not yet closed. Closed tenders are in 🗂️ History.'),[[upClose.length,L('Belum tutup','Open')],[upClose.filter(t=>left(t.closing).cls==='hot').length,L('≤ 3 hari','≤ 3 days')],[LS.close.length-upClose.length,L('Dalam History','In History')]],'#5a1f1a');
     h+=`<div id="lst"></div>`;
   }else{
     h+=settingsHTML();
@@ -572,22 +601,22 @@ function render(){
 }
 const byNew=(a,b)=>(b.created||0)-(a.created||0);
 function renderList(){
-  const L=lists(); let arr=[], key='closing', empty='';
+  const LS=lists(); let arr=[], key='closing', empty='';
   if(tab==='register'){
-    arr=regView==='aktif'?L.regAktif:L.regAll; key='regEnd';
+    arr=regView==='aktif'?LS.regAktif:LS.regAll; key='regEnd';
     const q=(window._q||'').toLowerCase().trim(); if(q) arr=arr.filter(t=>t.nama.toLowerCase().includes(q));
-    empty=T().length?'Tiada tender dalam tempoh pendaftaran. Lihat <b>Semua</b>.':'Belum ada tender.<br>Tekan <b>+</b> di kanan atas untuk tambah.';
+    empty=T().length?L('Tiada tender dalam tempoh pendaftaran. Lihat <b>Semua</b>.','No tenders in registration. See <b>All</b>.'):L('Belum ada tender.<br>Tekan <b>+</b> di kanan atas untuk tambah.','No tenders yet.<br>Tap <b>+</b> at the top right to add one.');
   }else if(tab==='briefing'){
-    const up=L.brief.filter(t=>!isPast(t.briefing)).sort(byNew), past=L.brief.filter(t=>isPast(t.briefing)).sort(byNew);
-    if(!L.brief.length){$('lst').innerHTML=`<div class="emptyrail">Tiada tender dengan site briefing.</div>`;return}
-    $('lst').innerHTML=(up.length?up.map((t,i)=>card(t,'briefing',i+1)).join(''):`<div class="emptyrail">Tiada briefing akan datang.</div>`)
-      +(past.length?`<div class="sec-h">Sudah lepas</div>`+past.map((t,i)=>card(t,'briefing',up.length+i+1)).join(''):'');
+    const up=LS.brief.filter(t=>!isPast(t.briefing)).sort(byNew), past=LS.brief.filter(t=>isPast(t.briefing)).sort(byNew);
+    if(!LS.brief.length){$('lst').innerHTML=`<div class="emptyrail">${L('Tiada tender dengan site briefing.','No tenders with a site briefing.')}</div>`;return}
+    $('lst').innerHTML=(up.length?up.map((t,i)=>card(t,'briefing',i+1)).join(''):`<div class="emptyrail">${L('Tiada briefing akan datang.','No upcoming briefings.')}</div>`)
+      +(past.length?`<div class="sec-h">${L('Sudah lepas','Past')}</div>`+past.map((t,i)=>card(t,'briefing',up.length+i+1)).join(''):'');
     return;
   }else if(tab==='buy'){
-    arr=L.buy; key='saleEnd'; empty='Tiada tender dalam fasa beli dokumen.<br>Tender akan muncul di sini bila tempoh pendaftaran tamat.';
+    arr=LS.buy; key='saleEnd'; empty=L('Tiada tender dalam fasa beli dokumen.<br>Tender akan muncul di sini bila tempoh pendaftaran tamat.','No tenders in the document-buying stage.<br>Tenders appear here once registration ends.');
   }else if(tab==='closing'){
-    arr=L.close.filter(t=>!isPast(t.closing));
-    empty='Tiada tender yang akan tutup.';
+    arr=LS.close.filter(t=>!isPast(t.closing));
+    empty=L('Tiada tender yang akan tutup.','No tenders closing.');
   }
   arr=[...arr].sort(byNew);
   $('lst').innerHTML=arr.length?arr.map((t,i)=>card(t,key,i+1)).join(''):`<div class="emptyrail">${empty}</div>`;
@@ -605,13 +634,13 @@ function card(t,key,n){
   else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',fmtClose(t.closing)); }
   else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
   const el=eligible(t.codes,t.gred,kindOf(t));
-  const chips=(t.codes&&t.codes.length)||t.gred?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):'<span class="chip">Tiada syarikat layak</span>'}</div>`:'';
+  const chips=(t.codes&&t.codes.length)||t.gred?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada syarikat layak','No eligible company')}</span>`}</div>`:'';
   let acts='';
   if(t.type==='invite'&&t.link&&key==='regEnd') acts+=`<a class="btn sec sm" href="${esc(t.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📝 Google Form</a>`;
-  if(key==='regEnd') acts+=flagBtn(t,'registered','✓ Sudah Daftar','Tanda Sudah Daftar');
-  if(key==='saleEnd') acts+=flagBtn(t,'bought','✓ Sudah Beli','Tanda Sudah Beli');
-  if(key==='briefing'&&!isPast(t.briefing)) acts+=flagBtn(t,'briefed','✓ Akan Hadir','Tanda Akan Hadir');
-  if(key==='closing'&&!isPast(t.closing)) acts+=flagBtn(t,'submitted','✓ Sudah Hantar','Tanda Sudah Hantar');
+  if(key==='regEnd') acts+=flagBtn(t,'registered',L('✓ Sudah Daftar','✓ Registered'),L('Tanda Sudah Daftar','Mark Registered'));
+  if(key==='saleEnd') acts+=flagBtn(t,'bought',L('✓ Sudah Beli','✓ Bought'),L('Tanda Sudah Beli','Mark Bought'));
+  if(key==='briefing'&&!isPast(t.briefing)) acts+=flagBtn(t,'briefed',L('✓ Akan Hadir','✓ Attending'),L('Tanda Akan Hadir','Mark Attending'));
+  if(key==='closing'&&!isPast(t.closing)) acts+=flagBtn(t,'submitted',L('✓ Sudah Hantar','✓ Submitted'),L('Tanda Sudah Hantar','Mark Submitted'));
   return `<div class="tc ${l.cls}" onclick="openDetail('${t.id}')">
     <div class="t1"><div>${n?`<span class="num">${n}</span>`:''}${typ}<h3>${esc(t.nama)}</h3></div>
       <div class="cd"><b>${l.big}</b><small>${l.small}</small></div></div>
@@ -622,10 +651,10 @@ function card(t,key,n){
 function flagBtn(t,f,on,off){return `<button class="btn ${t[f]?'sec':'gold'} sm" onclick="event.stopPropagation();toggleFlag('${t.id}','${f}')">${t[f]?on:off}</button>`}
 function toggleFlag(id,f){const t=findT(id);t[f]=!t[f];putDoc('pt_tenders',t);persist()}
 function saleStatus(t){
-  if(!t.saleStart&&!t.saleEnd) return '<span class="badge b-na">Tiada tarikh</span>';
-  if(t.saleStart&&!isPast(t.saleStart)) return '<span class="badge b-blue">Belum buka</span>';
-  if(t.saleEnd&&isPast(t.saleEnd)) return '<span class="badge b-no">Jualan tamat</span>';
-  return '<span class="badge b-ok">Sedang dijual</span>';
+  if(!t.saleStart&&!t.saleEnd) return `<span class="badge b-na">${L('Tiada tarikh','No date')}</span>`;
+  if(t.saleStart&&!isPast(t.saleStart)) return `<span class="badge b-blue">${L('Belum buka','Not open yet')}</span>`;
+  if(t.saleEnd&&isPast(t.saleEnd)) return `<span class="badge b-no">${L('Jualan tamat','Sales ended')}</span>`;
+  return `<span class="badge b-ok">${L('Sedang dijual','On sale')}</span>`;
 }
 
 // ================== SHEET ==================
@@ -637,64 +666,64 @@ function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';cle
 function typeUI(){$('formLinkBox').style.display=$('fType').value==='invite'?'block':'none'}
 function eligUI(){
   const codes=selT, gred=$('fGred').value;
-  if(!codes.length&&!gred){$('eligBox').innerHTML='<span class="muted">Pilih kod dari client — syarikat yang layak akan keluar di sini.</span>';return}
-  if(!C().length){$('eligBox').innerHTML='<span class="muted">Belum ada syarikat. Tambah syarikat & code di tab <b>Setting</b>.</span>';return}
+  if(!codes.length&&!gred){$('eligBox').innerHTML=`<span class="muted">${L('Pilih kod dari client — syarikat yang layak akan keluar di sini.','Choose the codes from the client — eligible companies will show here.')}</span>`;return}
+  if(!C().length){$('eligBox').innerHTML=`<span class="muted">${L('Belum ada syarikat. Tambah syarikat & kod di tab <b>Setting</b>.','No companies yet. Add companies & codes in the <b>Setting</b> tab.')}</span>`;return}
   const el=eligible(codes,gred,kindT);
-  let h=`<div class="muted" style="margin-bottom:4px">Syarikat layak (${el.ok.length})</div>`;
-  h+=el.ok.length?el.ok.map(c=>`<div class="row"><span class="done">✓ ${esc(c.nama)}</span></div>`).join(''):'<div class="row"><span style="color:var(--red)">✗ Tiada syarikat yang memenuhi semua syarat</span></div>';
-  if(el.part.length) h+=`<div class="muted" style="margin:8px 0 4px">Hampir layak</div>`+el.part.map(p=>`<div class="row"><span>${esc(p.c.nama)}</span><span class="muted">kurang: ${esc(p.miss.join(', '))}</span></div>`).join('');
+  let h=`<div class="muted" style="margin-bottom:4px">${L('Syarikat layak','Eligible companies')} (${el.ok.length})</div>`;
+  h+=el.ok.length?el.ok.map(c=>`<div class="row"><span class="done">✓ ${esc(c.nama)}</span></div>`).join(''):`<div class="row"><span style="color:var(--red)">✗ ${L('Tiada syarikat yang memenuhi semua syarat','No company meets all requirements')}</span></div>`;
+  if(el.part.length) h+=`<div class="muted" style="margin:8px 0 4px">${L('Hampir layak','Almost eligible')}</div>`+el.part.map(p=>`<div class="row"><span>${esc(p.c.nama)}</span><span class="muted">${L('kurang','missing')}: ${esc(p.miss.join(', '))}</span></div>`).join('');
   $('eligBox').innerHTML=h;
 }
 function openForm(id){
   const t=id?findT(id):null;
-  $('fTitle').textContent=t?'Edit Tender':'Tambah Tender';
+  $('fTitle').textContent=t?L('Edit Tender','Edit Tender'):L('Tambah Tender','Add Tender');
   $('fId').value=t?.id||''; $('fNama').value=t?.nama||''; $('fType').value=t?.type||'website'; $('fLink').value=t?.link||'';
   $('fRegS').value=t?.regStart||''; $('fRegE').value=t?.regEnd||''; selT=[...(t?.codes||[])]; kindT=t?kindOf(t):'cidb'; $('fGred').value=t?.gred||''; setKind(kindT);
   $('fBrief').value=t?.briefing||''; $('fSaleS').value=t?.saleStart||''; $('fSaleE').value=t?.saleEnd||'';
   $('fClose').value=t?.closing||''; $('fNote').value=t?.note||'';
   $('fDel').style.display=t?'inline-flex':'none';
-  typeUI(); eligUI(); closeS('sDetail'); openS('sForm');
+  typeUI(); eligUI(); dtSync(); closeS('sDetail'); openS('sForm'); $('sForm').querySelector('.panel').scrollTop=0;
 }
 function saveTender(){
   const nama=$('fNama').value.trim(), closing=$('fClose').value;
-  if(!nama){toast('Sila isi Nama Tender');return}
-  if(!closing){toast('Sila isi Tender Closing Date');return}
+  if(!nama){toast(L('Sila isi Nama Tender','Please fill in Tender Name'));return}
+  if(!closing){toast(L('Sila isi Tender Closing Date','Please fill in Tender Closing Date'));return}
   const v={nama,type:$('fType').value,link:$('fType').value==='invite'?$('fLink').value.trim():'',
     regStart:$('fRegS').value,regEnd:$('fRegE').value,codes:[...selT],kind:kindT,gred:kindT==='cidb'?$('fGred').value:'',
     briefing:$('fBrief').value,saleStart:$('fSaleS').value,saleEnd:$('fSaleE').value,closing,note:$('fNote').value.trim(),updated:Date.now()};
-  if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast('Tarikh tamat pendaftaran sebelum tarikh mula');return}
-  if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast('Tarikh tamat jualan sebelum tarikh mula');return}
+  if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast(L('Tarikh tamat pendaftaran sebelum tarikh mula','Registration end is before start'));return}
+  if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast(L('Tarikh tamat jualan sebelum tarikh mula','Sales end is before start'));return}
   const id=$('fId').value;
   let t; if(id){t=findT(id);Object.assign(t,v)} else {t={id:uid(),created:Date.now(),...v};S.tenders.push(t)}
-  putDoc('pt_tenders',t); closeS('sForm'); persist(); toast(id?'Tender dikemas kini':'Tender ditambah ✓');
+  putDoc('pt_tenders',t); closeS('sForm'); persist(); toast(id?L('Tender dikemas kini','Tender updated'):L('Tender ditambah ✓','Tender added ✓'));
 }
 function delTender(){
-  const t=findT($('fId').value); if(!t||!confirm('Padam tender ini?'))return;
-  S.tenders=S.tenders.filter(x=>x.id!==t.id);delDoc('pt_tenders',t.id);closeS('sForm');persist();toast('Tender dipadam');
+  const t=findT($('fId').value); if(!t||!confirm(L('Padam tender ini?','Delete this tender?')))return;
+  S.tenders=S.tenders.filter(x=>x.id!==t.id);delDoc('pt_tenders',t.id);closeS('sForm');persist();toast(L('Tender dipadam','Tender deleted'));
 }
 function openDetail(id){
   const t=findT(id); const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
   const el=eligible(t.codes,t.gred,kindOf(t));
-  $('dPanel').innerHTML=`<div class="ph"><h2>Butiran Tender</h2><button class="x" onclick="closeS('sDetail')">✕</button></div>
+  $('dPanel').innerHTML=`<div class="ph"><h2>${L('Butiran Tender','Tender Details')}</h2><button class="x" onclick="closeS('sDetail')">✕</button></div>
     <div class="card"><div style="margin-bottom:6px">${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'}</div>
       <h2>${esc(t.nama)}</h2>
       ${kv('Registration',fmtRange(t.regStart,t.regEnd))}
       ${kv('Site Briefing',fmt(t.briefing))}
       ${kv('Sales Period',fmtRange(t.saleStart,t.saleEnd))}
       ${kv('Closing Date','<b>'+fmtClose(t.closing)+'</b>')}
-      ${t.type==='invite'?kv('Google Form',t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:var(--gold)">Buka link</a>`:'-'):''}
-      ${t.note?kv('Catatan',esc(t.note)):''}
+      ${t.type==='invite'?kv('Google Form',t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:var(--gold)">${L('Buka link','Open link')}</a>`:'-'):''}
+      ${t.note?kv(L('Catatan','Notes'),esc(t.note)):''}
     </div>
     <div class="card"><h2>Company Code · ${KINDS[kindOf(t)]}</h2>
-      ${t.gred?`<div class="kv"><span>Gred minimum</span><span><b>${esc(t.gred)}</b></span></div>`:''}
-      <div class="chips" style="margin:6px 0 10px">${(t.codes||[]).map(c=>`<span class="cc ro">${esc(c)} <small>${esc(short(codeName(c),40))}</small></span>`).join('')||'<span class="muted">Tiada kod</span>'}</div>
-      <div class="muted">Syarikat layak</div>
-      <div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):'<span class="chip">Tiada</span>'}</div>
+      ${t.gred?`<div class="kv"><span>${L('Gred minimum','Minimum grade')}</span><span><b>${esc(t.gred)}</b></span></div>`:''}
+      <div class="chips" style="margin:6px 0 10px">${(t.codes||[]).map(c=>`<span class="cc ro">${esc(c)} <small>${esc(short(codeName(c),40))}</small></span>`).join('')||`<span class="muted">${L('Tiada kod','No codes')}</span>`}</div>
+      <div class="muted">${L('Syarikat layak','Eligible companies')}</div>
+      <div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada','None')}</span>`}</div>
     </div>
     <div class="card"><h2>Status</h2>
-      ${kv('Daftar',t.registered?'<span class="done">✓ Sudah</span>':'Belum')}
-      ${kv('Beli dokumen',t.bought?'<span class="done">✓ Sudah</span>':'Belum')}
-      ${kv('Hantar',t.submitted?'<span class="done">✓ Sudah</span>':'Belum')}
+      ${kv(L('Daftar','Registered'),t.registered?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
+      ${kv(L('Beli dokumen','Documents bought'),t.bought?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
+      ${kv(L('Hantar','Submitted'),t.submitted?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
     </div>
     <button class="btn gold full" onclick="openForm('${t.id}')">✏️ Edit Tender</button>`;
   openS('sDetail');
@@ -703,71 +732,72 @@ function openDetail(id){
 // ================== SETTING ==================
 function settingsHTML(){
   const co=C().sort((a,b)=>a.nama.localeCompare(b.nama));
-  return hero('Setting','Tetapan.','Syarikat & kod, peringatan, akaun dan backup.',null,'#2b3a33')+`
+  return hero('Setting',L('Tetapan.','Settings.'),L('Bahasa, syarikat & kod, peringatan, akaun dan backup.','Language, companies & codes, reminders, account and backup.'),null,'#2b3a33')+`
   <div class="pad">
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🌐 ${L('Bahasa','Language')}</h2><div class="lang">${langHTML()}</div></div>
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 Syarikat & Kod</h2><button class="btn gold sm" onclick="openCo()">+ Tambah</button></div>
-      <p class="muted">Gred & kod CIDB, kod bidang MOF dan jenis SPAN setiap syarikat. Dipadankan dengan syarat tender untuk tunjuk syarikat yang layak.</p>
-      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span><span class="muted" style="display:block">SPAN: ${esc(parseCodes(c.span).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada syarikat.</div>'}
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 ${L('Syarikat & Kod','Companies & Codes')}</h2><button class="btn gold sm" onclick="openCo()">+ ${L('Tambah','Add')}</button></div>
+      <p class="muted">${L('Gred & kod CIDB, kod bidang MOF dan jenis SPAN setiap syarikat. Dipadankan dengan syarat tender untuk tunjuk syarikat yang layak.','CIDB grade & codes, MOF field codes and SPAN types for each company. Matched against tender requirements to show eligible companies.')}</p>
+      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span><span class="muted" style="display:block">SPAN: ${esc(parseCodes(c.span).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):`<div class="emptyrail" style="margin:8px 0 0">${L('Belum ada syarikat.','No companies yet.')}</div>`}
     </div>
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">💧 Jenis SPAN</h2><button class="btn gold sm" onclick="openSpan()">+ Tambah</button></div>
-      <p class="muted">Senarai jenis pendaftaran SPAN. Dipilih dalam tender (Jenis Kod: SPAN) dan dalam syarikat.</p>
-      ${SPN().length?SPN().map(x=>`<div class="co" onclick="openSpan('${x.id}')" style="cursor:pointer"><div><b>${esc(x.code)}</b><span class="muted">${esc(x.nama)}</span></div><span class="muted">✏️</span></div>`).join(''):'<div class="emptyrail" style="margin:8px 0 0">Belum ada jenis SPAN.</div>'}
+      <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">💧 ${L('Jenis SPAN','SPAN Types')}</h2><button class="btn gold sm" onclick="openSpan()">+ ${L('Tambah','Add')}</button></div>
+      <p class="muted">${L('Senarai jenis pendaftaran SPAN. Dipilih dalam tender (Jenis Kod: SPAN) dan dalam syarikat.','List of SPAN registration types. Chosen in tenders (Code Type: SPAN) and in companies.')}</p>
+      ${SPN().length?SPN().map(x=>`<div class="co" onclick="openSpan('${x.id}')" style="cursor:pointer"><div><b>${esc(x.code)}</b><span class="muted">${esc(x.nama)}</span></div><span class="muted">✏️</span></div>`).join(''):`<div class="emptyrail" style="margin:8px 0 0">${L('Belum ada jenis SPAN.','No SPAN types yet.')}</div>`}
     </div>
     ${remCardHTML()}
     <div class="card">
-      <h2>👤 Akaun</h2>
-      <p class="muted"><span class="dot ${NET?'on':''}" id="syncDot"></span><span id="syncTxt">${NET?'Data disimpan terus ke Firebase':'Luar talian — data akan dihantar bila ada internet'}</span></p>
+      <h2>👤 ${L('Akaun','Account')}</h2>
+      <p class="muted"><span class="dot ${NET?'on':''}" id="syncDot"></span><span id="syncTxt">${NET?L('Data disimpan terus ke Firebase','Data saved directly to Firebase'):L('Luar talian — data akan dihantar bila ada internet','Offline — data will sync when online')}</span></p>
       <div class="kv"><span>Email</span><span>${esc(USER?USER.email:'-')}</span></div>
-      <button class="btn red full" style="margin-top:12px" onclick="doLogout()">Log Keluar</button>
+      <button class="btn red full" style="margin-top:12px" onclick="doLogout()">${L('Log Keluar','Sign Out')}</button>
     </div>
     <div class="card">
       <h2>💾 Backup</h2>
       <div style="display:grid;gap:8px">
-        <button class="btn sec full" onclick="exportJSON()">Eksport Backup (JSON)</button>
-        <button class="btn sec full" onclick="exportCSV()">Eksport ke Excel (CSV)</button>
-        <button class="btn sec full" onclick="$('imp').click()">Import Backup</button>
+        <button class="btn sec full" onclick="exportJSON()">${L('Eksport Backup (JSON)','Export Backup (JSON)')}</button>
+        <button class="btn sec full" onclick="exportCSV()">${L('Eksport ke Excel (CSV)','Export to Excel (CSV)')}</button>
+        <button class="btn sec full" onclick="$('imp').click()">${L('Import Backup','Import Backup')}</button>
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.3 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v3.4 · ProKuiz</p>
   </div>`;
 }
 function openCo(id){
   const c=id?findC(id):null;
-  $('cTitle').textContent=c?'Edit Syarikat':'Tambah Syarikat';
+  $('cTitle').textContent=c?L('Edit Syarikat','Edit Company'):L('Tambah Syarikat','Add Company');
   $('cId').value=c?.id||''; $('cNama').value=c?.nama||''; selC=c?parseCodes(c.codes):[]; selCM=c?parseCodes(c.mof):[]; selCS=c?parseCodes(c.span):[]; $('cGred').value=c?.gred||''; drawCodes();
-  $('cDel').style.display=c?'inline-flex':'none'; openS('sCo');
+  $('cDel').style.display=c?'inline-flex':'none'; openS('sCo'); $('sCo').querySelector('.panel').scrollTop=0;
 }
 function saveCo(){
-  const nama=$('cNama').value.trim(); if(!nama){toast('Sila isi nama syarikat');return}
+  const nama=$('cNama').value.trim(); if(!nama){toast(L('Sila isi nama syarikat','Please fill in company name'));return}
   const v={nama,gred:$('cGred').value,codes:selC.join(', '),mof:selCM.join(', '),span:selCS.join(', '),updated:Date.now()};
   const id=$('cId').value; let c; if(id){c=findC(id);Object.assign(c,v)} else {c={id:uid(),...v};S.companies.push(c)}
-  putDoc('pt_companies',c); closeS('sCo'); persist(); toast('Syarikat disimpan ✓');
+  putDoc('pt_companies',c); closeS('sCo'); persist(); toast(L('Syarikat disimpan ✓','Company saved ✓'));
 }
 function openSpan(id){
   const x=id?(S.span||[]).find(v=>v.id===id):null;
-  $('sTitle').textContent=x?'Edit Jenis SPAN':'Tambah Jenis SPAN';
+  $('sTitle').textContent=x?L('Edit Jenis SPAN','Edit SPAN Type'):L('Tambah Jenis SPAN','Add SPAN Type');
   $('sId').value=x?.id||''; $('sCode').value=x?.code||''; $('sNama').value=x?.nama||'';
   $('sDel').style.display=x?'inline-flex':'none'; openS('sSpan');
 }
 function saveSpan(){
   const code=$('sCode').value.trim().toUpperCase(), nama=$('sNama').value.trim();
-  if(!code||!nama){toast('Sila isi kod dan nama');return}
+  if(!code||!nama){toast(L('Sila isi kod dan nama','Please fill in code and name'));return}
   const id=$('sId').value;
-  if((S.span||[]).some(v=>v.code===code&&v.id!==id)){toast('Kod '+code+' sudah ada');return}
+  if((S.span||[]).some(v=>v.code===code&&v.id!==id)){toast(L('Kod ','Code ')+code+L(' sudah ada',' already exists'));return}
   let x; if(id){x=S.span.find(v=>v.id===id);Object.assign(x,{code,nama})} else {x={id:uid(),code,nama};S.span.push(x)}
-  putDoc('pt_span',x); closeS('sSpan'); persist(); toast('Jenis SPAN disimpan ✓');
+  putDoc('pt_span',x); closeS('sSpan'); persist(); toast(L('Jenis SPAN disimpan ✓','SPAN type saved ✓'));
 }
-function delSpan(){const x=(S.span||[]).find(v=>v.id===$('sId').value);if(!x||!confirm('Padam jenis SPAN '+x.code+'?'))return;S.span=S.span.filter(v=>v.id!==x.id);delDoc('pt_span',x.id);closeS('sSpan');persist()}
-function delCo(){const c=findC($('cId').value);if(!c||!confirm('Padam syarikat '+c.nama+'?'))return;S.companies=S.companies.filter(x=>x.id!==c.id);delDoc('pt_companies',c.id);closeS('sCo');persist()}
+function delSpan(){const x=(S.span||[]).find(v=>v.id===$('sId').value);if(!x||!confirm(L('Padam jenis SPAN ','Delete SPAN type ')+x.code+'?'))return;S.span=S.span.filter(v=>v.id!==x.id);delDoc('pt_span',x.id);closeS('sSpan');persist()}
+function delCo(){const c=findC($('cId').value);if(!c||!confirm(L('Padam syarikat ','Delete company ')+c.nama+'?'))return;S.companies=S.companies.filter(x=>x.id!==c.id);delDoc('pt_companies',c.id);closeS('sCo');persist()}
 
 // ================== PERINGATAN ==================
 function alerts(){
   const out=[], now=Date.now(), lim=3*86400000;
   T().forEach(t=>{
-    [['regEnd','Tamat pendaftaran',!t.registered],['briefing','Site briefing',true],['saleEnd','Tamat jualan dokumen',!t.bought],['closing','Tender closing',!t.submitted]].forEach(([k,lbl,need])=>{
+    [['regEnd',L('Tamat pendaftaran','Registration ends'),!t.registered],['briefing','Site briefing',true],['saleEnd',L('Tamat jualan dokumen','Document sales end'),!t.bought],['closing','Tender closing',!t.submitted]].forEach(([k,lbl,need])=>{
       if(!t[k]||!need)return; const ms=D(t[k])-now; if(ms>=0&&ms<=lim) out.push({t,k,lbl,ms});
     });
   });
@@ -778,30 +808,31 @@ function histList(){
   const q=$('hQ').value.toLowerCase().trim();
   const all=T().filter(t=>t.closing&&isPast(t.closing)).sort(byNew);
   const arr=all.filter(t=>!q||t.nama.toLowerCase().includes(q));
-  $('hSub').textContent=`Tender yang tarikh closing sudah tamat (${all.length}).`;
+  $('hSub').textContent=L(`Tender yang tarikh closing sudah tamat (${all.length}).`,`Tenders whose closing date has passed (${all.length}).`);
   $('hList').innerHTML=arr.length?arr.map((t,i)=>`<div class="hi" onclick="openDetail('${t.id}')">
     <span class="num">${i+1}</span>${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'} <span class="badge b-na">${KINDS[kindOf(t)]}</span>
     <h4>${esc(t.nama)}</h4>
-    <div class="hm">⏳ ${fmtClose(t.closing)} ${t.submitted?'<span class="badge b-ok">✓ Dihantar</span>':'<span class="badge b-no">Tidak dihantar</span>'}</div>
-  </div>`).join(''):`<div class="emptyrail" style="margin:0">${all.length?'Tiada tender sepadan.':'Belum ada tender yang tamat closing.'}</div>`;
+    <div class="hm">⏳ ${fmtClose(t.closing)} ${t.submitted?`<span class="badge b-ok">✓ ${L('Dihantar','Submitted')}</span>`:`<span class="badge b-no">${L('Tidak dihantar','Not submitted')}</span>`}</div>
+  </div>`).join(''):`<div class="emptyrail" style="margin:0">${all.length?L('Tiada tender sepadan.','No matching tenders.'):L('Belum ada tender yang tamat closing.','No closed tenders yet.')}</div>`;
 }
 function openAlerts(){
-  $('alertSub').textContent='Tarikh penting dalam 3 hari akan datang.';
+  $('alertSub').textContent=L('Tarikh penting dalam 3 hari akan datang.','Important dates in the next 3 days.');
   const a=alerts();
-  $('alertList').innerHTML=a.length?a.map(x=>{const l=left(x.t[x.k]);return `<div class="al ${x.ms<86400000?'hot':''}" onclick="closeS('sAlert');openDetail('${x.t.id}')"><b>${x.lbl} · ${l.big} ${l.small}</b><br>${esc(x.t.nama)}<br><span class="muted">${x.k==='closing'?fmtClose(x.t[x.k]):fmt(x.t[x.k])}</span></div>`}).join(''):'<div class="emptyrail" style="margin:0">Tiada tarikh penting dalam 3 hari. 👍</div>';
+  $('alertList').innerHTML=a.length?a.map(x=>{const l=left(x.t[x.k]);return `<div class="al ${x.ms<86400000?'hot':''}" onclick="closeS('sAlert');openDetail('${x.t.id}')"><b>${x.lbl} · ${l.big} ${l.small}</b><br>${esc(x.t.nama)}<br><span class="muted">${x.k==='closing'?fmtClose(x.t[x.k]):fmt(x.t[x.k])}</span></div>`}).join(''):`<div class="emptyrail" style="margin:0">${L('Tiada tarikh penting dalam 3 hari. 👍','No important dates in the next 3 days. 👍')}</div>`;
   openS('sAlert');
 }
 const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const LN=()=>window.Capacitor?.Plugins?.LocalNotifications;
 async function askNotif(){
-  if(isNative()&&LN()){const r=await LN().requestPermissions();toast(r.display==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');scheduleNative();render();return}
-  if(!('Notification' in window)){toast('Browser ini tak sokong notifikasi');return}
-  const p=await Notification.requestPermission();toast(p==='granted'?'Notifikasi dibenarkan ✓':'Notifikasi ditolak');render();
+  if(isNative()&&LN()){const r=await LN().requestPermissions();toast(r.display==='granted'?L('Notifikasi dibenarkan ✓','Notifications allowed ✓'):L('Notifikasi ditolak','Notifications denied'));scheduleNative();render();return}
+  if(!('Notification' in window)){toast(L('Browser ini tak sokong notifikasi','This browser does not support notifications'));return}
+  const p=await Notification.requestPermission();toast(p==='granted'?L('Notifikasi dibenarkan ✓','Notifications allowed ✓'):L('Notifikasi ditolak','Notifications denied'));render();
 }
 // ================== PERINGATAN BERBUNYI ==================
 const REMKEY='protender_rem2';
-const RCATS={register:['📝','Register','Tamat pendaftaran','regEnd','registered'],buy:['🛒','Buy','Tamat jualan dokumen','saleEnd','bought'],briefing:['🗣️','Briefing','Site briefing','briefing',''],closing:['⏳','Closing','Tender closing','closing','submitted']};
+const RCATS={register:['📝','Register','Tamat pendaftaran|Registration ends','regEnd','registered'],buy:['🛒','Buy','Tamat jualan dokumen|Document sales end','saleEnd','bought'],briefing:['🗣️','Briefing','Site briefing|Site briefing','briefing',''],closing:['⏳','Closing','Tender closing|Tender closing','closing','submitted']};
 const SOUNDS={pt_chime:'Chime',pt_bell:'Loceng',pt_alarm:'Alarm'};
+const sndName=k=>k==='pt_bell'?L('Loceng','Bell'):SOUNDS[k];
 const T3=()=>[{t:'09:00',on:true},{t:'11:00',on:true},{t:'13:00',on:true}];
 const REM_DEF={sound:'pt_chime',cats:{register:{on:true,times:T3()},buy:{on:true,times:T3()},briefing:{on:true,times:[{t:'08:00',on:true},{t:'09:00',on:false},{t:'10:00',on:false}]},closing:{on:true,times:T3()}}};
 function getRem(){let r;try{r=JSON.parse(localStorage.getItem(REMKEY))}catch(e){} r=r||JSON.parse(JSON.stringify(REM_DEF)); for(const k in REM_DEF.cats) if(!r.cats[k]||!r.cats[k].times) r.cats[k]=JSON.parse(JSON.stringify(REM_DEF.cats[k])); return r}
@@ -811,24 +842,24 @@ function remCardHTML(){
   const R=getRem();
   const notifOk=isNative()?true:('Notification' in window&&Notification.permission==='granted');
   return `<div class="card">
-    <h2>🔔 Peringatan & Bunyi</h2>
-    <p class="muted">Notifikasi berbunyi <b>pada hari tarikh tamat</b> setiap tab. Setiap tab ada 3 masa — boleh ubah atau matikan.</p>
-    <label>Bunyi notifikasi</label>
-    <div style="display:flex;gap:8px"><select id="rSound" onchange="const r=getRem();r.sound=this.value;setRem(r);playSound(this.value)">${Object.entries(SOUNDS).map(([k,v])=>`<option value="${k}" ${R.sound===k?'selected':''}>${v}</option>`).join('')}</select><button class="btn sec" onclick="playSound($('rSound').value)">▶ Uji</button></div>
+    <h2>🔔 ${L('Peringatan & Bunyi','Reminders & Sound')}</h2>
+    <p class="muted">${L('Notifikasi berbunyi <b>pada hari tarikh tamat</b> setiap tab. Setiap tab ada 3 masa — boleh ubah atau matikan.','Notifications ring <b>on the end date</b> of each tab. Each tab has 3 times — change or turn them off.')}</p>
+    <label>${L('Bunyi notifikasi','Notification sound')}</label>
+    <div style="display:flex;gap:8px"><select id="rSound" onchange="const r=getRem();r.sound=this.value;setRem(r);playSound(this.value)">${Object.entries(SOUNDS).map(([k,v])=>`<option value="${k}" ${R.sound===k?'selected':''}>${sndName(k)}</option>`).join('')}</select><button class="btn sec" onclick="playSound($('rSound').value)">▶ ${L('Uji','Test')}</button></div>
     <div style="margin-top:12px">
     ${Object.entries(RCATS).map(([k,[ic,nm,lbl]])=>{const c=R.cats[k];return `<div class="rc ${c.on?'':'off'}">
-      <div class="rh"><b>${ic} ${nm}<small>Hari ${lbl.toLowerCase()}</small></b><label class="sw" style="margin:0"><input type="checkbox" ${c.on?'checked':''} onchange="remToggle('${k}',this.checked)"><span></span></label></div>
-      <div class="r3">${c.times.map((x,i)=>`<div class="rt ${x.on?'':'dim'}"><label class="sw sm" style="margin:0"><input type="checkbox" ${x.on?'checked':''} onchange="remTime('${k}',${i},null,this.checked)"><span></span></label><span class="rn">Masa ${i+1}</span><input type="time" value="${x.t}" onchange="remTime('${k}',${i},this.value,null)"></div>`).join('')}</div>
+      <div class="rh"><b>${ic} ${nm}<small>${L('Hari ','On ')}${pick2(lbl).toLowerCase()}</small></b><label class="sw" style="margin:0"><input type="checkbox" ${c.on?'checked':''} onchange="remToggle('${k}',this.checked)"><span></span></label></div>
+      <div class="r3">${c.times.map((x,i)=>`<div class="rt ${x.on?'':'dim'}"><label class="sw sm" style="margin:0"><input type="checkbox" ${x.on?'checked':''} onchange="remTime('${k}',${i},null,this.checked)"><span></span></label><span class="rn">${L('Masa','Time')} ${i+1}</span><input type="time" value="${x.t}" onchange="remTime('${k}',${i},this.value,null)"></div>`).join('')}</div>
     </div>`}).join('')}
     </div>
-    ${isNative()?'':'<a class="btn gold full" style="margin-top:12px" href="https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk">⬇ Muat Turun APK Android</a>'}
-    <p class="muted" style="margin-top:12px">${isNative()?'APK: notifikasi berbunyi pada masa ditetapkan walaupun app ditutup.':'Versi web/pasang: notifikasi berbunyi bila app sedang dibuka. Untuk bunyi walaupun app ditutup, guna <b>APK</b>.'}</p>
-    <button class="btn ${notifOk?'sec':'gold'} full" onclick="askNotif()">${notifOk?'✓ Notifikasi dibenarkan':'Benarkan Notifikasi'}</button>
-    <button class="btn sec full" style="margin-top:8px" onclick="testNotif()">Uji Notifikasi</button>
+    ${isNative()?'':`<a class="btn gold full" style="margin-top:12px" href="https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk">⬇ ${L('Muat Turun APK Android','Download Android APK')}</a>`}
+    <p class="muted" style="margin-top:12px">${isNative()?L('APK: notifikasi berbunyi pada masa ditetapkan walaupun app ditutup.','APK: notifications ring at the set times even when the app is closed.'):L('Versi web/pasang: notifikasi berbunyi bila app sedang dibuka. Untuk bunyi walaupun app ditutup, guna <b>APK</b>.','Web/installed version: notifications ring while the app is open. To ring even when closed, use the <b>APK</b>.')}</p>
+    <button class="btn ${notifOk?'sec':'gold'} full" onclick="askNotif()">${notifOk?L('✓ Notifikasi dibenarkan','✓ Notifications allowed'):L('Benarkan Notifikasi','Allow Notifications')}</button>
+    <button class="btn sec full" style="margin-top:8px" onclick="testNotif()">${L('Uji Notifikasi','Test Notification')}</button>
   </div>`;
 }
 function remToggle(k,on){const r=getRem();r.cats[k].on=on;setRem(r)}
-function remTime(k,i,t,on){const r=getRem(),x=r.cats[k].times[i];if(t!==null&&t)x.t=t;if(on!==null)x.on=on;setRem(r);if(t)toast('Masa disimpan ✓')}
+function remTime(k,i,t,on){const r=getRem(),x=r.cats[k].times[i];if(t!==null&&t)x.t=t;if(on!==null)x.on=on;setRem(r);if(t)toast(L('Masa disimpan ✓','Time saved ✓'))}
 // senarai semua peringatan yang dijadualkan
 function remEvents(){
   const R=getRem(),out=[];
@@ -842,7 +873,7 @@ function remEvents(){
         const at=new Date(end); const [h,m]=r.t.split(':'); at.setHours(+h,+m,0,0);
         if(at>end)return;
         out.push({key:[t.id,k,r.t,t[field]].join('|'),at,cat:k,t,
-          title:`${ic} ${lbl} hari ini · ${p2(end.getHours())}:${p2(end.getMinutes())}`,body:t.nama});
+          title:`${ic} ${pick2(lbl)} ${L('hari ini','today')} · ${p2(end.getHours())}:${p2(end.getMinutes())}`,body:t.nama});
       });
     });
   });
@@ -853,9 +884,9 @@ let AUD=null;
 function playSound(name){try{if(AUD){AUD.pause()}AUD=new Audio('sounds/'+(name||getRem().sound)+'.wav');AUD.play().catch(()=>{})}catch(e){}}
 async function testNotif(){
   const R=getRem();
-  if(isNative()&&LN()){await ensureChannels();await LN().schedule({notifications:[{id:999999,title:'🔔 ProTender',body:'Ini notifikasi ujian · bunyi '+SOUNDS[R.sound],channelId:R.sound,smallIcon:'ic_stat_pt',schedule:{at:new Date(Date.now()+3000),allowWhileIdle:true}}]});toast('Notifikasi ujian dalam 3 saat…');return}
+  if(isNative()&&LN()){await ensureChannels();await LN().schedule({notifications:[{id:999999,title:'🔔 ProTender',body:L('Ini notifikasi ujian · bunyi ','Test notification · sound ')+sndName(R.sound),channelId:R.sound,smallIcon:'ic_stat_pt',schedule:{at:new Date(Date.now()+3000),allowWhileIdle:true}}]});toast(L('Notifikasi ujian dalam 3 saat…','Test notification in 3 seconds…'));return}
   if(!('Notification' in window)||Notification.permission!=='granted'){await askNotif();if(Notification.permission!=='granted')return}
-  showNote('🔔 ProTender','Ini notifikasi ujian · bunyi '+SOUNDS[R.sound],'test'+Date.now());
+  showNote('🔔 ProTender',L('Ini notifikasi ujian · bunyi ','Test notification · sound ')+sndName(R.sound),'test'+Date.now());
 }
 async function showNote(title,body,tag){
   playSound();
@@ -877,7 +908,7 @@ function webTick(){
   const canN='Notification' in window&&Notification.permission==='granted';
   due.forEach(e=>{ if(canN) showNote(e.title,e.body,e.key); });
   if(!canN) playSound();
-  $('alertSub').textContent='Peringatan yang baru sampai masanya.';
+  $('alertSub').textContent=L('Peringatan yang baru sampai masanya.','Reminders that are due now.');
   $('alertList').innerHTML=due.map(e=>`<div class="al hot" onclick="closeS('sAlert');openDetail('${e.t.id}')"><b>${esc(e.title)}</b><br>${esc(e.body)}</div>`).join('');
   openS('sAlert');
 }
@@ -885,7 +916,7 @@ function webTick(){
 let chOk=false;
 async function ensureChannels(){
   if(chOk||!LN()||!LN().createChannel)return;
-  for(const [id,nm] of Object.entries(SOUNDS)){try{await LN().createChannel({id,name:'ProTender · '+nm,description:'Peringatan tender',importance:5,visibility:1,sound:id+'.wav',vibration:true,lights:true})}catch(e){}}
+  for(const [id,nm] of Object.entries(SOUNDS)){try{await LN().createChannel({id,name:'ProTender · '+nm,description:'Tender reminders',importance:5,visibility:1,sound:id+'.wav',vibration:true,lights:true})}catch(e){}}
   chOk=true;
 }
 let schedT=null;
@@ -913,8 +944,8 @@ try{
 const clean=o=>JSON.parse(JSON.stringify(o));
 function putDoc(col,o){o.updated=Date.now();if(!db)return;db.collection(col).doc(o.id).set(clean(o)).catch(fbErr)}
 function delDoc(col,id){if(!db)return;db.collection(col).doc(id).delete().catch(fbErr)}
-function fbErr(e){console.log(e);if(e&&e.code==='permission-denied'){toast('Akaun ini tiada akses ProTender');}else toast('Gagal simpan: '+(e&&e.code||e))}
-function setSync(ok,msg){NET=ok;const d=$('syncDot'),t=$('syncTxt');if(d)d.classList.toggle('on',!!ok);if(t)t.textContent=msg||(ok?'Data disimpan terus ke Firebase':'Luar talian — data akan dihantar bila ada internet')}
+function fbErr(e){console.log(e);if(e&&e.code==='permission-denied'){toast(L('Akaun ini tiada akses ProTender','This account has no ProTender access'));}else toast(L('Gagal simpan: ','Save failed: ')+(e&&e.code||e))}
+function setSync(ok,msg){NET=ok;const d=$('syncDot'),t=$('syncTxt');if(d)d.classList.toggle('on',!!ok);if(t)t.textContent=msg||(ok?L('Data disimpan terus ke Firebase','Data saved directly to Firebase'):L('Luar talian — data akan dihantar bila ada internet','Offline — data will sync when online'))}
 window.addEventListener('online',()=>setSync(true));window.addEventListener('offline',()=>setSync(false));
 function stopListen(){unsubs.forEach(u=>u());unsubs=[]}
 function listen(){
@@ -929,7 +960,7 @@ function listen(){
     fbErr(e);
   });
   unsubs=[on('pt_tenders','tenders'),on('pt_companies','companies'),
-    db.collection('pt_span').onSnapshot(snap=>{S.span=snap.docs.map(d=>d.data());persist()},e=>{console.log('pt_span',e);if(e.code==='permission-denied'&&!window._spanWarn){window._spanWarn=1;toast('Jenis SPAN: kemas kini Firestore Rules dahulu')}})];
+    db.collection('pt_span').onSnapshot(snap=>{S.span=snap.docs.map(d=>d.data());persist()},e=>{console.log('pt_span',e);if(e.code==='permission-denied'&&!window._spanWarn){window._spanWarn=1;toast(L('Jenis SPAN: kemas kini Firestore Rules dahulu','SPAN types: update Firestore Rules first'))}})];
 }
 // Data lama (sebelum log masuk) dalam telefon ini → naik ke Firebase sekali sahaja
 function migrateOld(){
@@ -939,38 +970,39 @@ function migrateOld(){
     (old.tenders||[]).filter(t=>!t.deleted&&!findT(t.id)).forEach(t=>{b.set(db.collection('pt_tenders').doc(t.id),clean(t));n++});
     (old.companies||[]).filter(c=>!c.deleted&&!findC(c.id)).forEach(c=>{b.set(db.collection('pt_companies').doc(c.id),clean(c));n++});
     localStorage.removeItem(KEY);
-    if(n) b.commit().then(()=>toast(n+' rekod lama dinaikkan ke Firebase ✓')).catch(fbErr);
+    if(n) b.commit().then(()=>toast(n+L(' rekod lama dinaikkan ke Firebase ✓',' old records uploaded to Firebase ✓'))).catch(fbErr);
   }catch(e){}
 }
 function showDenied(){
   $('login').classList.remove('off'); $('lForm').style.display='none';
-  $('lSub').innerHTML=`<span style="color:var(--amber)">Log masuk berjaya, tetapi Firestore Rules belum benarkan akaun ini.</span><br><br>Email: <b>${esc(USER.email)}</b><br>UID: <b style="user-select:all;-webkit-user-select:all;word-break:break-all">${esc(USER.uid)}</b><br><br>Pastikan UID ini ada dalam <b>isProTender()</b> dan rules sudah di-<b>Publish</b>.<br><br><button class="btn gold full" onclick="location.reload()">Cuba Lagi</button><button class="btn sec full" style="margin-top:8px" onclick="auth.signOut()">Log Keluar</button>`;
+  $('lSub').innerHTML=`<span style="color:var(--amber)">${L('Log masuk berjaya, tetapi Firestore Rules belum benarkan akaun ini.','Signed in, but Firestore Rules do not allow this account yet.')}</span><br><br>Email: <b>${esc(USER.email)}</b><br>UID: <b style="user-select:all;-webkit-user-select:all;word-break:break-all">${esc(USER.uid)}</b><br><br>${L('Pastikan UID ini ada dalam <b>isProTender()</b> dan rules sudah di-<b>Publish</b>.','Make sure this UID is in <b>isProTender()</b> and the rules are <b>Published</b>.')}<br><br><button class="btn gold full" onclick="location.reload()">${L('Cuba Lagi','Try Again')}</button><button class="btn sec full" style="margin-top:8px" onclick="auth.signOut()">${L('Log Keluar','Sign Out')}</button>`;
 }
 function showLogin(msg){
   $('login').classList.remove('off'); $('lForm').style.display='block';
-  $('lSub').textContent='Log masuk untuk teruskan'; $('lErr').textContent=msg||'';
+  $('lSub').textContent=L('Log masuk untuk teruskan','Sign in to continue'); $('lErr').textContent=msg||'';
 }
 async function doLogin(){
   const em=$('lEmail').value.trim(), pw=$('lPass').value;
-  if(!em||!pw){$('lErr').textContent='Sila isi email dan kata laluan';return}
-  $('lBtn').disabled=true;$('lBtn').textContent='Sedang log masuk…';$('lErr').textContent='';
+  if(!em||!pw){$('lErr').textContent=L('Sila isi email dan kata laluan','Please enter email and password');return}
+  $('lBtn').disabled=true;$('lBtn').textContent=L('Sedang log masuk…','Signing in…');$('lErr').textContent='';
   try{await auth.signInWithEmailAndPassword(em,pw)}
   catch(e){
-    const m={'auth/operation-not-allowed':'Log masuk Email/Password belum dihidupkan. Firebase Console → Authentication → Sign-in method → Email/Password → Enable.','auth/invalid-login-credentials':'Email atau kata laluan salah','auth/invalid-credential':'Email atau kata laluan salah','auth/wrong-password':'Kata laluan salah','auth/user-not-found':'Akaun tidak wujud','auth/invalid-email':'Format email tidak sah','auth/too-many-requests':'Terlalu banyak cubaan. Cuba sebentar lagi.','auth/network-request-failed':'Tiada sambungan internet','auth/user-disabled':'Akaun ini telah disekat'};
-    $('lErr').textContent=(m[e.code]||('Gagal log masuk.'))+' ['+(e.code||e.message||e)+']';
-    if(/referer|api-key|API key/i.test((e.code||'')+(e.message||''))) $('lErr').textContent='API key Firebase menyekat domain ini. Google Cloud Console → Credentials → API key → tambah alemmaxx.github.io/* dalam Website restrictions. ['+(e.code||'')+']';
+    const wrong=L('Email atau kata laluan salah','Wrong email or password');
+    const m={'auth/operation-not-allowed':L('Log masuk Email/Password belum dihidupkan. Firebase Console → Authentication → Sign-in method → Email/Password → Enable.','Email/Password sign-in is not enabled. Firebase Console → Authentication → Sign-in method → Email/Password → Enable.'),'auth/invalid-login-credentials':wrong,'auth/invalid-credential':wrong,'auth/wrong-password':L('Kata laluan salah','Wrong password'),'auth/user-not-found':L('Akaun tidak wujud','Account does not exist'),'auth/invalid-email':L('Format email tidak sah','Invalid email format'),'auth/too-many-requests':L('Terlalu banyak cubaan. Cuba sebentar lagi.','Too many attempts. Try again later.'),'auth/network-request-failed':L('Tiada sambungan internet','No internet connection'),'auth/user-disabled':L('Akaun ini telah disekat','This account is disabled')};
+    $('lErr').textContent=(m[e.code]||L('Gagal log masuk.','Sign-in failed.'))+' ['+(e.code||e.message||e)+']';
+    if(/referer|api-key|API key/i.test((e.code||'')+(e.message||''))) $('lErr').textContent=L('API key Firebase menyekat domain ini. Google Cloud Console → Credentials → API key → tambah alemmaxx.github.io/* dalam Website restrictions.','The Firebase API key blocks this domain. Google Cloud Console → Credentials → API key → add alemmaxx.github.io/* to Website restrictions.')+' ['+(e.code||'')+']';
   }
-  $('lBtn').disabled=false;$('lBtn').textContent='Log Masuk';
+  $('lBtn').disabled=false;$('lBtn').textContent=L('Log Masuk','Sign In');
 }
 async function forgotPass(){
-  const em=$('lEmail').value.trim(); if(!em){$('lErr').textContent='Isi email dahulu, kemudian tekan Lupa kata laluan';return}
-  try{await auth.sendPasswordResetEmail(em);$('lErr').style.color='var(--green)';$('lErr').textContent='Email set semula kata laluan telah dihantar';setTimeout(()=>$('lErr').style.color='',4000)}
-  catch(e){$('lErr').textContent='Gagal: '+e.code}
+  const em=$('lEmail').value.trim(); if(!em){$('lErr').textContent=L('Isi email dahulu, kemudian tekan Lupa kata laluan','Enter your email first, then tap Forgot password');return}
+  try{await auth.sendPasswordResetEmail(em);$('lErr').style.color='var(--green)';$('lErr').textContent=L('Email set semula kata laluan telah dihantar','Password reset email sent');setTimeout(()=>$('lErr').style.color='',4000)}
+  catch(e){$('lErr').textContent=L('Gagal: ','Failed: ')+e.code}
 }
-function togglePw(){const i=$('lPass'),b=$('pwEye'),show=i.type==='password';i.type=show?'text':'password';b.textContent=show?'🙈':'👁️';b.classList.toggle('on',show);b.setAttribute('aria-label',show?'Sembunyi kata laluan':'Tunjuk kata laluan')}
-function doLogout(){if(!confirm('Log keluar dari ProTender?'))return;stopListen();auth.signOut()}
+function togglePw(){const i=$('lPass'),b=$('pwEye'),show=i.type==='password';i.type=show?'text':'password';b.textContent=show?'🙈':'👁️';b.classList.toggle('on',show);b.setAttribute('aria-label',show?L('Sembunyi kata laluan','Hide password'):L('Tunjuk kata laluan','Show password'))}
+function doLogout(){if(!confirm(L('Log keluar dari ProTender?','Sign out of ProTender?')))return;stopListen();auth.signOut()}
 function startAuth(){
-  if(!auth){$('lSub').textContent='Tiada sambungan ke Firebase. Semak internet dan buka semula.';$('lForm').style.display='none';return}
+  if(!auth){$('lSub').textContent=L('Tiada sambungan ke Firebase. Semak internet dan buka semula.','Cannot reach Firebase. Check your internet and reopen.');$('lForm').style.display='none';return}
   auth.onAuthStateChanged(u=>{
     USER=u;
     if(!u){stopListen();S={tenders:[],companies:[],span:[]};$('lPass').value='';$('lPass').type='password';$('pwEye').textContent='👁️';$('pwEye').classList.remove('on');showLogin();return}
@@ -984,9 +1016,9 @@ const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth(
 function download(n,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()}
 function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.stringify({v:3,...S},null,1),'application/json')}
 function exportCSV(){
-  const h=['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','Jenis Kod','Gred Min','Kod','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
+  const h=LANG==='en'?['Tender Name','Type','Google Form','Registration Start','Registration End','Code Type','Min Grade','Codes','Eligible Companies','Site Briefing','Sales Start','Sales End','Closing','Registered','Bought','Submitted','Notes']:['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','Jenis Kod','Gred Min','Kod','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),kindOf(t).toUpperCase(),t.gred,(t.codes||[]).join(' / '),eligible(t.codes,t.gred,kindOf(t)).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?'Ya':'',t.bought?'Ya':'',t.submitted?'Ya':'',t.note].map(q).join(','));
+  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),kindOf(t).toUpperCase(),t.gred,(t.codes||[]).join(' / '),eligible(t.codes,t.gred,kindOf(t)).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?L('Ya','Yes'):'',t.bought?L('Ya','Yes'):'',t.submitted?L('Ya','Yes'):'',t.note].map(q).join(','));
   download(`ProTender-${todayStr()}.csv`,'﻿'+h.join(',')+'\n'+rows.join('\n'),'text/csv');
 }
 function importJSON(inp){
@@ -996,8 +1028,8 @@ function importJSON(inp){
     d.tenders.filter(t=>!t.deleted).forEach(t=>{b.set(db.collection('pt_tenders').doc(t.id),clean(t));n++});
     (d.companies||[]).filter(c=>!c.deleted).forEach(c=>{b.set(db.collection('pt_companies').doc(c.id),clean(c));n++});
     (d.span||[]).forEach(x=>{b.set(db.collection('pt_span').doc(x.id),clean(x));n++});
-    return b.commit().then(()=>toast(n+' rekod diimport ✓'));
-  }).catch(e=>toast(e&&e.code?'Gagal import: '+e.code:'Fail tidak sah'));inp.value='';
+    return b.commit().then(()=>toast(n+L(' rekod diimport ✓',' records imported ✓')));
+  }).catch(e=>toast(e&&e.code?L('Gagal import: ','Import failed: ')+e.code:L('Fail tidak sah','Invalid file')));inp.value='';
 }
 
 // ================== PASANG APP ==================
@@ -1005,17 +1037,18 @@ let INSTALL_EVT=null;
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();INSTALL_EVT=e;updateInstallBtn()});
-window.addEventListener('appinstalled',()=>{INSTALL_EVT=null;updateInstallBtn();toast('✓ ProTender dipasang')});
+window.addEventListener('appinstalled',()=>{INSTALL_EVT=null;updateInstallBtn();toast(L('✓ ProTender dipasang','✓ ProTender installed'))});
 function canOfferInstall(){return !isNative()&&!isStandalone()&&(INSTALL_EVT||isIOS()||/android/i.test(navigator.userAgent))}
 function updateInstallBtn(){const on=canOfferInstall();$('instB').style.display=on?'':'none';document.body.classList.toggle('ins',!!on)}
 async function installApp(){
-  if(INSTALL_EVT){INSTALL_EVT.prompt();const r=await INSTALL_EVT.userChoice;INSTALL_EVT=null;updateInstallBtn();if(r.outcome==='accepted')toast('✓ ProTender dipasang');return}
+  if(INSTALL_EVT){INSTALL_EVT.prompt();const r=await INSTALL_EVT.userChoice;INSTALL_EVT=null;updateInstallBtn();if(r.outcome==='accepted')toast(L('✓ ProTender dipasang','✓ ProTender installed'));return}
   $('insBody').innerHTML=isIOS()
-    ?'<ol class="ins"><li>Buka laman ini dalam <b>Safari</b>.</li><li>Tekan butang <b>Kongsi</b> (petak dengan anak panah ke atas).</li><li>Pilih <b>Tambah ke Skrin Utama</b>, kemudian tekan <b>Tambah</b>.</li></ol>'
-    :'<ol class="ins"><li>Buka laman ini dalam <b>Chrome</b>.</li><li>Tekan menu <b>⋮</b> di atas kanan.</li><li>Pilih <b>Pasang aplikasi</b> atau <b>Tambah ke skrin utama</b>, kemudian tekan <b>Pasang</b>.</li></ol>';
+    ?L('<ol class="ins"><li>Buka laman ini dalam <b>Safari</b>.</li><li>Tekan butang <b>Kongsi</b> (petak dengan anak panah ke atas).</li><li>Pilih <b>Tambah ke Skrin Utama</b>, kemudian tekan <b>Tambah</b>.</li></ol>','<ol class="ins"><li>Open this page in <b>Safari</b>.</li><li>Tap the <b>Share</b> button (square with an up arrow).</li><li>Choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</li></ol>')
+    :L('<ol class="ins"><li>Buka laman ini dalam <b>Chrome</b>.</li><li>Tekan menu <b>⋮</b> di atas kanan.</li><li>Pilih <b>Pasang aplikasi</b> atau <b>Tambah ke skrin utama</b>, kemudian tekan <b>Pasang</b>.</li></ol>','<ol class="ins"><li>Open this page in <b>Chrome</b>.</li><li>Tap the <b>⋮</b> menu at the top right.</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b>, then tap <b>Install</b>.</li></ol>');
   openS('sInstall');
 }
 // ================== MULA ==================
+applyLang();
 render();
 startAuth();
 setInterval(()=>{if(tab!=='setting'&&!document.querySelector('.sheet.on'))render()},60000);
