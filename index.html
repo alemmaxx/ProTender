@@ -189,6 +189,8 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .lang button{border:1px solid var(--line);background:none;color:var(--muted);padding:6px 14px;font:700 12px var(--f);cursor:pointer}
 .lang button:first-child{border-radius:10px 0 0 10px}.lang button:last-child{border-radius:0 10px 10px 0;border-left:0}
 .lang button.on{background:var(--ink);color:var(--bg)}
+.exitbox{max-width:340px;border-radius:18px!important;text-align:center;margin:0 20px;border:1px solid var(--line)}
+.exitbox h2{margin:10px 0 4px;font-size:20px;font-weight:800}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 </style>
 </head>
@@ -368,6 +370,18 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
     <div class="ph"><h2 data-l="Pasang ProTender|Install ProTender">Pasang ProTender</h2><button class="x" onclick="closeS('sInstall')">✕</button></div>
     <div id="insBody"></div>
     <p class="muted" data-l="App dibuka dalam tetingkap sendiri tanpa bar alamat, ada ikon di skrin utama dan boleh dibuka walaupun tiada internet.|The app opens in its own window without an address bar, has a home-screen icon and works offline."></p>
+  </div>
+</div>
+
+<div class="sheet" id="sExit" style="z-index:40;align-items:center" onclick="if(event.target===this)closeS('sExit')">
+  <div class="panel exitbox">
+    <img src="icons/icon-192.png" alt="" style="width:56px;height:56px;border-radius:14px">
+    <h2 data-l="Tutup ProTender?|Close ProTender?">Tutup ProTender?</h2>
+    <p class="muted" id="exitSub"></p>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn sec full" onclick="closeS('sExit')" data-l="Batal|Cancel">Batal</button>
+      <button class="btn gold full" onclick="exitApp()" data-l="Tutup|Close">Tutup</button>
+    </div>
   </div>
 </div>
 
@@ -761,7 +775,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.4 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v3.5 · ProKuiz</p>
   </div>`;
 }
 function openCo(id){
@@ -1054,10 +1068,35 @@ startAuth();
 setInterval(()=>{if(tab!=='setting'&&!document.querySelector('.sheet.on'))render()},60000);
 setInterval(webTick,20000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();webTick()}});
+// Butang Kembali: tutup pop up → balik ke Register → tanya sebelum keluar
+let EXITING=false;
+function openExit(){$('exitSub').textContent=isNative()?L('Peringatan tetap akan berbunyi pada masanya.','Reminders will still ring on time.'):L('Peringatan hanya berbunyi bila app dibuka. Guna APK untuk bunyi walaupun app ditutup.','Reminders only ring while the app is open. Use the APK to ring even when closed.');openS('sExit')}
+function onBack(){
+  if($('sExit').classList.contains('on')){closeS('sExit');return}
+  const o=[...document.querySelectorAll('.sheet.on')].pop();
+  if(o){o.classList.remove('on');return}
+  if(!$('login').classList.contains('off')){openExit();return}
+  if(tab!=='register'){go('register');return}
+  openExit();
+}
+function exitApp(){
+  closeS('sExit');
+  if(isNative()){const App=window.Capacitor.Plugins.App;App&&(App.exitApp?App.exitApp():App.minimizeApp());return}
+  EXITING=true; history.back();
+  setTimeout(()=>{EXITING=false;try{history.pushState({pt:1},'')}catch(e){};try{window.close()}catch(e){}},400);
+}
+if(!isNative()){
+  try{history.pushState({pt:1},'')}catch(e){}
+  window.addEventListener('popstate',()=>{
+    if(EXITING)return;
+    onBack();
+    try{history.pushState({pt:1},'')}catch(e){}
+  });
+}
 // APK: butang Kembali & tekan notifikasi
 if(isNative()){
   const App=window.Capacitor.Plugins.App;
-  App&&App.addListener('backButton',()=>{const o=[...document.querySelectorAll('.sheet.on')].pop();if(o){o.classList.remove('on');return}if(tab!=='register'){go('register');return}App.minimizeApp()});
+  App&&App.addListener('backButton',()=>onBack());
   LN()&&LN().addListener('localNotificationActionPerformed',a=>{const id=a.notification?.extra?.tid;if(id&&findT(id))setTimeout(()=>openDetail(id),400)});
 }
 updateInstallBtn();
