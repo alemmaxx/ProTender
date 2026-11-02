@@ -94,6 +94,7 @@ label b{color:var(--red)}
 .tc{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 16px 12px;padding:14px;border-left:3px solid var(--green);cursor:pointer}
 .tc.warn{border-left-color:var(--amber)}.tc.hot{border-left-color:var(--red)}.tc.past{border-left-color:var(--line);opacity:.62}
 .tc .t1{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.num{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 6px;border-radius:7px;background:var(--gold);color:#1b1503;font:800 12px var(--f);margin-right:6px;vertical-align:middle;font-variant-numeric:tabular-nums}
 .tc h3{margin:4px 0 0;font-size:15px;font-weight:700;line-height:1.3}
 .cd{flex:none;text-align:center;min-width:64px;border-radius:10px;padding:6px 8px;background:var(--green2);color:var(--green)}
 .cd b{display:block;font-size:20px;line-height:1.05;font-weight:800;font-variant-numeric:tabular-nums}
@@ -569,6 +570,7 @@ function render(){
   $('main').innerHTML=h;
   if(tab!=='setting') renderList();
 }
+const byNew=(a,b)=>(b.created||0)-(a.created||0);
 function renderList(){
   const L=lists(); let arr=[], key='closing', empty='';
   if(tab==='register'){
@@ -576,10 +578,10 @@ function renderList(){
     const q=(window._q||'').toLowerCase().trim(); if(q) arr=arr.filter(t=>t.nama.toLowerCase().includes(q));
     empty=T().length?'Tiada tender dalam tempoh pendaftaran. Lihat <b>Semua</b>.':'Belum ada tender.<br>Tekan <b>+</b> di kanan atas untuk tambah.';
   }else if(tab==='briefing'){
-    const up=L.brief.filter(t=>!isPast(t.briefing)), past=L.brief.filter(t=>isPast(t.briefing)).reverse();
+    const up=L.brief.filter(t=>!isPast(t.briefing)).sort(byNew), past=L.brief.filter(t=>isPast(t.briefing)).sort(byNew);
     if(!L.brief.length){$('lst').innerHTML=`<div class="emptyrail">Tiada tender dengan site briefing.</div>`;return}
-    $('lst').innerHTML=(up.length?up.map(t=>card(t,'briefing')).join(''):`<div class="emptyrail">Tiada briefing akan datang.</div>`)
-      +(past.length?`<div class="sec-h">Sudah lepas</div>`+past.map(t=>card(t,'briefing')).join(''):'');
+    $('lst').innerHTML=(up.length?up.map((t,i)=>card(t,'briefing',i+1)).join(''):`<div class="emptyrail">Tiada briefing akan datang.</div>`)
+      +(past.length?`<div class="sec-h">Sudah lepas</div>`+past.map((t,i)=>card(t,'briefing',up.length+i+1)).join(''):'');
     return;
   }else if(tab==='buy'){
     arr=L.buy; key='saleEnd'; empty='Tiada tender dalam fasa beli dokumen.<br>Tender akan muncul di sini bila tempoh pendaftaran tamat.';
@@ -587,9 +589,10 @@ function renderList(){
     arr=L.close.filter(t=>!isPast(t.closing));
     empty='Tiada tender yang akan tutup.';
   }
-  $('lst').innerHTML=arr.length?arr.map(t=>card(t,key)).join(''):`<div class="emptyrail">${empty}</div>`;
+  arr=[...arr].sort(byNew);
+  $('lst').innerHTML=arr.length?arr.map((t,i)=>card(t,key,i+1)).join(''):`<div class="emptyrail">${empty}</div>`;
 }
-function card(t,key){
+function card(t,key,n){
   // tarikh utama untuk kiraan
   let ref=t[key]||t.closing, refLbl={regEnd:'Tamat daftar',briefing:'Briefing',saleEnd:'Tamat jualan',closing:'Tutup'}[t[key]?key:'closing'];
   if(key==='saleEnd'&&t.saleEnd&&isPast(t.saleEnd)){ref=t.closing;refLbl='Tutup'}
@@ -610,7 +613,7 @@ function card(t,key){
   if(key==='briefing'&&!isPast(t.briefing)) acts+=flagBtn(t,'briefed','✓ Akan Hadir','Tanda Akan Hadir');
   if(key==='closing'&&!isPast(t.closing)) acts+=flagBtn(t,'submitted','✓ Sudah Hantar','Tanda Sudah Hantar');
   return `<div class="tc ${l.cls}" onclick="openDetail('${t.id}')">
-    <div class="t1"><div>${typ}<h3>${esc(t.nama)}</h3></div>
+    <div class="t1"><div>${n?`<span class="num">${n}</span>`:''}${typ}<h3>${esc(t.nama)}</h3></div>
       <div class="cd"><b>${l.big}</b><small>${l.small}</small></div></div>
     <div class="kvs">${rows}</div>${chips}
     ${acts?`<div class="acts">${acts}</div>`:''}
@@ -728,7 +731,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.2 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v3.3 · ProKuiz</p>
   </div>`;
 }
 function openCo(id){
@@ -773,11 +776,11 @@ function alerts(){
 function openHist(){ $('hQ').value=''; histList(); openS('sHist'); }
 function histList(){
   const q=$('hQ').value.toLowerCase().trim();
-  const all=T().filter(t=>t.closing&&isPast(t.closing)).sort((a,b)=>D(b.closing)-D(a.closing));
+  const all=T().filter(t=>t.closing&&isPast(t.closing)).sort(byNew);
   const arr=all.filter(t=>!q||t.nama.toLowerCase().includes(q));
   $('hSub').textContent=`Tender yang tarikh closing sudah tamat (${all.length}).`;
-  $('hList').innerHTML=arr.length?arr.map(t=>`<div class="hi" onclick="openDetail('${t.id}')">
-    ${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'} <span class="badge b-na">${KINDS[kindOf(t)]}</span>
+  $('hList').innerHTML=arr.length?arr.map((t,i)=>`<div class="hi" onclick="openDetail('${t.id}')">
+    <span class="num">${i+1}</span>${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'} <span class="badge b-na">${KINDS[kindOf(t)]}</span>
     <h4>${esc(t.nama)}</h4>
     <div class="hm">⏳ ${fmtClose(t.closing)} ${t.submitted?'<span class="badge b-ok">✓ Dihantar</span>':'<span class="badge b-no">Tidak dihantar</span>'}</div>
   </div>`).join(''):`<div class="emptyrail" style="margin:0">${all.length?'Tiada tender sepadan.':'Belum ada tender yang tamat closing.'}</div>`;
