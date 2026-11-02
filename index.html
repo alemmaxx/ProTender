@@ -146,10 +146,34 @@ label b{color:var(--red)}
 .segs{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
 .segs button{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 12px;font:600 12px var(--f);cursor:pointer}
 .segs button.on{background:var(--gold);color:#1b1503;border-color:var(--gold)}
+.login{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(120% 80% at 85% 10%,#0f5a45 0%,transparent 60%),radial-gradient(90% 70% at 0% 100%,#2a2210 0%,transparent 60%),var(--bg)}
+.login.off{display:none}
+.lbox{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 20px;text-align:center}
+.lbox label{text-align:left}
+.llogo{width:72px;height:72px;border-radius:18px}
+.lh{margin:10px 0 2px;font-size:30px;font-weight:800;letter-spacing:-1px;background-image:linear-gradient(180deg,#fffbe9 0%,#f3dc8e 42%,#c99a2e 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lerr{color:var(--red);font-size:13px;min-height:18px;margin:8px 0 0}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 </style>
 </head>
 <body>
+
+<div id="login" class="login">
+  <div class="lbox">
+    <img src="icons/icon-192.png" alt="" class="llogo">
+    <h2 class="lh">ProTender</h2>
+    <p class="muted" id="lSub">Log masuk untuk teruskan</p>
+    <div id="lForm" style="display:none">
+      <label>Email</label>
+      <input id="lEmail" type="email" autocomplete="username" placeholder="email@contoh.com">
+      <label>Kata Laluan</label>
+      <input id="lPass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <p id="lErr" class="lerr"></p>
+      <button class="btn gold full" id="lBtn" onclick="doLogin()" style="margin-top:6px">Log Masuk</button>
+      <button class="btn sec full" onclick="forgotPass()" style="margin-top:8px">Lupa kata laluan?</button>
+    </div>
+  </div>
+</div>
 
 <header>
   <img class="mark" src="icons/icon-192.png" alt="">
@@ -284,18 +308,22 @@ label b{color:var(--red)}
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 // ================== DATA ==================
-const KEY='protender_v2', SKEY='protender_sync_code';
+const KEY='protender_v2';
+let USER=null;
 let S={tenders:[],companies:[]};
 let tab='register', regView='aktif', closeView='akan';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 
-function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.tenders)S=d}catch(e){} S.companies=S.companies||[];}
-function persist(push=true){localStorage.setItem(KEY,JSON.stringify(S));render();scheduleNative();if(push)pushSync()}
+const cacheKey=()=>KEY+'_'+(USER?USER.uid:'');
+function load(){S={tenders:[],companies:[]};try{const d=JSON.parse(localStorage.getItem(cacheKey()));if(d&&d.tenders)S=d}catch(e){} S.companies=S.companies||[];}
+function cache(){try{localStorage.setItem(cacheKey(),JSON.stringify(S))}catch(e){}}
+function persist(){cache();render();scheduleNative()}
 const T=()=>S.tenders.filter(t=>!t.deleted);
 const C=()=>S.companies.filter(c=>!c.deleted);
 const findT=id=>S.tenders.find(t=>t.id===id);
@@ -519,7 +547,7 @@ function card(t,key){
   </div>`;
 }
 function flagBtn(t,f,on,off){return `<button class="btn ${t[f]?'sec':'gold'} sm" onclick="event.stopPropagation();toggleFlag('${t.id}','${f}')">${t[f]?on:off}</button>`}
-function toggleFlag(id,f){const t=findT(id);t[f]=!t[f];t.updated=Date.now();persist()}
+function toggleFlag(id,f){const t=findT(id);t[f]=!t[f];putDoc('pt_tenders',t);persist()}
 function saleStatus(t){
   if(!t.saleStart&&!t.saleEnd) return '<span class="badge b-na">Tiada tarikh</span>';
   if(t.saleStart&&!isPast(t.saleStart)) return '<span class="badge b-blue">Belum buka</span>';
@@ -564,12 +592,12 @@ function saveTender(){
   if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast('Tarikh tamat pendaftaran sebelum tarikh mula');return}
   if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast('Tarikh tamat jualan sebelum tarikh mula');return}
   const id=$('fId').value;
-  if(id) Object.assign(findT(id),v); else S.tenders.push({id:uid(),created:Date.now(),...v});
-  closeS('sForm'); persist(); toast(id?'Tender dikemas kini':'Tender ditambah ✓');
+  let t; if(id){t=findT(id);Object.assign(t,v)} else {t={id:uid(),created:Date.now(),...v};S.tenders.push(t)}
+  putDoc('pt_tenders',t); closeS('sForm'); persist(); toast(id?'Tender dikemas kini':'Tender ditambah ✓');
 }
 function delTender(){
   const t=findT($('fId').value); if(!t||!confirm('Padam tender ini?'))return;
-  t.deleted=true;t.updated=Date.now();closeS('sForm');persist();toast('Tender dipadam');
+  S.tenders=S.tenders.filter(x=>x.id!==t.id);delDoc('pt_tenders',t.id);closeS('sForm');persist();toast('Tender dipadam');
 }
 function openDetail(id){
   const t=findT(id); const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
@@ -602,7 +630,7 @@ function openDetail(id){
 // ================== SETTING ==================
 function settingsHTML(){
   const co=C().sort((a,b)=>a.nama.localeCompare(b.nama));
-  return hero('Setting','Tetapan.','Syarikat & code, peringatan, sync dan backup.',null,'#2b3a33')+`
+  return hero('Setting','Tetapan.','Syarikat & kod, peringatan, akaun dan backup.',null,'#2b3a33')+`
   <div class="pad">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 Syarikat & Kod</h2><button class="btn gold sm" onclick="openCo()">+ Tambah</button></div>
@@ -615,14 +643,10 @@ function settingsHTML(){
       <button class="btn sec full" onclick="askNotif()">Benarkan Notifikasi</button>
     </div>
     <div class="card">
-      <h2>☁️ Sync Antara Telefon</h2>
-      <p class="muted"><span class="dot ${syncCode()?'on':''}" id="syncDot"></span><span id="syncTxt">${syncCode()?'Disambung':'Belum disambung'}</span></p>
-      ${syncCode()?`<p class="muted">Masukkan kod ini di telefon lain untuk kongsi data. Jangan kongsi dengan orang luar.</p>
-        <div class="code">${syncCode()}</div>
-        <div style="display:flex;gap:8px"><button class="btn sec full" onclick="copyCode()">📋 Salin Kod</button><button class="btn red" onclick="stopSync()">Putus</button></div>`
-      :`<button class="btn gold full" onclick="startSync()">✨ Cipta Kod Sync Baru</button>
-        <label>Atau sambung guna kod dari telefon lain</label>
-        <div style="display:flex;gap:8px"><input id="joinCode" placeholder="Kod 20 aksara"><button class="btn sec" onclick="joinSync()">Sambung</button></div>`}
+      <h2>👤 Akaun</h2>
+      <p class="muted"><span class="dot ${NET?'on':''}" id="syncDot"></span><span id="syncTxt">${NET?'Data disimpan terus ke Firebase':'Luar talian — data akan dihantar bila ada internet'}</span></p>
+      <div class="kv"><span>Email</span><span>${esc(USER?USER.email:'-')}</span></div>
+      <button class="btn red full" style="margin-top:12px" onclick="doLogout()">Log Keluar</button>
     </div>
     <div class="card">
       <h2>💾 Backup</h2>
@@ -633,7 +657,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v2.3 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v3.0 · ProKuiz</p>
   </div>`;
 }
 function openCo(id){
@@ -645,10 +669,10 @@ function openCo(id){
 function saveCo(){
   const nama=$('cNama').value.trim(); if(!nama){toast('Sila isi nama syarikat');return}
   const v={nama,gred:$('cGred').value,codes:selC.join(', '),mof:selCM.join(', '),updated:Date.now()};
-  const id=$('cId').value; if(id) Object.assign(findC(id),v); else S.companies.push({id:uid(),...v});
-  closeS('sCo'); persist(); toast('Syarikat disimpan ✓');
+  const id=$('cId').value; let c; if(id){c=findC(id);Object.assign(c,v)} else {c={id:uid(),...v};S.companies.push(c)}
+  putDoc('pt_companies',c); closeS('sCo'); persist(); toast('Syarikat disimpan ✓');
 }
-function delCo(){const c=findC($('cId').value);if(!c||!confirm('Padam syarikat '+c.nama+'?'))return;c.deleted=true;c.updated=Date.now();closeS('sCo');persist()}
+function delCo(){const c=findC($('cId').value);if(!c||!confirm('Padam syarikat '+c.nama+'?'))return;S.companies=S.companies.filter(x=>x.id!==c.id);delDoc('pt_companies',c.id);closeS('sCo');persist()}
 
 // ================== PERINGATAN ==================
 function alerts(){
@@ -687,39 +711,78 @@ async function scheduleNative(){ // untuk APK nanti: 1 hari & 2 jam sebelum seti
   }catch(e){console.log(e)}
 }
 
-// ================== SYNC FIREBASE ==================
+// ================== FIREBASE (LOG MASUK & DATA) ==================
 const firebaseConfig={apiKey:"AIzaSyAi5O-7iD9E67Gc_mLLW726_ms5EkmV-5U",authDomain:"ar-trading-b246f.firebaseapp.com",projectId:"ar-trading-b246f",storageBucket:"ar-trading-b246f.firebasestorage.app",messagingSenderId:"252959184778",appId:"1:252959184778:web:f0eb94f71a56941ffb1a73"};
-let db=null,unsub=null,pushTimer=null;
-try{firebase.initializeApp(firebaseConfig);db=firebase.firestore()}catch(e){console.log('Firebase off',e)}
-const syncCode=()=>localStorage.getItem(SKEY)||'';
-function newCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';let s='';crypto.getRandomValues(new Uint8Array(20)).forEach(x=>s+=c[x%c.length]);return s}
-function mergeArr(local,remote){const m={};local.forEach(x=>m[x.id]=x);(remote||[]).forEach(r=>{const l=m[r.id];if(!l||(r.updated||0)>(l.updated||0))m[r.id]=r});return Object.values(m)}
-function setSync(ok,msg){const d=$('syncDot'),t=$('syncTxt');if(d)d.classList.toggle('on',!!ok);if(t)t.textContent=msg||(ok?'Disambung · data disync':'Belum disambung')}
-function pushSync(){
-  if(!db||!syncCode())return; clearTimeout(pushTimer);
-  pushTimer=setTimeout(()=>db.collection('ptender').doc(syncCode()).set({data:JSON.stringify({v:2,...S}),updated:Date.now()}).then(()=>setSync(true)).catch(e=>setSync(false,'Gagal sync: '+e.code)),800);
-}
+let db=null,auth=null,unsubs=[],NET=navigator.onLine;
+try{
+  firebase.initializeApp(firebaseConfig);
+  db=firebase.firestore();
+  db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+  auth=firebase.auth();
+}catch(e){console.log('Firebase off',e)}
+const clean=o=>JSON.parse(JSON.stringify(o));
+function putDoc(col,o){o.updated=Date.now();if(!db)return;db.collection(col).doc(o.id).set(clean(o)).catch(fbErr)}
+function delDoc(col,id){if(!db)return;db.collection(col).doc(id).delete().catch(fbErr)}
+function fbErr(e){console.log(e);if(e&&e.code==='permission-denied'){toast('Akaun ini tiada akses ProTender');}else toast('Gagal simpan: '+(e&&e.code||e))}
+function setSync(ok,msg){NET=ok;const d=$('syncDot'),t=$('syncTxt');if(d)d.classList.toggle('on',!!ok);if(t)t.textContent=msg||(ok?'Data disimpan terus ke Firebase':'Luar talian — data akan dihantar bila ada internet')}
+window.addEventListener('online',()=>setSync(true));window.addEventListener('offline',()=>setSync(false));
+function stopListen(){unsubs.forEach(u=>u());unsubs=[]}
 function listen(){
-  if(unsub){unsub();unsub=null} if(!db||!syncCode())return;
-  unsub=db.collection('ptender').doc(syncCode()).onSnapshot(s=>{
-    setSync(true); if(!s.exists){pushSync();return}
-    let r={};try{r=JSON.parse(s.data().data)}catch(e){} if(!r||!r.tenders){pushSync();return}
-    const before=JSON.stringify(S);
-    S.tenders=mergeArr(S.tenders,r.tenders); S.companies=mergeArr(S.companies,r.companies);
-    const after=JSON.stringify(S);
-    if(after!==before){localStorage.setItem(KEY,after);render();scheduleNative()}
-    if(after!==JSON.stringify({tenders:r.tenders,companies:r.companies||[]})) pushSync();
-  },e=>setSync(false,'Gagal sync: '+e.code));
+  stopListen(); if(!db||!USER)return;
+  let got=0;
+  const on=(col,key)=>db.collection(col).onSnapshot({includeMetadataChanges:false},snap=>{
+    S[key]=snap.docs.map(d=>d.data());
+    if(++got===2) migrateOld();
+    persist();
+  },e=>{fbErr(e);if(e.code==='permission-denied')showLogin('Akaun ini tiada akses ProTender. Hubungi admin.');});
+  unsubs=[on('pt_tenders','tenders'),on('pt_companies','companies')];
 }
-function startSync(){if(!db){toast('Tiada internet / Firebase');return}localStorage.setItem(SKEY,newCode());listen();pushSync();render();toast('Sync dihidupkan ✓')}
-function joinSync(){const c=$('joinCode').value.trim();if(c.length!==20){toast('Kod mesti 20 aksara');return}localStorage.setItem(SKEY,c);listen();render();toast('Disambung ✓')}
-function stopSync(){if(!confirm('Putuskan sync? Data dalam telefon ini kekal.'))return;localStorage.removeItem(SKEY);if(unsub)unsub();render()}
-function copyCode(){navigator.clipboard?.writeText(syncCode()).then(()=>toast('Kod disalin')).catch(()=>toast(syncCode()))}
+// Data lama (sebelum log masuk) dalam telefon ini → naik ke Firebase sekali sahaja
+function migrateOld(){
+  try{
+    const old=JSON.parse(localStorage.getItem(KEY)); if(!old||!old.tenders)return;
+    const b=db.batch(); let n=0;
+    (old.tenders||[]).filter(t=>!t.deleted&&!findT(t.id)).forEach(t=>{b.set(db.collection('pt_tenders').doc(t.id),clean(t));n++});
+    (old.companies||[]).filter(c=>!c.deleted&&!findC(c.id)).forEach(c=>{b.set(db.collection('pt_companies').doc(c.id),clean(c));n++});
+    localStorage.removeItem(KEY);
+    if(n) b.commit().then(()=>toast(n+' rekod lama dinaikkan ke Firebase ✓')).catch(fbErr);
+  }catch(e){}
+}
+function showLogin(msg){
+  $('login').classList.remove('off'); $('lForm').style.display='block';
+  $('lSub').textContent='Log masuk untuk teruskan'; $('lErr').textContent=msg||'';
+}
+async function doLogin(){
+  const em=$('lEmail').value.trim(), pw=$('lPass').value;
+  if(!em||!pw){$('lErr').textContent='Sila isi email dan kata laluan';return}
+  $('lBtn').disabled=true;$('lBtn').textContent='Sedang log masuk…';$('lErr').textContent='';
+  try{await auth.signInWithEmailAndPassword(em,pw)}
+  catch(e){
+    const m={'auth/invalid-credential':'Email atau kata laluan salah','auth/wrong-password':'Kata laluan salah','auth/user-not-found':'Akaun tidak wujud','auth/invalid-email':'Format email tidak sah','auth/too-many-requests':'Terlalu banyak cubaan. Cuba sebentar lagi.','auth/network-request-failed':'Tiada sambungan internet','auth/user-disabled':'Akaun ini telah disekat'};
+    $('lErr').textContent=m[e.code]||('Gagal log masuk: '+e.code);
+  }
+  $('lBtn').disabled=false;$('lBtn').textContent='Log Masuk';
+}
+async function forgotPass(){
+  const em=$('lEmail').value.trim(); if(!em){$('lErr').textContent='Isi email dahulu, kemudian tekan Lupa kata laluan';return}
+  try{await auth.sendPasswordResetEmail(em);$('lErr').style.color='var(--green)';$('lErr').textContent='Email set semula kata laluan telah dihantar';setTimeout(()=>$('lErr').style.color='',4000)}
+  catch(e){$('lErr').textContent='Gagal: '+e.code}
+}
+function doLogout(){if(!confirm('Log keluar dari ProTender?'))return;stopListen();auth.signOut()}
+function startAuth(){
+  if(!auth){$('lSub').textContent='Tiada sambungan ke Firebase. Semak internet dan buka semula.';return}
+  auth.onAuthStateChanged(u=>{
+    USER=u;
+    if(!u){stopListen();S={tenders:[],companies:[]};$('lPass').value='';showLogin();return}
+    $('login').classList.add('off');
+    load(); render(); listen(); notifyDue();
+  });
+}
 
 // ================== BACKUP ==================
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 function download(n,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()}
-function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.stringify({v:2,...S},null,1),'application/json')}
+function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.stringify({v:3,...S},null,1),'application/json')}
 function exportCSV(){
   const h=['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','Jenis Kod','Gred Min','Kod','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
@@ -728,7 +791,12 @@ function exportCSV(){
 }
 function importJSON(inp){
   const f=inp.files[0];if(!f)return;
-  f.text().then(x=>{const d=JSON.parse(x);if(!d.tenders)throw 0;S.tenders=mergeArr(S.tenders,d.tenders);S.companies=mergeArr(S.companies,d.companies||[]);persist();toast('Import berjaya ✓')}).catch(()=>toast('Fail tidak sah'));inp.value='';
+  f.text().then(x=>{const d=JSON.parse(x);if(!d.tenders)throw 0;
+    const b=db.batch();let n=0;
+    d.tenders.filter(t=>!t.deleted).forEach(t=>{b.set(db.collection('pt_tenders').doc(t.id),clean(t));n++});
+    (d.companies||[]).filter(c=>!c.deleted).forEach(c=>{b.set(db.collection('pt_companies').doc(c.id),clean(c));n++});
+    return b.commit().then(()=>toast(n+' rekod diimport ✓'));
+  }).catch(e=>toast(e&&e.code?'Gagal import: '+e.code:'Fail tidak sah'));inp.value='';
 }
 
 // ================== PASANG APP ==================
@@ -763,14 +831,13 @@ async function notifyDue(){
 }
 
 // ================== MULA ==================
-load(); render();
-if(syncCode()) listen();
+render();
+startAuth();
 setInterval(()=>{if(tab!=='setting'&&!document.querySelector('.sheet.on'))render()},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();notifyDue()}});
 if(isNative()) scheduleNative();
 updateInstallBtn();
-if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').then(()=>notifyDue()).catch(()=>notifyDue());
-else notifyDue();
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>

@@ -12,15 +12,17 @@ service cloud.firestore {
       allow list, delete: if false;
     }
 
-    // ---------- ProTender (sync antara telefon) ----------
-    // Sama seperti ProSchedule: ID 20 aksara rawak = "kunci".
-    match /ptender/{code} {
-      allow get: if code.size() == 20;
-      allow create, update: if code.size() == 20
-        && request.resource.data.keys().hasOnly(['data', 'updated'])
-        && request.resource.data.data is string
-        && request.resource.data.data.size() < 900000;
-      allow list, delete: if false;
+    // ---------- ProTender (log masuk email & kata laluan) ----------
+    // Tambah UID pengguna lain dalam senarai ini untuk beri akses.
+    function isProTender() {
+      return request.auth != null
+        && request.auth.uid in ['7BtMVHkbk9aUmudtKPvM2vAuz9z2'];
+    }
+    match /pt_tenders/{id} {
+      allow read, write: if isProTender();
+    }
+    match /pt_companies/{id} {
+      allow read, write: if isProTender();
     }
 
     // ---------- ProIklan ----------
