@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a1210">
 <title>ProTender</title>
-<script>try{if(localStorage.getItem("protender_theme")==="light"){document.documentElement.dataset.theme="light";document.querySelector('meta[name="theme-color"]').content="#f6f4ee"}}catch(e){}</script>
+<script>try{if(localStorage.getItem("protender_theme")==="light"){document.documentElement.dataset.theme="light";document.querySelector('meta[name="theme-color"]').content="#ffffff"}}catch(e){}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -144,7 +144,7 @@ label b{color:var(--red)}
 .pcat{font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 4px;position:sticky;top:0;background:var(--bg);padding:4px 0;z-index:1}
 .pi{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px}
 .pi input{width:20px;height:20px;min-height:0;accent-color:var(--gold);flex:none}
-.pi b{min-width:42px;font-variant-numeric:tabular-nums;color:var(--gold)}
+.pi b{min-width:52px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--gold)}
 .pi span small{display:block;color:var(--muted);font-size:11px}
 .pi.on{background:rgba(217,180,74,.08)}
 .segs{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
@@ -193,13 +193,31 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .lang button.on{background:var(--ink);color:var(--bg)}
 .exitbox{max-width:340px;border-radius:18px!important;text-align:center;margin:0 20px;border:1px solid var(--line)}
 .exitbox h2{margin:10px 0 4px;font-size:20px;font-weight:800}
-:root[data-theme="light"]{--bg:#f6f4ee;--card:#ffffff;--card2:#f1ede3;--ink:#17211c;--muted:#5d6b63;--line:#e3ddd0;--green:#16935f;--green2:#dff3e9;--gold:#c99a2e;--gold2:#f7eed6;--red:#c9483a;--red2:#fbe3df;--amber:#b7791f;--amber2:#fbefd9;--blue:#3b6fd4;--blue2:#e3ecfb;
-  --soft:rgba(23,33,28,.06);--soft2:rgba(23,33,28,.07);--hdr:rgba(246,244,238,.96);--hdr0:rgba(246,244,238,0);--navbg:rgba(255,255,255,.95);--cs:light}
-:root[data-theme="light"] .hero::before{background:radial-gradient(120% 80% at 85% 10%,color-mix(in srgb,var(--hc,#0f5a45) 22%,#fff) 0%,transparent 60%),radial-gradient(90% 70% at 0% 100%,#f3e7c4 0%,transparent 60%),var(--bg)}
-:root[data-theme="light"] .hero::after{opacity:.12}
-:root[data-theme="light"] .hero h2,:root[data-theme="light"] .lh{background-image:linear-gradient(180deg,#c99a2e 0%,#8a6512 100%);filter:drop-shadow(0 2px 0 rgba(90,64,10,.18))}
-:root[data-theme="light"] .login{background:radial-gradient(120% 80% at 85% 10%,#cfeadd 0%,transparent 60%),radial-gradient(90% 70% at 0% 100%,#f1e4bf 0%,transparent 60%),var(--bg)}
-:root[data-theme="light"] .card,:root[data-theme="light"] .tc,:root[data-theme="light"] .hi,:root[data-theme="light"] .lbox{box-shadow:0 1px 3px rgba(23,33,28,.06)}
+:root[data-theme="light"]{--bg:#ffffff;--card:#ffffff;--card2:#f4f4f4;--ink:#000000;--muted:#000000;--line:#000000;--green:#16935f;--green2:#dff3e9;--gold:#c99a2e;--gold2:#f7eed6;--red:#c9483a;--red2:#fbe3df;--amber:#b7791f;--amber2:#fbefd9;--blue:#3b6fd4;--blue2:#e3ecfb;
+  --soft:rgba(0,0,0,.06);--soft2:rgba(0,0,0,.07);--hdr:rgba(255,255,255,.97);--hdr0:rgba(255,255,255,0);--navbg:#ffffff;--cs:light}
+:root[data-theme="light"] .hero h2,:root[data-theme="light"] .lh{background:none;-webkit-text-fill-color:#000;color:#000;filter:none}
+:root[data-theme="light"] .hero::before{background:#fff}
+:root[data-theme="light"] .hero::after{display:none}
+:root[data-theme="light"] .login{background:#fff}
+:root[data-theme="light"] .hero .tag b,:root[data-theme="light"] .pcat,:root[data-theme="light"] .pi b,:root[data-theme="light"] .tc .no{color:#000}
+:root[data-theme="light"] nav button,:root[data-theme="light"] nav button.on{color:#000}
+:root[data-theme="light"] nav button .ic{filter:none;opacity:1}
+:root[data-theme="light"] nav{border-top:1px solid #000}
+:root[data-theme="light"] .hb,:root[data-theme="light"] .x,:root[data-theme="light"] .btn.sec,:root[data-theme="light"] .lang button,:root[data-theme="light"] .segs button{border:1px solid #000}
+:root[data-theme="light"] .btn.gold,:root[data-theme="light"] .hb.add,:root[data-theme="light"] .instb{border:1px solid #000;color:#000}
+:root[data-theme="light"] .btn.red{border:1px solid #000}
+:root[data-theme="light"] .tc{border:1px solid #000;border-left:5px solid var(--green)}
+:root[data-theme="light"] .tc.warn{border-left-color:var(--amber)}
+:root[data-theme="light"] .tc.hot{border-left-color:var(--red)}
+:root[data-theme="light"] .tc.past{border-left-color:#000}
+:root[data-theme="light"] .badge,:root[data-theme="light"] .chip,:root[data-theme="light"] .chip.ok,:root[data-theme="light"] .cc,:root[data-theme="light"] .cc small,:root[data-theme="light"] .rchip,:root[data-theme="light"] .cd,:root[data-theme="light"] .done,:root[data-theme="light"] .co span[style*="gold"],:root[data-theme="light"] .hi .hm{color:#000!important}
+:root[data-theme="light"] .al{color:#000}
+:root[data-theme="light"] .rt,:root[data-theme="light"] .elig,:root[data-theme="light"] .cpick,:root[data-theme="light"] .chip,:root[data-theme="light"] .badge,:root[data-theme="light"] .cc,:root[data-theme="light"] .rchip,:root[data-theme="light"] .cd,:root[data-theme="light"] .num{border:1px solid #000}
+:root[data-theme="light"] .emptyrail{border-color:#000}
+:root[data-theme="light"] .sheet .panel{border:1px solid #000}
+:root[data-theme="light"] input::placeholder,:root[data-theme="light"] textarea::placeholder,:root[data-theme="light"] .dtw::after,:root[data-theme="light"] .ph0{color:#555;opacity:1}
+:root[data-theme="light"] .sw span{border:1px solid #000}
+:root[data-theme="light"] .card,:root[data-theme="light"] .tc,:root[data-theme="light"] .hi,:root[data-theme="light"] .lbox{box-shadow:none}
 :root[data-theme="light"] .sheet{background:rgba(23,33,28,.35)}
 :root[data-theme="light"] .rchip button,:root[data-theme="light"] .cc button{background:rgba(0,0,0,.08)}
 :root[data-theme="light"] .lang button.on{background:var(--ink);color:#fff}
@@ -274,7 +292,7 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 
 <header>
   <img class="mark" src="icons/icon-192.png" alt="">
-  <h1>ProTender<span>by ProKuiz</span></h1>
+  <h1>ProTender</h1>
   <button class="instb" id="instB" onclick="installApp()" style="display:none" data-l="⬇ Pasang|⬇ Install">⬇ Pasang</button>
   <button class="hb first" id="histB" onclick="openHist()" aria-label="History">🗂️</button>
   <button class="hb" id="bell" onclick="openAlerts()" aria-label="Alerts">🔔<span id="bellN"></span></button>
@@ -284,7 +302,7 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 <main id="main"></main>
 
 <nav id="nav">
-  <div class="navbrand"><img src="icons/icon-192.png" alt=""><b>ProTender</b><small>by ProKuiz</small></div>
+  <div class="navbrand"><img src="icons/icon-192.png" alt=""><b>ProTender</b></div>
   <button data-t="register" onclick="go('register')"><span class="ic">📝</span>Register<i id="nRegister"></i></button>
   <button data-t="briefing" onclick="go('briefing')"><span class="ic">🗣️</span>Briefing<i id="nBriefing"></i></button>
   <button data-t="buy" onclick="go('buy')"><span class="ic">🛒</span>Buy<i id="nBuy"></i></button>
@@ -390,9 +408,9 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
     <div class="ph"><h2 id="sTitle">Tambah Jenis SPAN</h2><button class="x" onclick="closeS('sSpan')">✕</button></div>
     <input type="hidden" id="sId">
     <label><span data-l="Kod / Singkatan|Code / Short name">Kod / Singkatan</span> <b>*</b></label>
-    <input id="sCode" data-ph="cth: SPAN-A1|e.g. SPAN-A1">
+    <input id="sCode" data-ph="cth: SPAN-X|e.g. SPAN-X">
     <label><span data-l="Nama / Keterangan|Name / Description">Nama / Keterangan</span> <b>*</b></label>
-    <input id="sNama" data-ph="cth: Kontraktor Paip Air|e.g. Water Pipe Contractor">
+    <input id="sNama" data-ph="cth: Jenis permit lain|e.g. Another permit type">
     <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn red" id="sDel" onclick="delSpan()">🗑️</button>
       <button class="btn gold full" onclick="saveSpan()" data-l="Simpan|Save">Simpan</button>
@@ -466,7 +484,7 @@ let THEME=(()=>{try{return localStorage.getItem('protender_theme')||'dark'}catch
 function themeHTML(){return `<button class="${THEME==='dark'?'on':''}" onclick="setTheme('dark')">🌙 ${L('Asal','Original')}</button><button class="${THEME==='light'?'on':''}" onclick="setTheme('light')">☀️ ${L('Putih','White')}</button>`}
 function setTheme(t){THEME=t;try{localStorage.setItem('protender_theme',t)}catch(e){}
   if(t==='light')document.documentElement.dataset.theme='light';else delete document.documentElement.dataset.theme;
-  const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#f6f4ee':'#0a1210';
+  const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#ffffff':'#0a1210';
   document.querySelectorAll('.themes').forEach(e=>e.innerHTML=themeHTML());
   try{const SB=window.Capacitor?.Plugins?.StatusBar;SB&&SB.setStyle({style:t==='light'?'LIGHT':'DARK'})}catch(e){}
 }
@@ -528,8 +546,33 @@ const ORDER=[...Object.keys(CIDB),...Object.keys(MOF)];
 const KINDS={cidb:'CIDB',mof:'MOF',span:'SPAN'};
 const kindOf=t=>t.kind||((t.codes||[]).length&&(t.codes||[]).every(isMof)?'mof':'cidb');
 const gNum=g=>g?parseInt(String(g).replace(/\D/g,''))||0:0;
-const SPN=()=>(S.span||[]).slice().sort((a,b)=>a.code.localeCompare(b.code,undefined,{numeric:true}));
-const spanName=c=>{const x=(S.span||[]).find(v=>v.code===c);return x?x.nama:''};
+// Permit IPA SPAN (Kaedah-Kaedah Industri Perkhidmatan Air (Permit) 2007)
+const SPANG={A:['Jenis A · Paip & kelengkapan air','Type A · Water pipes & fittings'],B:['Jenis B · Sambungan pembetungan persendirian','Type B · Private sewer connection'],C:['Jenis C · Pembinaan / pemasangan sistem','Type C · System construction / installation'],D:['Jenis D · Penyenggaraan sistem','Type D · System maintenance'],E:['Jenis E · Penyahenap cemar','Type E · Desludging services']};
+const SPANP={
+ 'A1':['Tukang paip — paip perkhidmatan selepas meter & paip dalaman','Plumber — service pipes after meter & internal piping'],
+ 'A2':['Tukang paip berlesen — sistem bekalan air & paip perhubungan','Licensed plumber — water supply system & connecting pipes'],
+ 'B':['Sambungan persendirian ke pembetung / loji rawatan kumbahan','Private connection to sewer / sewage treatment plant'],
+ 'C1-BA':['C1 Bekalan Air — projek melebihi RM10 juta','C1 Water Supply — projects above RM10 million'],
+ 'C2-BA':['C2 Bekalan Air — RM2 juta hingga RM10 juta','C2 Water Supply — RM2 million to RM10 million'],
+ 'C3-BA':['C3 Bekalan Air — RM200 ribu hingga RM2 juta','C3 Water Supply — RM200k to RM2 million'],
+ 'C4-BA':['C4 Bekalan Air — tidak melebihi RM200 ribu','C4 Water Supply — up to RM200k'],
+ 'C1-PB':['C1 Pembetungan — projek melebihi RM10 juta','C1 Sewerage — projects above RM10 million'],
+ 'C2-PB':['C2 Pembetungan — RM2 juta hingga RM10 juta','C2 Sewerage — RM2 million to RM10 million'],
+ 'C3-PB':['C3 Pembetungan — RM200 ribu hingga RM2 juta','C3 Sewerage — RM200k to RM2 million'],
+ 'C4-PB':['C4 Pembetungan — tidak melebihi RM200 ribu','C4 Sewerage — up to RM200k'],
+ 'D-BA':['D Bekalan Air — penyenggaraan sistem bekalan air','D Water Supply — water supply system maintenance'],
+ 'D-PB':['D Pembetungan — penyenggaraan sistem pembetungan','D Sewerage — sewerage system maintenance'],
+ 'E':['Perkhidmatan penyahenap cemar','Desludging services']};
+const spanGrp=c=>c[0];
+const SPN=()=>(S.span||[]).filter(x=>!SPANP[x.code]).slice().sort((a,b)=>a.code.localeCompare(b.code,undefined,{numeric:true}));
+const spanName=c=>{if(SPANP[c])return L(SPANP[c][0],SPANP[c][1]);const x=(S.span||[]).find(v=>v.code===c);return x?x.nama:''};
+// kelas lebih tinggi meliputi kelas lebih rendah (C1 ⊇ C2 ⊇ C3 ⊇ C4; A2 ⊇ A1)
+function spanHas(have,need){
+  if(have.includes(need))return true;
+  if(need==='A1')return have.includes('A2');
+  const m=need.match(/^C([1-4])-(BA|PB)$/); if(m) return have.some(h=>{const k=h.match(/^C([1-4])-(BA|PB)$/);return k&&k[2]===m[2]&&+k[1]<=+m[1]});
+  return false;
+}
 const codeName=c=>spanName(c)&&!CIDB[c]&&!MOF[c]?spanName(c):CIDB[c]||(MOF[c]?(MOF[c][0].startsWith('Pembuat')?MOF[c][0]+' – '+MOF[c][1]:MOF[c][0]):'');
 const short=(t,n=34)=>t.length>n?t.slice(0,n-1)+'…':t;
 function eligible(codes,gred,kind){
@@ -538,7 +581,7 @@ function eligible(codes,gred,kind){
   const ok=[],part=[];
   C().forEach(c=>{
     const have=parseCodes(kind==='mof'?c.mof:kind==='span'?c.span:c.codes);
-    const miss=codes.filter(k=>!have.includes(k));
+    const miss=codes.filter(k=>kind==='span'?!spanHas(have,k):!have.includes(k));
     if(kind!=='cidb') gred='';
     const gOk=!gred||gNum(c.gred)>=gNum(gred);
     if(gred&&!gOk) miss.push(c.gred?L('Gred ','Grade ')+gred+L(' (syarikat ',' (company ')+c.gred+')':L('Gred ','Grade ')+gred+L(' (gred syarikat belum diisi)',' (company grade not set)'));
@@ -573,8 +616,8 @@ function rmCode(box,c){ if(box==='t'){selT=selT.filter(x=>x!==c);eligUI()}else i
 function openPick(t){
   PK.target=t; PK.type=t==='cm'?'mof':t==='cs'?'span':t==='c'?'cidb':kindT;
   PK.sel=[...pickArr(t)]; PK.cat=''; $('pQ').value='';
-  $('pTitle').textContent={mof:L('Kod Bidang MOF','MOF Field Codes'),cidb:L('Kod Pengkhususan CIDB','CIDB Specialisation Codes'),span:L('Jenis SPAN','SPAN Types')}[PK.type];
-  $('pQ').placeholder={mof:L('Cari kod atau bidang, cth: 210104 / ICT','Search code or field, e.g. 210104 / ICT'),cidb:L('Cari kod atau bidang, cth: CE21 / SCADA','Search code or field, e.g. CE21 / SCADA'),span:L('Cari jenis SPAN, cth: SPAN-A1','Search SPAN type, e.g. SPAN-A1')}[PK.type];
+  $('pTitle').textContent={mof:L('Kod Bidang MOF','MOF Field Codes'),cidb:L('Kod Pengkhususan CIDB','CIDB Specialisation Codes'),span:L('Permit SPAN (IPA)','SPAN Permit (IPA)')}[PK.type];
+  $('pQ').placeholder={mof:L('Cari kod atau bidang, cth: 210104 / ICT','Search code or field, e.g. 210104 / ICT'),cidb:L('Cari kod atau bidang, cth: CE21 / SCADA','Search code or field, e.g. CE21 / SCADA'),span:L('Cari jenis SPAN, cth: C1 / Bekalan Air','Search SPAN type, e.g. C1 / Water Supply')}[PK.type];
   $('pCats').style.display=PK.type==='cidb'?'flex':'none'; $('pCatSel').style.display=PK.type==='mof'?'block':'none';
   pickList(); openS('sPick'); setTimeout(()=>$('pList').scrollTop=0,0);
 }
@@ -616,17 +659,24 @@ function pickListMof(){
   $('pDone').textContent=L(`Selesai (${PK.sel.length} dipilih)`,`Done (${PK.sel.length} selected)`);
 }
 function pickListSpan(){
-  const q=$('pQ').value.toLowerCase().trim(), all=SPN();
-  const rows=all.filter(x=>!q||x.code.toLowerCase().includes(q)||x.nama.toLowerCase().includes(q));
-  let h=rows.map(x=>{const on=PK.sel.includes(x.code);return `<label class="pi ${on?'on':''}" style="margin:0;color:var(--ink)"><input type="checkbox" ${on?'checked':''} onchange="togPick('${esc(x.code)}')"><b>${esc(x.code)}</b><span>${esc(x.nama)}</span></label>`}).join('');
-  const extra=PK.sel.filter(c=>!all.some(x=>x.code===c));
-  if(extra.length) h=`<div class="pcat">${L('Jenis lama (sudah dipadam)','Old types (deleted)')}</div>`+extra.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">${L('Tiada dalam senarai','Not in list')}</span></label>`).join('')+h;
-  $('pList').innerHTML=h||`<div class="emptyrail" style="margin:10px 0">${all.length?L('Tiada jenis sepadan.','No matching types.'):L('Belum ada jenis SPAN.<br>Tambah di <b>Setting → Jenis SPAN</b>.','No SPAN types yet.<br>Add them in <b>Setting → SPAN Types</b>.')}</div>`;
+  const q=$('pQ').value.toLowerCase().trim(), extraT=SPN();
+  const row=(code,name)=>{const on=PK.sel.includes(code);return `<label class="pi ${on?'on':''}" style="margin:0;color:var(--ink)"><input type="checkbox" ${on?'checked':''} onchange="togPick('${esc(code)}')"><b>${esc(code)}</b><span>${esc(name)}</span></label>`};
+  const hit=(c,n)=>!q||c.toLowerCase().includes(q)||n.toLowerCase().includes(q);
+  let h='';
+  Object.keys(SPANG).forEach(g=>{
+    const rows=Object.keys(SPANP).filter(c=>spanGrp(c)===g&&hit(c,spanName(c)));
+    if(rows.length) h+=`<div class="pcat">${L(SPANG[g][0],SPANG[g][1])}</div>`+rows.map(c=>row(c,spanName(c))).join('');
+  });
+  const ex=extraT.filter(x=>hit(x.code,x.nama));
+  if(ex.length) h+=`<div class="pcat">${L('Jenis tambahan (Setting)','Extra types (Setting)')}</div>`+ex.map(x=>row(x.code,x.nama)).join('');
+  const lost=PK.sel.filter(c=>!SPANP[c]&&!extraT.some(x=>x.code===c));
+  if(lost.length) h=`<div class="pcat">${L('Jenis lama (sudah dipadam)','Old types (deleted)')}</div>`+lost.map(c=>`<label class="pi on" style="margin:0;color:var(--ink)"><input type="checkbox" checked onchange="togPick('${esc(c)}')"><b>${esc(c)}</b><span class="muted">${L('Tiada dalam senarai','Not in list')}</span></label>`).join('')+h;
+  $('pList').innerHTML=h||`<div class="emptyrail" style="margin:10px 0">${L('Tiada jenis sepadan.','No matching types.')}</div>`;
   $('pDone').textContent=L(`Selesai (${PK.sel.length} dipilih)`,`Done (${PK.sel.length} selected)`);
 }
 function togPick(c){ PK.sel=PK.sel.includes(c)?PK.sel.filter(x=>x!==c):[...PK.sel,c]; const st=$('pList').scrollTop; pickList(); $('pList').scrollTop=st; }
 function pickDone(){
-  const ord=PK.type==='span'?SPN().map(x=>x.code):ORDER;
+  const ord=PK.type==='span'?[...Object.keys(SPANP),...SPN().map(x=>x.code)]:ORDER;
   const sorted=[...PK.sel].sort((a,b)=>ord.indexOf(a)-ord.indexOf(b));
   if(PK.target==='t'){selT=sorted;eligUI()}else if(PK.target==='c')selC=sorted;else if(PK.target==='cs')selCS=sorted;else selCM=sorted;
   drawCodes(); closeS('sPick');
@@ -827,8 +877,9 @@ function settingsHTML(){
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">💧 ${L('Jenis SPAN','SPAN Types')}</h2><button class="btn gold sm" onclick="openSpan()">+ ${L('Tambah','Add')}</button></div>
-      <p class="muted">${L('Senarai jenis pendaftaran SPAN. Dipilih dalam tender (Jenis Kod: SPAN) dan dalam syarikat.','List of SPAN registration types. Chosen in tenders (Code Type: SPAN) and in companies.')}</p>
-      ${SPN().length?SPN().map(x=>`<div class="co" onclick="openSpan('${x.id}')" style="cursor:pointer"><div><b>${esc(x.code)}</b><span class="muted">${esc(x.nama)}</span></div><span class="muted">✏️</span></div>`).join(''):`<div class="emptyrail" style="margin:8px 0 0">${L('Belum ada jenis SPAN.','No SPAN types yet.')}</div>`}
+      <p class="muted">${L('Permit IPA SPAN rasmi sudah tersedia untuk dipilih. Kelas lebih tinggi dikira layak untuk kelas lebih rendah (cth: C1 layak untuk tender C3). Tambah di sini hanya jika perlu jenis lain.','Official SPAN IPA permits are built in. A higher class counts for a lower one (e.g. C1 qualifies for a C3 tender). Add here only if you need another type.')}</p>
+      <div class="chips" style="margin:4px 0 10px">${Object.keys(SPANP).map(c=>`<span class="cc ro" title="${esc(spanName(c))}">${c}</span>`).join('')}</div>
+      ${SPN().length?`<div class="muted" style="margin-top:6px">${L('Jenis tambahan','Extra types')}</div>`+SPN().map(x=>`<div class="co" onclick="openSpan('${x.id}')" style="cursor:pointer"><div><b>${esc(x.code)}</b><span class="muted">${esc(x.nama)}</span></div><span class="muted">✏️</span></div>`).join(''):''}
     </div>
     ${remCardHTML()}
     <div class="card">
@@ -846,7 +897,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.6 · ProKuiz</p>
+    <p class="muted" style="text-align:center">ProTender v3.7</p>
   </div>`;
 }
 function openCo(id){
@@ -871,6 +922,7 @@ function saveSpan(){
   const code=$('sCode').value.trim().toUpperCase(), nama=$('sNama').value.trim();
   if(!code||!nama){toast(L('Sila isi kod dan nama','Please fill in code and name'));return}
   const id=$('sId').value;
+  if(SPANP[code]){toast(L('Kod ','Code ')+code+L(' sudah ada dalam senarai rasmi',' is already in the official list'));return}
   if((S.span||[]).some(v=>v.code===code&&v.id!==id)){toast(L('Kod ','Code ')+code+L(' sudah ada',' already exists'));return}
   let x; if(id){x=S.span.find(v=>v.id===id);Object.assign(x,{code,nama})} else {x={id:uid(),code,nama};S.span.push(x)}
   putDoc('pt_span',x); closeS('sSpan'); persist(); toast(L('Jenis SPAN disimpan ✓','SPAN type saved ✓'));
