@@ -22,6 +22,8 @@ jobs:
           java-version: 17
       - name: Sediakan fail web
         run: mkdir -p www && cp -r index.html manifest.webmanifest sw.js icons sounds www/
+      - name: Kunci tandatangan tetap (supaya APK baru boleh dikemas kini atas APK lama)
+        run: mkdir -p ~/.android && cp android-signing/debug.keystore ~/.android/debug.keystore
       - run: npm install
       - run: npx cap add android
       - name: Ikon app, ikon notifikasi & bunyi

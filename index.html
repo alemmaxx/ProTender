@@ -866,7 +866,7 @@ function remCardHTML(){
       <div class="r3">${c.times.map((x,i)=>`<div class="rt ${x.on?'':'dim'}"><label class="sw sm" style="margin:0"><input type="checkbox" ${x.on?'checked':''} onchange="remTime('${k}',${i},null,this.checked)"><span></span></label><span class="rn">${L('Masa','Time')} ${i+1}</span><input type="time" value="${x.t}" onchange="remTime('${k}',${i},this.value,null)"></div>`).join('')}</div>
     </div>`}).join('')}
     </div>
-    ${isNative()?'':`<a class="btn gold full" style="margin-top:12px" href="https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk">⬇ ${L('Muat Turun APK Android','Download Android APK')}</a>`}
+    ${isNative()?'':`<a class="btn gold full" style="margin-top:12px" href="https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk" target="_blank" rel="noopener">⬇ ${L('Muat Turun APK Android','Download Android APK')}</a>`}
     <p class="muted" style="margin-top:12px">${isNative()?L('APK: notifikasi berbunyi pada masa ditetapkan walaupun app ditutup.','APK: notifications ring at the set times even when the app is closed.'):L('Versi web/pasang: notifikasi berbunyi bila app sedang dibuka. Untuk bunyi walaupun app ditutup, guna <b>APK</b>.','Web/installed version: notifications ring while the app is open. To ring even when closed, use the <b>APK</b>.')}</p>
     <button class="btn ${notifOk?'sec':'gold'} full" onclick="askNotif()">${notifOk?L('✓ Notifikasi dibenarkan','✓ Notifications allowed'):L('Benarkan Notifikasi','Allow Notifications')}</button>
     <button class="btn sec full" style="margin-top:8px" onclick="testNotif()">${L('Uji Notifikasi','Test Notification')}</button>
