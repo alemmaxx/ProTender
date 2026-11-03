@@ -227,6 +227,8 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .ynb.on{background:var(--green2);color:var(--green)}
 :root[data-theme="light"] .ynb{border-color:#000;color:#000}
 .hint{margin:16px 0 0;padding:10px 12px;border-radius:10px;background:var(--blue2);color:var(--ink);font-size:13px;line-height:1.45;border:1px solid var(--line)}
+.tc .acts .btn.del{flex:0 0 42px}
+.hi{position:relative}.hi .hdel{position:absolute;top:10px;right:10px;width:34px;height:34px;padding:0}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -830,7 +832,7 @@ function card(t,key,n){
     <div class="t1"><div>${n?`<span class="num">${n}</span>`:''}${typ}<h3>${esc(t.nama)}</h3></div>
       <div class="cd"><b>${l.big}</b><small>${l.small}</small></div></div>
     <div class="kvs">${rows}</div>${chips}
-    ${acts?`<div class="acts">${acts}</div>`:''}
+    <div class="acts">${acts}<button class="btn red sm del" title="${L('Padam','Delete')}" onclick="event.stopPropagation();delTenderId('${t.id}')">🗑️</button></div>
   </div>`;
 }
 function flagBtn(t,f,on,off){return `<button class="btn ${t[f]?'sec':'gold'} sm" onclick="event.stopPropagation();toggleFlag('${t.id}','${f}')">${t[f]?on:off}</button>`}
@@ -901,9 +903,12 @@ function saveTender(){
   let t; if(id){t=findT(id);Object.assign(t,v)} else {t={id:uid(),created:Date.now(),...v};S.tenders.push(t)}
   putDoc('pt_tenders',t); closeS('sForm'); persist(); toast(id?L('Tender dikemas kini','Tender updated'):L('Tender ditambah ✓','Tender added ✓'));
 }
-function delTender(){
-  const t=findT($('fId').value); if(!t||!confirm(L('Padam tender ini?','Delete this tender?')))return;
-  S.tenders=S.tenders.filter(x=>x.id!==t.id);delDoc('pt_tenders',t.id);closeS('sForm');persist();toast(L('Tender dipadam','Tender deleted'));
+function delTender(){ delTenderId($('fId').value); }
+function delTenderId(id){
+  const t=findT(id); if(!t||!confirm(L('Padam tender ini?\n\n','Delete this tender?\n\n')+t.nama))return;
+  S.tenders=S.tenders.filter(x=>x.id!==t.id);delDoc('pt_tenders',t.id);
+  ['sForm','sDetail'].forEach(closeS); persist(); if($('sHist').classList.contains('on'))histList();
+  toast(L('Tender dipadam','Tender deleted'));
 }
 function openDetail(id){
   const t=findT(id); const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
@@ -935,7 +940,7 @@ function openDetail(id){
       ${kv(t.type==='invite'?L('Terima BQ','BQ received'):L('Beli dokumen','Documents bought'),t.bought?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
       ${kv(L('Hantar','Submitted'),t.submitted?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
     </div>
-    <button class="btn gold full" onclick="openForm('${t.id}')">✏️ Edit Tender</button>`;
+    <div style="display:flex;gap:10px"><button class="btn red" onclick="delTenderId('${t.id}')">🗑️ ${L('Padam','Delete')}</button><button class="btn gold full" onclick="openForm('${t.id}')">✏️ Edit Tender</button></div>`;
   openS('sDetail');
 }
 
@@ -975,7 +980,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v4.0</p>
+    <p class="muted" style="text-align:center">ProTender v4.1</p>
   </div>`;
 }
 function openCo(id){
@@ -1026,6 +1031,7 @@ function histList(){
   const arr=all.filter(t=>!q||t.nama.toLowerCase().includes(q));
   $('hSub').textContent=L(`Tender yang tarikh closing sudah tamat (${all.length}).`,`Tenders whose closing date has passed (${all.length}).`);
   $('hList').innerHTML=arr.length?arr.map((t,i)=>`<div class="hi" onclick="openDetail('${t.id}')">
+    <button class="btn red sm hdel" title="${L('Padam','Delete')}" onclick="event.stopPropagation();delTenderId('${t.id}')">🗑️</button>
     <span class="num">${i+1}</span>${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'} <span class="badge b-na">${KINDS[kindOf(t)]}</span>
     <h4>${esc(t.nama)}</h4>
     <div class="hm">⏳ ${fmtClose(t.closing)} ${t.submitted?`<span class="badge b-ok">✓ ${L('Dihantar','Submitted')}</span>`:`<span class="badge b-no">${L('Tidak dihantar','Not submitted')}</span>`}</div>
