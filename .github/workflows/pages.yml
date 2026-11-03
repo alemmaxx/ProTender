@@ -19,7 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Sediakan fail web
-        run: mkdir -p _site && cp -r index.html manifest.webmanifest sw.js icons sounds _site/
+        run: |
+          mkdir -p _site && cp -r index.html download.html manifest.webmanifest sw.js icons sounds _site/
+          curl -sSLf -o _site/ProTender.apk https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk && ls -la _site/ProTender.apk || echo "APK belum ada dalam Release"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

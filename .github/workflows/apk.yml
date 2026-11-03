@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: apk
   cancel-in-progress: true
@@ -91,3 +92,7 @@ jobs:
           body: "Muat turun ProTender.apk di bawah dan pasang di telefon Android."
           files: ProTender.apk
           make_latest: true
+      - name: Kemas kini salinan APK di GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main -R ${{ github.repository }}

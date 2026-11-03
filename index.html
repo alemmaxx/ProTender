@@ -233,6 +233,8 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .rmw{position:relative}.rmw span{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;font-size:14px;pointer-events:none}.rmw input{padding-left:46px}
 .dacts{display:flex;gap:10px;margin-bottom:10px}.dacts .btn{flex:1}
 .btn.wa{background:#25d366;color:#06291a}
+.dlalt{display:block;text-align:center;margin:8px 0 2px;font-size:13px;font-weight:700;color:var(--gold);text-decoration:underline}
+:root[data-theme="light"] .dlalt{color:#000}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -1023,7 +1025,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v4.3</p>
+    <p class="muted" style="text-align:center">ProTender v4.4</p>
   </div>`;
 }
 function openCo(id){
@@ -1117,7 +1119,8 @@ function remCardHTML(){
       <div class="r3">${c.times.map((x,i)=>`<div class="rt ${x.on?'':'dim'}"><label class="sw sm" style="margin:0"><input type="checkbox" ${x.on?'checked':''} onchange="remTime('${k}',${i},null,this.checked)"><span></span></label><span class="rn">${L('Masa','Time')} ${i+1}</span><input type="time" value="${x.t}" onchange="remTime('${k}',${i},this.value,null)"></div>`).join('')}</div>
     </div>`}).join('')}
     </div>
-    ${isNative()?'':`<a class="btn gold full" style="margin-top:12px" href="https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk" target="_blank" rel="noopener">⬇ ${L('Muat Turun APK Android','Download Android APK')}</a>`}
+    ${isNative()?'':`<a class="btn gold full" style="margin-top:12px" href="https://alemmaxx.github.io/ProTender/ProTender.apk" target="_blank" rel="noopener">⬇ ${L('Muat Turun APK Android','Download Android APK')}</a>
+    <a class="dlalt" href="https://alemmaxx.github.io/ProTender/download.html" target="_blank" rel="noopener">${L('Muat turun gagal? Buka halaman muat turun','Download failed? Open the download page')} ↗</a>`}
     <p class="muted" style="margin-top:12px">${isNative()?L('APK: notifikasi berbunyi pada masa ditetapkan walaupun app ditutup.','APK: notifications ring at the set times even when the app is closed.'):L('Versi web/pasang: notifikasi berbunyi bila app sedang dibuka. Untuk bunyi walaupun app ditutup, guna <b>APK</b>.','Web/installed version: notifications ring while the app is open. To ring even when closed, use the <b>APK</b>.')}</p>
     ${isNative()?`<div class="nstat">
       <div class="kv"><span>${L('Kebenaran notifikasi','Notification permission')}</span><span>${NATIVE.perm==='granted'?`<span class="badge b-ok">✓ ${L('Dibenarkan','Allowed')}</span>`:`<span class="badge b-no">${L('Belum','Not yet')}</span>`}</span></div>
