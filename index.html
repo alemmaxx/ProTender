@@ -226,6 +226,7 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .ynb{border:1px solid var(--line);background:var(--red2);color:var(--red);border-radius:999px;padding:5px 11px;font:700 12px var(--f);cursor:pointer}
 .ynb.on{background:var(--green2);color:var(--green)}
 :root[data-theme="light"] .ynb{border-color:#000;color:#000}
+.hint{margin:16px 0 0;padding:10px 12px;border-radius:10px;background:var(--blue2);color:var(--ink);font-size:13px;line-height:1.45;border:1px solid var(--line)}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -359,16 +360,22 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
     <div class="cpick" id="fSpanBox" onclick="openPick('ts')"></div>
     <div class="elig" id="eligBox"></div>
 
-    <label>Site Briefing</label>
+    <div id="invLater" class="hint" style="display:none" data-l="📧 Selepas pendaftaran tamat, client akan email tarikh <b>site visit</b>, <b>BQ</b> dan <b>closing date</b>. Edit tender ini untuk isi bila sudah terima.|📧 After registration closes, the client will email the <b>site visit</b> date, <b>BQ</b> and <b>closing date</b>. Edit this tender to fill them in once received."></div>
+    <label id="fBriefLbl">Site Briefing</label>
     <div class="dtw" data-ph="cth: 30-Oct-2026 10:00|e.g. 30-Oct-2026 10:00"><input type="datetime-local" id="fBrief"></div>
 
+    <div id="salesBox">
     <label>Document Sales Period</label>
     <div class="grid2 dt">
       <div><small data-l="Mula|Start">Mula</small><div class="dtw" data-ph="cth: 02-Nov-2026 07:00|e.g. 02-Nov-2026 07:00"><input type="datetime-local" id="fSaleS"></div></div>
       <div><small data-l="Tamat|End">Tamat</small><div class="dtw" data-ph="cth: 09-Nov-2026 23:00|e.g. 09-Nov-2026 23:00"><input type="datetime-local" id="fSaleE"></div></div>
     </div>
+    </div>
 
-    <label>Tender Closing Date <b>*</b></label>
+    <label id="fBqLbl" style="display:none" data-l="Tarikh Terima BQ|BQ Received Date">Tarikh Terima BQ</label>
+    <div class="dtw" id="fBqBox" style="display:none" data-ph="cth: 05-Nov-2026 10:00|e.g. 05-Nov-2026 10:00"><input type="datetime-local" id="fBq"></div>
+
+    <label>Tender Closing Date <b id="fCloseReq">*</b><span id="fCloseOpt" class="muted" style="display:none" data-l=" (isi bila client email)| (fill in when the client emails)"></span></label>
     <div class="dtw" data-ph="cth: 18-Nov-2026 15:00|e.g. 18-Nov-2026 15:00"><input type="datetime-local" id="fClose"></div>
 
     <label data-l="Catatan|Notes">Catatan</label>
@@ -764,7 +771,7 @@ function render(){
     h+=hero('Site Briefing',L('Taklimat tapak.','Site briefing.'),L('Senarai tender yang ada site briefing / lawatan tapak.','Tenders with a site briefing / site visit.'),[[upBrief.length,L('Akan datang','Upcoming')],[LS.brief.length-upBrief.length,L('Sudah lepas','Past')]],'#1d3f6b');
     h+=`<div id="lst"></div>`;
   }else if(tab==='buy'){
-    h+=hero('Document Sales',L('Beli dokumen.','Buy documents.'),L('Tender yang tempoh pendaftaran sudah tamat — masa untuk beli dokumen.','Registration has ended — time to buy the tender documents.'),[[LS.buy.length,L('Perlu tindakan','Need action')],[LS.buy.filter(t=>t.bought).length,L('Sudah beli','Bought')]],'#5a3d0f');
+    h+=hero('Document Sales',L('Beli dokumen.','Buy documents.'),L('Pendaftaran sudah tamat — Website: beli dokumen. Invite: tunggu email client (site visit, BQ & closing date).','Registration has ended — Website: buy documents. Invite: await the client email (site visit, BQ & closing date).'),[[LS.buy.length,L('Perlu tindakan','Need action')],[LS.buy.filter(t=>t.bought).length,L('Sudah beli','Bought')]],'#5a3d0f');
     h+=`<div id="lst"></div>`;
   }else if(tab==='closing'){
     h+=hero('Closing Date',L('Tarikh tutup.','Closing date.'),L('Tender yang belum tutup. Tender yang sudah tamat ada dalam 🗂️ History.','Tenders not yet closed. Closed tenders are in 🗂️ History.'),[[upClose.length,L('Belum tutup','Open')],[upClose.filter(t=>left(t.closing).cls==='hot').length,L('≤ 3 hari','≤ 3 days')],[LS.close.length-upClose.length,L('Dalam History','In History')]],'#5a1f1a');
@@ -801,20 +808,22 @@ function card(t,key,n){
   // tarikh utama untuk kiraan
   let ref=t[key]||t.closing, refLbl={regEnd:'Tamat daftar',briefing:'Briefing',saleEnd:'Tamat jualan',closing:'Tutup'}[t[key]?key:'closing'];
   if(key==='saleEnd'&&t.saleEnd&&isPast(t.saleEnd)){ref=t.closing;refLbl='Tutup'}
-  const l=left(ref)||{cls:'',big:'-',small:''};
+  const l=left(ref)||(t.type==='invite'&&!t.closing?{cls:'warn',big:'📧',small:L('Tunggu','Waiting')}:{cls:'',big:'-',small:''});
   const typ=t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>';
   let rows='';
   const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
-  if(key==='regEnd'){ rows+=t.type==='invite'?kv(L('Akhir daftar','Last registration'),'<b>'+fmt(t.regEnd)+'</b>'):kv('Registration',fmtRange(t.regStart,t.regEnd)); rows+=kv('Closing',fmtClose(t.closing)); }
-  else if(key==='briefing'){ rows+=kv('Site Briefing','<b>'+fmt(t.briefing)+'</b>'); rows+=kv('Closing',fmtClose(t.closing)); }
-  else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',fmtClose(t.closing)); }
+  if(key==='regEnd'){ rows+=t.type==='invite'?kv(L('Akhir daftar','Last registration'),'<b>'+fmt(t.regEnd)+'</b>'):kv('Registration',fmtRange(t.regStart,t.regEnd)); rows+=kv('Closing',clTxt(t)); }
+  else if(key==='briefing'){ rows+=kv('Site Briefing','<b>'+fmt(t.briefing)+'</b>'); rows+=kv('Closing',clTxt(t)); }
+  else if(key==='saleEnd'&&t.type==='invite'){ rows+=kv(L('Akhir daftar','Last registration'),fmt(t.regEnd)); rows+=kv('Status',inviteStatus(t)); if(t.briefing) rows+=kv('Site Visit',fmt(t.briefing)); rows+=kv('Closing',t.closing?fmtClose(t.closing):`<span class="muted">${L('Menunggu email client','Awaiting client email')}</span>`); }
+  else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',clTxt(t)); }
   else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
   const el=eligT(t);
   const chips=!el.none?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada syarikat layak','No eligible company')}</span>`}</div>`:'';
   let acts='';
   if(t.type==='invite'&&t.link&&key==='regEnd') acts+=`<a class="btn sec sm" href="${esc(t.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📝 Google Form</a>`;
   if(key==='regEnd') acts+=flagBtn(t,'registered',L('✓ Sudah Daftar','✓ Registered'),L('Tanda Sudah Daftar','Mark Registered'));
-  if(key==='saleEnd') acts+=flagBtn(t,'bought',L('✓ Sudah Beli','✓ Bought'),L('Tanda Sudah Beli','Mark Bought'));
+  if(key==='saleEnd') acts+=t.type==='invite'?flagBtn(t,'bought',L('✓ Sudah Terima BQ','✓ BQ Received'),L('Tanda Sudah Terima BQ','Mark BQ Received')):flagBtn(t,'bought',L('✓ Sudah Beli','✓ Bought'),L('Tanda Sudah Beli','Mark Bought'));
+  if(key==='saleEnd'&&t.type==='invite'&&!t.closing) acts+=`<button class="btn sec sm" onclick="event.stopPropagation();openForm('${t.id}')">✏️ ${L('Isi Site Visit / BQ / Closing','Fill Site Visit / BQ / Closing')}</button>`;
   if(key==='briefing'&&!isPast(t.briefing)) acts+=flagBtn(t,'briefed',L('✓ Akan Hadir','✓ Attending'),L('Tanda Akan Hadir','Mark Attending'));
   if(key==='closing'&&!isPast(t.closing)) acts+=flagBtn(t,'submitted',L('✓ Sudah Hantar','✓ Submitted'),L('Tanda Sudah Hantar','Mark Submitted'));
   return `<div class="tc ${l.cls}" onclick="openDetail('${t.id}')">
@@ -826,6 +835,12 @@ function card(t,key,n){
 }
 function flagBtn(t,f,on,off){return `<button class="btn ${t[f]?'sec':'gold'} sm" onclick="event.stopPropagation();toggleFlag('${t.id}','${f}')">${t[f]?on:off}</button>`}
 function toggleFlag(id,f){const t=findT(id);t[f]=!t[f];putDoc('pt_tenders',t);persist()}
+function clTxt(t){return t.closing?fmtClose(t.closing):(t.type==='invite'?`<span class="muted">${L('Menunggu email client','Awaiting client email')}</span>`:'-')}
+function inviteStatus(t){
+  if(t.closing) return `<span class="badge b-ok">${L('Closing date diterima','Closing date received')}</span>`;
+  if(t.bought||t.bqDate) return `<span class="badge b-blue">${L('BQ diterima','BQ received')}</span>`;
+  return `<span class="badge b-warn">${L('Menunggu email client','Awaiting client email')}</span>`;
+}
 function saleStatus(t){
   if(!t.saleStart&&!t.saleEnd) return `<span class="badge b-na">${L('Tiada tarikh','No date')}</span>`;
   if(t.saleStart&&!isPast(t.saleStart)) return `<span class="badge b-blue">${L('Belum buka','Not open yet')}</span>`;
@@ -839,7 +854,13 @@ function closeS(id){$(id).classList.remove('on')}
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2200)}
 
 // ================== BORANG TENDER ==================
-function typeUI(){const inv=$('fType').value==='invite';$('formLinkBox').style.display=inv?'block':'none';$('regWeb').style.display=inv?'none':'block';dtSync()}
+function typeUI(){const inv=$('fType').value==='invite';
+  $('formLinkBox').style.display=inv?'block':'none';$('regWeb').style.display=inv?'none':'block';
+  $('salesBox').style.display=inv?'none':'block';$('invLater').style.display=inv?'block':'none';
+  $('fBqLbl').style.display=$('fBqBox').style.display=inv?'block':'none';
+  $('fCloseReq').style.display=inv?'none':'inline';$('fCloseOpt').style.display=inv?'inline':'none';
+  $('fBriefLbl').textContent=inv?L('Site Visit / Briefing','Site Visit / Briefing'):'Site Briefing';
+  dtSync()}
 function eligUI(){
   const req={codes:selT,gred:$('fGred').value,kind:kindT,ssm:YN.fSSM,ais:YN.fAIS,span:selTS};
   if(!selT.length&&!req.gred&&!selTS.length&&!req.ssm&&!req.ais){$('eligBox').innerHTML=`<span class="muted">${L('Pilih syarat dari client — syarikat yang layak akan keluar di sini.','Choose the client requirements — eligible companies will show here.')}</span>`;return}
@@ -860,18 +881,20 @@ function openForm(id){
   setYN('fSSM',t?.ssm?1:0); setYN('fAIS',t?.ais?1:0);
   $('fGred').value=t?.gred||''; setKind(kindT);
   $('fBrief').value=t?.briefing||''; $('fSaleS').value=t?.saleStart||''; $('fSaleE').value=t?.saleEnd||'';
-  $('fClose').value=t?.closing||''; $('fNote').value=t?.note||'';
+  $('fClose').value=t?.closing||''; $('fBq').value=t?.bqDate||''; $('fNote').value=t?.note||'';
   $('fDel').style.display=t?'inline-flex':'none';
   typeUI(); eligUI(); dtSync(); closeS('sDetail'); openS('sForm'); $('sForm').querySelector('.panel').scrollTop=0;
 }
 function saveTender(){
   const nama=$('fNama').value.trim(), closing=$('fClose').value;
   if(!nama){toast(L('Sila isi Nama Tender','Please fill in Tender Name'));return}
-  if(!closing){toast(L('Sila isi Tender Closing Date','Please fill in Tender Closing Date'));return}
+  const inv=$('fType').value==='invite';
+  if(!closing&&!inv){toast(L('Sila isi Tender Closing Date','Please fill in Tender Closing Date'));return}
+  if(inv&&!$('fRegLast').value){toast(L('Sila isi Tarikh & Masa Akhir Daftar','Please fill in Last Registration Date & Time'));return}
   const v={nama,type:$('fType').value,link:$('fType').value==='invite'?$('fLink').value.trim():'',
     regStart:$('fType').value==='invite'?'':$('fRegS').value,regEnd:$('fType').value==='invite'?$('fRegLast').value:$('fRegE').value,
     codes:[...selT],kind:kindT,gred:kindT==='cidb'?$('fGred').value:'',ssm:!!YN.fSSM,ais:!!YN.fAIS,span:[...selTS],
-    briefing:$('fBrief').value,saleStart:$('fSaleS').value,saleEnd:$('fSaleE').value,closing,note:$('fNote').value.trim(),updated:Date.now()};
+    briefing:$('fBrief').value,saleStart:inv?'':$('fSaleS').value,saleEnd:inv?'':$('fSaleE').value,bqDate:inv?$('fBq').value:'',closing,note:$('fNote').value.trim(),updated:Date.now()};
   if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast(L('Tarikh tamat pendaftaran sebelum tarikh mula','Registration end is before start'));return}
   if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast(L('Tarikh tamat jualan sebelum tarikh mula','Sales end is before start'));return}
   const id=$('fId').value;
@@ -891,8 +914,8 @@ function openDetail(id){
       <h2>${esc(t.nama)}</h2>
       ${t.type==='invite'?kv(L('Akhir daftar','Last registration'),'<b>'+fmt(t.regEnd)+'</b>'):kv('Registration',fmtRange(t.regStart,t.regEnd))}
       ${kv('Site Briefing',fmt(t.briefing))}
-      ${kv('Sales Period',fmtRange(t.saleStart,t.saleEnd))}
-      ${kv('Closing Date','<b>'+fmtClose(t.closing)+'</b>')}
+      ${t.type==='invite'?kv(L('Terima BQ','BQ received'),t.bqDate?fmt(t.bqDate):(t.bought?'✓':'-')):kv('Sales Period',fmtRange(t.saleStart,t.saleEnd))}
+      ${kv('Closing Date',t.closing?'<b>'+fmtClose(t.closing)+'</b>':(t.type==='invite'?`<span class="muted">${L('Menunggu email client','Awaiting client email')}</span>`:'-'))}
       ${t.type==='invite'?kv('Google Form',t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:var(--gold)">${L('Buka link','Open link')}</a>`:'-'):''}
       ${t.note?kv(L('Catatan','Notes'),esc(t.note)):''}
     </div>
@@ -909,7 +932,7 @@ function openDetail(id){
     </div>
     <div class="card"><h2>Status</h2>
       ${kv(L('Daftar','Registered'),t.registered?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
-      ${kv(L('Beli dokumen','Documents bought'),t.bought?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
+      ${kv(t.type==='invite'?L('Terima BQ','BQ received'):L('Beli dokumen','Documents bought'),t.bought?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
       ${kv(L('Hantar','Submitted'),t.submitted?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
     </div>
     <button class="btn gold full" onclick="openForm('${t.id}')">✏️ Edit Tender</button>`;
@@ -952,7 +975,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.9</p>
+    <p class="muted" style="text-align:center">ProTender v4.0</p>
   </div>`;
 }
 function openCo(id){
