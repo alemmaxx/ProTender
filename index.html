@@ -238,6 +238,9 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .lic{margin-top:10px}.lic>b{display:block;font-size:14px;margin-bottom:4px}
 .lic .grid2 input{min-height:44px}
 .lexp{display:block;margin-top:2px;font-size:12px}
+.rcg{font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 4px}
+:root[data-theme="light"] .rcg{color:#000}
+.regby{margin-top:8px;font-size:12px}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -438,6 +441,19 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
   </div>
 </div>
 
+<!-- Syarikat yang sudah daftar -->
+<div class="sheet" id="sRegCo" style="z-index:24" onclick="if(event.target===this)closeS('sRegCo')">
+  <div class="panel">
+    <div class="ph"><h2 data-l="Syarikat Yang Sudah Daftar|Registered Companies">Syarikat Yang Sudah Daftar</h2><button class="x" onclick="closeS('sRegCo')">✕</button></div>
+    <p class="muted" id="rcTender"></p>
+    <div id="rcList"></div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn sec" onclick="RC.sel=[];rcDraw()" data-l="Kosongkan|Clear">Kosongkan</button>
+      <button class="btn gold full" id="rcSave" onclick="rcSave()"></button>
+    </div>
+  </div>
+</div>
+
 <!-- History -->
 <div class="sheet" id="sHist" onclick="if(event.target===this)closeS('sHist')">
   <div class="panel">
@@ -565,7 +581,7 @@ const D=s=>s?new Date(s):null;
 const p2=n=>String(n).padStart(2,'0');
 function fmt(s){const d=D(s);if(!d||isNaN(d))return '-';return `${p2(d.getDate())}-${MON[d.getMonth()]}-${d.getFullYear()} ${p2(d.getHours())}:${p2(d.getMinutes())}`}
 function fmtClose(s){const d=D(s);if(!d||isNaN(d))return '-';let h=d.getHours(),ap=h>=12?'pm':'am';h=h%12||12;return `${p2(d.getDate())}-${MON[d.getMonth()]}-${d.getFullYear()} (${h}.${p2(d.getMinutes())}${ap})`}
-function fmtRange(a,b){if(!a&&!b)return '-';return `${fmt(a)} to ${fmt(b)}`}
+function fmtRange(a,b){if(!a&&!b)return '-';if(!a)return fmt(b);if(!b)return fmt(a);return `${fmt(a)} to ${fmt(b)}`}
 // kiraan masa berbaki
 function left(s){
   const d=D(s); if(!d) return null;
@@ -837,11 +853,12 @@ function card(t,key,n){
   else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',clTxt(t)); }
   else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
   if(t.price) rows+=kv('Indicative Price','<b>'+fmtRM(t.price)+'</b>');
+  if(regNames(t).length) rows+=kv(L('Didaftar oleh','Registered by'),'<b>'+regNames(t).map(esc).join(', ')+'</b>');
   const el=eligT(t);
   const chips=!el.none?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada syarikat layak','No eligible company')}</span>`}</div>`:'';
   let acts='';
   if(t.type==='invite'&&t.link&&key==='regEnd') acts+=`<a class="btn sec sm" href="${esc(t.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📝 Google Form</a>`;
-  if(key==='regEnd') acts+=flagBtn(t,'registered',L('✓ Sudah Daftar','✓ Registered'),L('Tanda Sudah Daftar','Mark Registered'));
+  if(key==='regEnd') acts+=`<button class="btn ${t.registered?'sec':'gold'} sm" onclick="event.stopPropagation();openRegCo('${t.id}')">${t.registered?L('✓ Sudah Daftar','✓ Registered')+(regNames(t).length?' ('+regNames(t).length+')':''):L('Tanda Sudah Daftar','Mark Registered')}</button>`;
   if(key==='saleEnd') acts+=t.type==='invite'?flagBtn(t,'bought',L('✓ Sudah Terima BQ','✓ BQ Received'),L('Tanda Sudah Terima BQ','Mark BQ Received')):flagBtn(t,'bought',L('✓ Sudah Beli','✓ Bought'),L('Tanda Sudah Beli','Mark Bought'));
   if(key==='saleEnd'&&t.type==='invite'&&!t.closing) acts+=`<button class="btn sec sm" onclick="event.stopPropagation();openForm('${t.id}')">✏️ ${L('Isi Site Visit / BQ / Closing','Fill Site Visit / BQ / Closing')}</button>`;
   if(key==='briefing'&&!isPast(t.briefing)) acts+=flagBtn(t,'briefed',L('✓ Akan Hadir','✓ Attending'),L('Tanda Akan Hadir','Mark Attending'));
@@ -854,6 +871,23 @@ function card(t,key,n){
   </div>`;
 }
 function flagBtn(t,f,on,off){return `<button class="btn ${t[f]?'sec':'gold'} sm" onclick="event.stopPropagation();toggleFlag('${t.id}','${f}')">${t[f]?on:off}</button>`}
+// pilih syarikat yang sudah daftar tender
+const RC={id:'',sel:[]};
+const regNames=t=>(t.regCos||[]).map(id=>findC(id)?.nama).filter(Boolean);
+function openRegCo(id){
+  const t=findT(id); if(!t)return;
+  if(!C().length){ if(confirm(L('Belum ada syarikat dalam Setting. Tanda sudah daftar tanpa pilih syarikat?','No companies in Setting yet. Mark registered without choosing a company?'))){t.registered=!t.registered;putDoc('pt_tenders',t);persist()} return }
+  RC.id=id; RC.sel=[...(t.regCos||[])]; $('rcTender').textContent=t.nama; rcDraw(); openS('sRegCo');
+}
+function rcDraw(){
+  const t=findT(RC.id), el=eligT(t), okIds=el.ok.map(c=>c.id);
+  const row=c=>{const on=RC.sel.includes(c.id);return `<label class="pi ${on?'on':''}" style="margin:0;color:var(--ink)"><input type="checkbox" ${on?'checked':''} onchange="rcTog('${c.id}')"><span><b style="color:inherit">${esc(c.nama)}</b>${okIds.includes(c.id)?`<small style="color:var(--green)">✓ ${L('Layak','Eligible')}</small>`:''}</span></label>`};
+  const all=C().sort((a,b)=>a.nama.localeCompare(b.nama)), ok=all.filter(c=>okIds.includes(c.id)), oth=all.filter(c=>!okIds.includes(c.id));
+  $('rcList').innerHTML=(ok.length?`<div class="rcg">${L('Syarikat layak','Eligible companies')}</div>`+ok.map(row).join(''):'')+(oth.length?`<div class="rcg">${ok.length?L('Syarikat lain','Other companies'):L('Syarikat','Companies')}</div>`+oth.map(row).join(''):'');
+  $('rcSave').textContent=RC.sel.length?L(`Simpan (${RC.sel.length} syarikat)`,`Save (${RC.sel.length} companies)`):L('Simpan — belum daftar','Save — not registered');
+}
+function rcTog(id){RC.sel=RC.sel.includes(id)?RC.sel.filter(x=>x!==id):[...RC.sel,id];rcDraw()}
+function rcSave(){const t=findT(RC.id);if(!t)return;t.regCos=[...RC.sel];t.registered=RC.sel.length>0;putDoc('pt_tenders',t);closeS('sRegCo');persist();if($('sDetail').classList.contains('on'))openDetail(t.id);toast(t.registered?L('Ditanda sudah daftar ✓','Marked registered ✓'):L('Ditanda belum daftar','Marked not registered'))}
 function toggleFlag(id,f){const t=findT(id);t[f]=!t[f];putDoc('pt_tenders',t);persist()}
 const numRM=v=>{const n=parseFloat(String(v||'').replace(/[^0-9.]/g,''));return isNaN(n)?null:n};
 function fmtRM(v,bare){const n=numRM(v);if(n===null)return '';const s=n.toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});return bare?s:'RM '+s}
@@ -877,7 +911,7 @@ function tenderText(t){
   if(mc.length||t.gred){L1.push(`${kind==='mof'?L('Kod MOF','MOF Codes'):L('Kod CIDB','CIDB Codes')}${t.gred?' ('+L('Gred min ','Min grade ')+t.gred+')':''}:`);mc.forEach(c=>L1.push(`• ${c} – ${codeName(c)}`))}
   if(sp.length){L1.push('SPAN:');sp.forEach(c=>L1.push(`• ${c} – ${spanName(c)||codeName(c)}`))}
   if(!el.none) L1.push(`${L('Syarikat layak','Eligible companies')}: ${el.ok.length?el.ok.map(c=>c.nama).join(', '):L('Tiada','None')}`);
-  L1.push('',`*Status*`,`${L('Daftar','Registered')}: ${t.registered?L('Sudah','Yes'):L('Belum','Not yet')}`,`${inv?L('Terima BQ','BQ received'):L('Beli dokumen','Documents bought')}: ${t.bought?L('Sudah','Yes'):L('Belum','Not yet')}`,`${L('Hantar','Submitted')}: ${t.submitted?L('Sudah','Yes'):L('Belum','Not yet')}`);
+  L1.push('',`*Status*`,`${L('Daftar','Registered')}: ${t.registered?(regNames(t).length?regNames(t).join(', '):L('Sudah','Yes')):L('Belum','Not yet')}`,`${inv?L('Terima BQ','BQ received'):L('Beli dokumen','Documents bought')}: ${t.bought?L('Sudah','Yes'):L('Belum','Not yet')}`,`${L('Hantar','Submitted')}: ${t.submitted?L('Sudah','Yes'):L('Belum','Not yet')}`);
   if(t.note) L1.push('',`${L('Catatan','Notes')}: ${t.note}`);
   return L1.join('\n');
 }
@@ -988,7 +1022,8 @@ function openDetail(id){
       <div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada','None')}</span>`}</div>
     </div>
     <div class="card"><h2>Status</h2>
-      ${kv(L('Daftar','Registered'),t.registered?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
+      ${kv(L('Daftar','Registered'),t.registered?`<span class="done">✓ ${regNames(t).length?regNames(t).map(esc).join(', '):L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
+      <button class="btn sec full sm" style="margin:8px 0 4px" onclick="openRegCo('${t.id}')">🏢 ${L('Pilih syarikat yang sudah daftar','Choose registered companies')}</button>
       ${kv(t.type==='invite'?L('Terima BQ','BQ received'):L('Beli dokumen','Documents bought'),t.bought?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
       ${kv(L('Hantar','Submitted'),t.submitted?`<span class="done">✓ ${L('Sudah','Yes')}</span>`:L('Belum','Not yet'))}
     </div>
@@ -1032,7 +1067,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v4.5</p>
+    <p class="muted" style="text-align:center">ProTender v4.6</p>
   </div>`;
 }
 const LICS={cidb:'CIDB',mof:'MOF',span:'SPAN'};

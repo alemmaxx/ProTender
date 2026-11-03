@@ -1,5 +1,5 @@
 // Pekerja servis ProTender: "Pasang app", guna luar talian & notifikasi.
-const C='protender-v21';
+const C='protender-v22';
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./sounds/pt_chime.wav','./sounds/pt_bell.wav','./sounds/pt_alarm.wav'])).catch(()=>{}));});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;
