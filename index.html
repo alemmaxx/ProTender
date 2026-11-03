@@ -229,6 +229,7 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .hint{margin:16px 0 0;padding:10px 12px;border-radius:10px;background:var(--blue2);color:var(--ink);font-size:13px;line-height:1.45;border:1px solid var(--line)}
 .tc .acts .btn.del{flex:0 0 42px}
 .hi{position:relative}.hi .hdel{position:absolute;top:10px;right:10px;width:34px;height:34px;padding:0}
+.nstat{margin:12px 0 10px;padding:4px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line)}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -512,11 +513,12 @@ function applyLang(){
 }
 let THEME=(()=>{try{return localStorage.getItem('protender_theme')||'dark'}catch(e){return 'dark'}})();
 function themeHTML(){return `<button class="${THEME==='dark'?'on':''}" onclick="setTheme('dark')">🌙 ${L('Asal','Original')}</button><button class="${THEME==='light'?'on':''}" onclick="setTheme('light')">☀️ ${L('Putih','White')}</button>`}
+function statusBar(){try{const SB=window.Capacitor?.Plugins?.StatusBar;if(!SB)return;SB.setOverlaysWebView&&SB.setOverlaysWebView({overlay:false});SB.setBackgroundColor({color:THEME==='light'?'#ffffff':'#0a1210'});SB.setStyle({style:THEME==='light'?'LIGHT':'DARK'})}catch(e){}}
 function setTheme(t){THEME=t;try{localStorage.setItem('protender_theme',t)}catch(e){}
   if(t==='light')document.documentElement.dataset.theme='light';else delete document.documentElement.dataset.theme;
   const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='light'?'#ffffff':'#0a1210';
   document.querySelectorAll('.themes').forEach(e=>e.innerHTML=themeHTML());
-  try{const SB=window.Capacitor?.Plugins?.StatusBar;SB&&SB.setStyle({style:t==='light'?'LIGHT':'DARK'})}catch(e){}
+  statusBar();
 }
 function setLang(l){LANG=l;try{localStorage.setItem('protender_lang',l)}catch(e){}applyLang();if(USER)render();scheduleNative()}
 // contoh dalam kotak tarikh
@@ -980,7 +982,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v4.1</p>
+    <p class="muted" style="text-align:center">ProTender v4.2</p>
   </div>`;
 }
 function openCo(id){
@@ -1046,7 +1048,7 @@ function openAlerts(){
 const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const LN=()=>window.Capacitor?.Plugins?.LocalNotifications;
 async function askNotif(){
-  if(isNative()&&LN()){const r=await LN().requestPermissions();toast(r.display==='granted'?L('Notifikasi dibenarkan ✓','Notifications allowed ✓'):L('Notifikasi ditolak','Notifications denied'));scheduleNative();render();return}
+  if(isNative()&&LN()){const r=await LN().requestPermissions();NATIVE.perm=r.display;toast(r.display==='granted'?L('Notifikasi dibenarkan ✓','Notifications allowed ✓'):L('Notifikasi ditolak — buka Tetapan Android → Apps → ProTender → Notifikasi','Notifications denied — open Android Settings → Apps → ProTender → Notifications'));scheduleNative();render();return}
   if(!('Notification' in window)){toast(L('Browser ini tak sokong notifikasi','This browser does not support notifications'));return}
   const p=await Notification.requestPermission();toast(p==='granted'?L('Notifikasi dibenarkan ✓','Notifications allowed ✓'):L('Notifikasi ditolak','Notifications denied'));render();
 }
@@ -1062,7 +1064,7 @@ function setRem(r){localStorage.setItem(REMKEY,JSON.stringify(r));scheduleNative
 const dLbl=d=>d==0?'Pada hari tamat':d==1?'1 hari sebelum':d+' hari sebelum';
 function remCardHTML(){
   const R=getRem();
-  const notifOk=isNative()?true:('Notification' in window&&Notification.permission==='granted');
+  const notifOk=isNative()?NATIVE.perm==='granted':('Notification' in window&&Notification.permission==='granted');
   return `<div class="card">
     <h2>🔔 ${L('Peringatan & Bunyi','Reminders & Sound')}</h2>
     <p class="muted">${L('Notifikasi berbunyi <b>pada hari tarikh tamat</b> setiap tab. Setiap tab ada 3 masa — boleh ubah atau matikan.','Notifications ring <b>on the end date</b> of each tab. Each tab has 3 times — change or turn them off.')}</p>
@@ -1076,6 +1078,13 @@ function remCardHTML(){
     </div>
     ${isNative()?'':`<a class="btn gold full" style="margin-top:12px" href="https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk" target="_blank" rel="noopener">⬇ ${L('Muat Turun APK Android','Download Android APK')}</a>`}
     <p class="muted" style="margin-top:12px">${isNative()?L('APK: notifikasi berbunyi pada masa ditetapkan walaupun app ditutup.','APK: notifications ring at the set times even when the app is closed.'):L('Versi web/pasang: notifikasi berbunyi bila app sedang dibuka. Untuk bunyi walaupun app ditutup, guna <b>APK</b>.','Web/installed version: notifications ring while the app is open. To ring even when closed, use the <b>APK</b>.')}</p>
+    ${isNative()?`<div class="nstat">
+      <div class="kv"><span>${L('Kebenaran notifikasi','Notification permission')}</span><span>${NATIVE.perm==='granted'?`<span class="badge b-ok">✓ ${L('Dibenarkan','Allowed')}</span>`:`<span class="badge b-no">${L('Belum','Not yet')}</span>`}</span></div>
+      <div class="kv"><span>${L('Alarm tepat','Exact alarms')}</span><span>${NATIVE.exact==='granted'||!NATIVE.exact?`<span class="badge b-ok">✓ ${L('Dibenarkan','Allowed')}</span>`:`<span class="badge b-warn">${L('Tidak tepat','Not exact')}</span>`}</span></div>
+      <div class="kv"><span>${L('Notifikasi dijadualkan','Scheduled notifications')}</span><span><b>${NATIVE.pending}</b></span></div>
+      <div class="kv"><span>${L('Seterusnya','Next')}</span><span>${NATIVE.next?fmt(new Date(NATIVE.next-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)):'-'}</span></div>
+    </div>
+    ${NATIVE.exact&&NATIVE.exact!=='granted'?`<button class="btn gold full" style="margin-bottom:8px" onclick="exactFix()">⏰ ${L('Benarkan Alarm Tepat','Allow Exact Alarms')}</button>`:''}`:''}
     <button class="btn ${notifOk?'sec':'gold'} full" onclick="askNotif()">${notifOk?L('✓ Notifikasi dibenarkan','✓ Notifications allowed'):L('Benarkan Notifikasi','Allow Notifications')}</button>
     <button class="btn sec full" style="margin-top:8px" onclick="testNotif()">${L('Uji Notifikasi','Test Notification')}</button>
   </div>`;
@@ -1135,6 +1144,25 @@ function webTick(){
   openS('sAlert');
 }
 // APK: jadualkan notifikasi tempatan (berbunyi walaupun app ditutup)
+// ----- APK: kebenaran & status notifikasi -----
+const NATIVE={perm:'',exact:'',pending:0,next:null};
+async function nativeRefresh(){
+  if(!isNative()||!LN())return;
+  try{NATIVE.perm=(await LN().checkPermissions()).display}catch(e){}
+  try{if(LN().checkExactNotificationSetting)NATIVE.exact=(await LN().checkExactNotificationSetting()).exact_alarm}catch(e){}
+  try{const p=await LN().getPending();NATIVE.pending=p.notifications.length;
+      const at=p.notifications.map(n=>n.schedule&&n.schedule.at?new Date(n.schedule.at).getTime():0).filter(Boolean).sort((a,b)=>a-b);NATIVE.next=at[0]||null}catch(e){}
+  if(tab==='setting')render();
+}
+async function nativeSetup(){
+  if(!isNative()||!LN())return;
+  try{let p=await LN().checkPermissions();if(p.display!=='granted')p=await LN().requestPermissions();NATIVE.perm=p.display}catch(e){}
+  try{if(LN().checkExactNotificationSetting){const x=await LN().checkExactNotificationSetting();NATIVE.exact=x.exact_alarm;
+      if(x.exact_alarm!=='granted'&&!localStorage.getItem('pt_exact_asked')){localStorage.setItem('pt_exact_asked','1');
+        if(confirm(L('Benarkan "Alarm & peringatan" supaya notifikasi berbunyi TEPAT pada masanya walaupun app ditutup?','Allow "Alarms & reminders" so notifications ring at the EXACT time even when the app is closed?')))await LN().changeExactNotificationSetting()}}}catch(e){}
+  scheduleNative();
+}
+async function exactFix(){try{await LN().changeExactNotificationSetting()}catch(e){toast(L('Buka Tetapan Android → Apps → ProTender → Alarm & peringatan','Open Android Settings → Apps → ProTender → Alarms & reminders'))}setTimeout(nativeRefresh,1500)}
 let chOk=false;
 async function ensureChannels(){
   if(chOk||!LN()||!LN().createChannel)return;
@@ -1151,6 +1179,7 @@ async function doSchedule(){
     const R=getRem(), now=Date.now();
     const list=remEvents().filter(e=>e.at.getTime()>now).slice(0,60).map(e=>({id:hashId(e.key),title:e.title,body:e.body,channelId:R.sound,smallIcon:'ic_stat_pt',iconColor:'#d9b44a',extra:{tid:e.t.id},schedule:{at:e.at,allowWhileIdle:true}}));
     if(list.length) await LN().schedule({notifications:list});
+    nativeRefresh();
   }catch(e){console.log('schedule',e)}
 }
 
@@ -1229,7 +1258,7 @@ function startAuth(){
     USER=u;
     if(!u){stopListen();S={tenders:[],companies:[],span:[]};$('lPass').value='';$('lPass').type='password';$('pwEye').textContent='👁️';$('pwEye').classList.remove('on');showLogin();return}
     $('login').classList.add('off');
-    load(); render(); listen(); setTimeout(webTick,2500);
+    load(); render(); listen(); setTimeout(webTick,2500); setTimeout(nativeSetup,1200);
   });
 }
 
@@ -1276,6 +1305,7 @@ startAuth();
 setInterval(()=>{if(tab!=='setting'&&!document.querySelector('.sheet.on'))render()},60000);
 setInterval(webTick,20000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();webTick()}});
+if(isNative()){setTimeout(statusBar,300);const A=window.Capacitor.Plugins.App;A&&A.addListener('appStateChange',s=>{if(s.isActive){nativeRefresh();if(USER)scheduleNative()}})}
 // Butang Kembali: tutup pop up → balik ke Register → tanya sebelum keluar
 let EXITING=false;
 function openExit(){$('exitSub').textContent=isNative()?L('Peringatan tetap akan berbunyi pada masanya.','Reminders will still ring on time.'):L('Peringatan hanya berbunyi bila app dibuka. Guna APK untuk bunyi walaupun app ditutup.','Reminders only ring while the app is open. Use the APK to ring even when closed.');openS('sExit')}

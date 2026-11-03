@@ -6,7 +6,10 @@
     "@capacitor/android": "^6.1.0",
     "@capacitor/cli": "^6.1.0",
     "@capacitor/core": "^6.1.0",
-    "@capacitor/local-notifications": "^6.0.0",
-    "@capacitor/app": "^6.0.0"
+    "@capacitor/local-notifications": "^6.1.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "firebase": "10.12.2",
+    "@fontsource/bricolage-grotesque": "^5.0.0"
   }
 }

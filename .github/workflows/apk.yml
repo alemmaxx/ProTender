@@ -20,11 +20,26 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Sediakan fail web
-        run: mkdir -p www && cp -r index.html manifest.webmanifest sw.js icons sounds www/
       - name: Kunci tandatangan tetap (supaya APK baru boleh dikemas kini atas APK lama)
         run: mkdir -p ~/.android && cp android-signing/debug.keystore ~/.android/debug.keystore
       - run: npm install
+      - name: Sediakan fail app (Firebase & font dalam APK, tiada muat dari internet)
+        run: |
+          mkdir -p www/lib www/fonts
+          cp -r index.html icons sounds www/
+          for f in firebase-app-compat.js firebase-auth-compat.js firebase-firestore-compat.js; do
+            test -f node_modules/firebase/$f || { echo "TIADA $f"; ls node_modules/firebase | head -50; exit 1; }
+            cp node_modules/firebase/$f www/lib/
+          done
+          FS=node_modules/@fontsource/bricolage-grotesque
+          test -f $FS/400.css || { echo "TIADA font"; ls $FS; exit 1; }
+          cp -r $FS/files www/fonts/
+          cat $FS/400.css $FS/600.css $FS/800.css > www/fonts/bricolage.css
+          sed -i 's#https://www.gstatic.com/firebasejs/10.12.2/#lib/#g' www/index.html
+          sed -i 's#<link href="https://fonts.googleapis.com/css2[^"]*" rel="stylesheet">#<link href="fonts/bricolage.css" rel="stylesheet">#' www/index.html
+          sed -i '/fonts.googleapis.com" *>$/d;/rel="preconnect"/d' www/index.html
+          echo "--- pautan luar yang tinggal dalam www/index.html:"; grep -o 'https://[a-z.]*\(gstatic\|googleapis\)[^"]*' www/index.html || echo "(tiada)"
+          ls -la www www/lib www/fonts | head -40
       - run: npx cap add android
       - name: Ikon app, ikon notifikasi & bunyi
         run: |
@@ -59,6 +74,11 @@ jobs:
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk ProTender.apk
+      - name: Semak APK (kebenaran & isi)
+        run: |
+          AAPT=$(ls -d $ANDROID_HOME/build-tools/*/ | sort -V | tail -1)aapt2
+          $AAPT dump badging ProTender.apk | grep -E "^package|sdkVersion|targetSdk|application-label|uses-permission" || true
+          unzip -l ProTender.apk | grep -E "assets/public/(index.html|lib/|fonts/bricolage.css)|res/raw/pt_" || true
       - uses: actions/upload-artifact@v4
         with:
           name: ProTender-apk
