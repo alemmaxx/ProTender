@@ -222,6 +222,10 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 :root[data-theme="light"] .rchip button,:root[data-theme="light"] .cc button{background:rgba(0,0,0,.08)}
 :root[data-theme="light"] .lang button.on{background:var(--ink);color:#fff}
 .reqh{margin:20px 0 2px;padding-top:14px;border-top:1px dashed var(--line);font-size:15px;font-weight:800;color:var(--ink)}
+.yn2{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.ynb{border:1px solid var(--line);background:var(--red2);color:var(--red);border-radius:999px;padding:5px 11px;font:700 12px var(--f);cursor:pointer}
+.ynb.on{background:var(--green2);color:var(--green)}
+:root[data-theme="light"] .ynb{border-color:#000;color:#000}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -923,8 +927,8 @@ function settingsHTML(){
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 ${L('Syarikat & Kod','Companies & Codes')}</h2><button class="btn gold sm" onclick="openCo()">+ ${L('Tambah','Add')}</button></div>
-      <p class="muted">${L('Gred & kod CIDB, kod bidang MOF dan jenis SPAN setiap syarikat. Dipadankan dengan syarat tender untuk tunjuk syarikat yang layak.','CIDB grade & codes, MOF field codes and SPAN types for each company. Matched against tender requirements to show eligible companies.')}</p>
-      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted" style="display:block">SSM: ${c.ssm?'✓':'✗'} · AIS Vendor: ${c.ais?'✓':'✗'}</span><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span><span class="muted" style="display:block">SPAN: ${esc(parseCodes(c.span).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):`<div class="emptyrail" style="margin:8px 0 0">${L('Belum ada syarikat.','No companies yet.')}</div>`}
+      <p class="muted">${L('Register SSM, Register AIS Vendor, gred & kod CIDB, kod MOF dan permit SPAN setiap syarikat. Tekan butang SSM / AIS Vendor untuk tukar Ya/Tidak. Tekan nama syarikat untuk edit kod.','Register SSM, Register AIS Vendor, CIDB grade & codes, MOF codes and SPAN permits for each company. Tap SSM / AIS Vendor to switch Yes/No. Tap the company name to edit codes.')}</p>
+      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div style="flex:1;min-width:0"><b>${esc(c.nama)}</b><div class="yn2"><button class="ynb ${c.ssm?'on':''}" onclick="event.stopPropagation();coFlag('${c.id}','ssm')">Register SSM: ${c.ssm?L('Ya','Yes'):L('Tidak','No')}</button><button class="ynb ${c.ais?'on':''}" onclick="event.stopPropagation();coFlag('${c.id}','ais')">Register AIS Vendor: ${c.ais?L('Ya','Yes'):L('Tidak','No')}</button></div><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span><span class="muted" style="display:block">SPAN: ${esc(parseCodes(c.span).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):`<div class="emptyrail" style="margin:8px 0 0">${L('Belum ada syarikat.','No companies yet.')}</div>`}
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">💧 ${L('Jenis SPAN','SPAN Types')}</h2><button class="btn gold sm" onclick="openSpan()">+ ${L('Tambah','Add')}</button></div>
@@ -948,7 +952,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.8</p>
+    <p class="muted" style="text-align:center">ProTender v3.9</p>
   </div>`;
 }
 function openCo(id){
@@ -979,6 +983,7 @@ function saveSpan(){
   putDoc('pt_span',x); closeS('sSpan'); persist(); toast(L('Jenis SPAN disimpan ✓','SPAN type saved ✓'));
 }
 function delSpan(){const x=(S.span||[]).find(v=>v.id===$('sId').value);if(!x||!confirm(L('Padam jenis SPAN ','Delete SPAN type ')+x.code+'?'))return;S.span=S.span.filter(v=>v.id!==x.id);delDoc('pt_span',x.id);closeS('sSpan');persist()}
+function coFlag(id,f){const c=findC(id);if(!c)return;c[f]=!c[f];putDoc('pt_companies',c);persist();toast((f==='ssm'?'Register SSM':'Register AIS Vendor')+': '+(c[f]?L('Ya','Yes'):L('Tidak','No')))}
 function delCo(){const c=findC($('cId').value);if(!c||!confirm(L('Padam syarikat ','Delete company ')+c.nama+'?'))return;S.companies=S.companies.filter(x=>x.id!==c.id);delDoc('pt_companies',c.id);closeS('sCo');persist()}
 
 // ================== PERINGATAN ==================
