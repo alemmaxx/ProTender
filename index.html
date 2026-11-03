@@ -221,6 +221,7 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 :root[data-theme="light"] .sheet{background:rgba(23,33,28,.35)}
 :root[data-theme="light"] .rchip button,:root[data-theme="light"] .cc button{background:rgba(0,0,0,.08)}
 :root[data-theme="light"] .lang button.on{background:var(--ink);color:#fff}
+.reqh{margin:20px 0 2px;padding-top:14px;border-top:1px dashed var(--line);font-size:15px;font-weight:800;color:var(--ink)}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -326,20 +327,32 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
     <div id="formLinkBox" style="display:none">
       <label data-l="Link Google Form|Google Form Link">Link Google Form</label>
       <input id="fLink" type="url" data-ph="cth: https://forms.gle/abc123|e.g. https://forms.gle/abc123">
+      <label data-l="Tarikh & Masa Akhir Daftar|Last Registration Date & Time">Tarikh & Masa Akhir Daftar</label>
+      <div class="dtw" data-ph="cth: 27-Oct-2026 15:00|e.g. 27-Oct-2026 15:00"><input type="datetime-local" id="fRegLast"></div>
     </div>
 
+    <div id="regWeb">
     <label>Document Registration Period</label>
     <div class="grid2 dt">
       <div><small data-l="Mula|Start">Mula</small><div class="dtw" data-ph="cth: 15-Oct-2026 07:00|e.g. 15-Oct-2026 07:00"><input type="datetime-local" id="fRegS"></div></div>
       <div><small data-l="Tamat|End">Tamat</small><div class="dtw" data-ph="cth: 27-Oct-2026 15:00|e.g. 27-Oct-2026 15:00"><input type="datetime-local" id="fRegE"></div></div>
     </div>
+    </div>
+
+    <div class="reqh" data-l="Syarat Kelayakan|Eligibility Requirements">Syarat Kelayakan</div>
+    <label>Register SSM</label>
+    <div class="seg" style="margin:0" id="fSSM"><button type="button" data-v="1" onclick="setYN('fSSM',1)" data-l="Ya|Yes">Ya</button><button type="button" data-v="0" onclick="setYN('fSSM',0)" data-l="Tidak|No">Tidak</button></div>
+    <label>Register AIS Vendor</label>
+    <div class="seg" style="margin:0" id="fAIS"><button type="button" data-v="1" onclick="setYN('fAIS',1)" data-l="Ya|Yes">Ya</button><button type="button" data-v="0" onclick="setYN('fAIS',0)" data-l="Tidak|No">Tidak</button></div>
 
     <label data-l="Jenis Kod Bidang|Code Type">Jenis Kod Bidang</label>
-    <div class="seg" style="margin:0" id="fKind"><button type="button" data-k="cidb" onclick="setKind('cidb')">CIDB</button><button type="button" data-k="mof" onclick="setKind('mof')">MOF</button><button type="button" data-k="span" onclick="setKind('span')">SPAN</button></div>
+    <div class="seg" style="margin:0" id="fKind"><button type="button" data-k="cidb" onclick="setKind('cidb')">CIDB</button><button type="button" data-k="mof" onclick="setKind('mof')">MOF</button></div>
     <div id="gredBox"><label data-l="Gred CIDB Minimum|Minimum CIDB Grade">Gred CIDB Minimum</label>
     <select id="fGred" onchange="eligUI()"><option value="" data-l="Tiada / tidak dinyatakan|None / not stated">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select></div>
     <label id="fCodesLbl">Company Code</label>
     <div class="cpick" id="fCodesBox" onclick="openPick('t')"></div>
+    <label data-l="SPAN (Permit IPA)|SPAN (IPA Permit)">SPAN (Permit IPA)</label>
+    <div class="cpick" id="fSpanBox" onclick="openPick('ts')"></div>
     <div class="elig" id="eligBox"></div>
 
     <label>Site Briefing</label>
@@ -376,6 +389,10 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
     <input type="hidden" id="cId">
     <label><span data-l="Nama Syarikat|Company Name">Nama Syarikat</span> <b>*</b></label>
     <input id="cNama" data-ph="cth: Nama syarikat|e.g. Company name">
+    <label>Register SSM</label>
+    <div class="seg" style="margin:0" id="cSSM"><button type="button" data-v="1" onclick="setYN('cSSM',1)" data-l="Ya|Yes">Ya</button><button type="button" data-v="0" onclick="setYN('cSSM',0)" data-l="Tidak|No">Tidak</button></div>
+    <label>Register AIS Vendor</label>
+    <div class="seg" style="margin:0" id="cAIS"><button type="button" data-v="1" onclick="setYN('cAIS',1)" data-l="Ya|Yes">Ya</button><button type="button" data-v="0" onclick="setYN('cAIS',0)" data-l="Tidak|No">Tidak</button></div>
     <label data-l="Gred CIDB|CIDB Grade">Gred CIDB</label>
     <select id="cGred"><option value="" data-l="Tiada / tidak dinyatakan|None / not stated">Tiada / tidak dinyatakan</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option><option>G7</option></select>
     <label data-l="Kod Pengkhususan CIDB yang dimiliki|CIDB specialisation codes held">Kod Pengkhususan CIDB yang dimiliki</label>
@@ -384,7 +401,7 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
     <div class="cpick" id="cMofBox" onclick="openPick('cm')"></div>
     <label data-l="Jenis SPAN yang dimiliki|SPAN types held">Jenis SPAN yang dimiliki</label>
     <div class="cpick" id="cSpanBox" onclick="openPick('cs')"></div>
-    <p class="muted" data-l="Syarikat dikira <b>layak</b> bila ia ada <b>semua</b> kod (CIDB, MOF atau SPAN) yang tender minta. Untuk tender CIDB, gred syarikat juga mesti sama atau lebih tinggi daripada gred minimum.|A company is <b>eligible</b> when it holds <b>all</b> codes (CIDB, MOF or SPAN) the tender requires. For CIDB tenders, the company grade must also be equal to or higher than the minimum grade."></p>
+    <p class="muted" data-l="Syarikat dikira <b>layak</b> bila ia memenuhi <b>semua</b> syarat tender: SSM, AIS Vendor, kod CIDB/MOF, gred dan permit SPAN.|A company is <b>eligible</b> when it meets <b>all</b> tender requirements: SSM, AIS Vendor, CIDB/MOF codes, grade and SPAN permits."></p>
     <div style="display:flex;gap:10px;margin-top:14px">
       <button class="btn red" id="cDel" onclick="delCo()">🗑️</button>
       <button class="btn gold full" onclick="saveCo()" data-l="Simpan Syarikat|Save Company">Simpan Syarikat</button>
@@ -589,15 +606,38 @@ function eligible(codes,gred,kind){
   });
   return {ok,part};
 }
+// kelayakan penuh ikut tender (SSM, AIS Vendor, kod CIDB/MOF, gred, SPAN)
+function eligT(t){
+  const kind=kindOf(t); let codes=[...(t.codes||[])], span=[...(t.span||[])];
+  if(kind==='span'){span=[...span,...codes];codes=[]}
+  const gred=kind==='cidb'?(t.gred||''):'';
+  const reqN=codes.length+span.length+(gred?1:0)+(t.ssm?1:0)+(t.ais?1:0);
+  const ok=[],part=[];
+  if(!reqN) return {ok,part,none:true};
+  C().forEach(c=>{
+    const miss=[];
+    if(t.ssm&&!c.ssm) miss.push('SSM');
+    if(t.ais&&!c.ais) miss.push(L('AIS Vendor','AIS Vendor'));
+    const have=parseCodes(kind==='mof'?c.mof:c.codes);
+    codes.forEach(k=>{if(!have.includes(k))miss.push(k)});
+    if(gred&&gNum(c.gred)<gNum(gred)) miss.push(c.gred?L('Gred ','Grade ')+gred+L(' (syarikat ',' (company ')+c.gred+')':L('Gred ','Grade ')+gred);
+    const hs=parseCodes(c.span); span.forEach(k=>{if(!spanHas(hs,k))miss.push('SPAN '+k)});
+    if(!miss.length) ok.push(c); else if(miss.length<reqN) part.push({c,miss});
+  });
+  return {ok,part};
+}
 // ----- pemilih kod -----
 const PK={target:'t',sel:[],cat:''};
-let selT=[],selC=[],selCM=[],selCS=[],kindT='cidb';
+let selT=[],selC=[],selCM=[],selCS=[],selTS=[],kindT='cidb';
+const YN={fSSM:0,fAIS:0,cSSM:0,cAIS:0};
+function setYN(id,v){YN[id]=v;document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',+b.dataset.v===v));if(id[0]==='f')eligUI()}
 function chipsHTML(arr,box,ph){
   return arr.length?arr.map(c=>`<span class="cc" title="${esc(codeName(c))}">${esc(c)} <small>${esc(short(codeName(c)))}</small><button onclick="event.stopPropagation();rmCode('${box}','${c}')">✕</button></span>`).join('')
     :`<span class="ph0">${ph}</span>`;
 }
 function drawCodes(){
-  $('fCodesBox').innerHTML=chipsHTML(selT,'t',{cidb:L('Tekan untuk pilih kod CIDB…','Tap to choose CIDB codes…'),mof:L('Tekan untuk pilih kod bidang MOF…','Tap to choose MOF codes…'),span:L('Tekan untuk pilih jenis SPAN…','Tap to choose SPAN types…')}[kindT]);
+  $('fCodesBox').innerHTML=chipsHTML(selT,'t',kindT==='mof'?L('Tekan untuk pilih kod bidang MOF…','Tap to choose MOF codes…'):L('Tekan untuk pilih kod CIDB…','Tap to choose CIDB codes…'));
+  $('fSpanBox').innerHTML=chipsHTML(selTS,'ts',L('Tekan untuk pilih permit SPAN (jika perlu)…','Tap to choose SPAN permits (if required)…'));
   $('cSpanBox').innerHTML=chipsHTML(selCS,'cs',L('Tekan untuk pilih jenis SPAN…','Tap to choose SPAN types…'));
   $('cCodesBox').innerHTML=chipsHTML(selC,'c',L('Tekan untuk pilih kod CIDB…','Tap to choose CIDB codes…'));
   $('cMofBox').innerHTML=chipsHTML(selCM,'cm',L('Tekan untuk pilih kod MOF…','Tap to choose MOF codes…'));
@@ -608,13 +648,13 @@ function setKind(k){
   kindT=k;
   document.querySelectorAll('#fKind button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
   $('gredBox').style.display=k==='cidb'?'block':'none'; if(k!=='cidb') $('fGred').value='';
-  $('fCodesLbl').textContent={cidb:L('Company Code (Kod Pengkhususan CIDB)','Company Code (CIDB Specialisation)'),mof:L('Company Code (Kod Bidang MOF)','Company Code (MOF Field Code)'),span:L('Company Code (Jenis SPAN)','Company Code (SPAN Type)')}[k];
+  $('fCodesLbl').textContent=k==='mof'?L('Company Code (Kod Bidang MOF)','Company Code (MOF Field Code)'):L('Company Code (Kod Pengkhususan CIDB)','Company Code (CIDB Specialisation)');
   drawCodes(); eligUI();
 }
-const pickArr=t=>t==='t'?selT:t==='c'?selC:t==='cs'?selCS:selCM;
-function rmCode(box,c){ if(box==='t'){selT=selT.filter(x=>x!==c);eligUI()}else if(box==='c')selC=selC.filter(x=>x!==c);else if(box==='cs')selCS=selCS.filter(x=>x!==c);else selCM=selCM.filter(x=>x!==c); drawCodes(); }
+const pickArr=t=>t==='t'?selT:t==='ts'?selTS:t==='c'?selC:t==='cs'?selCS:selCM;
+function rmCode(box,c){ if(box==='t'){selT=selT.filter(x=>x!==c);eligUI()}else if(box==='ts'){selTS=selTS.filter(x=>x!==c);eligUI()}else if(box==='c')selC=selC.filter(x=>x!==c);else if(box==='cs')selCS=selCS.filter(x=>x!==c);else selCM=selCM.filter(x=>x!==c); drawCodes(); }
 function openPick(t){
-  PK.target=t; PK.type=t==='cm'?'mof':t==='cs'?'span':t==='c'?'cidb':kindT;
+  PK.target=t; PK.type=t==='cm'?'mof':(t==='cs'||t==='ts')?'span':t==='c'?'cidb':kindT;
   PK.sel=[...pickArr(t)]; PK.cat=''; $('pQ').value='';
   $('pTitle').textContent={mof:L('Kod Bidang MOF','MOF Field Codes'),cidb:L('Kod Pengkhususan CIDB','CIDB Specialisation Codes'),span:L('Permit SPAN (IPA)','SPAN Permit (IPA)')}[PK.type];
   $('pQ').placeholder={mof:L('Cari kod atau bidang, cth: 210104 / ICT','Search code or field, e.g. 210104 / ICT'),cidb:L('Cari kod atau bidang, cth: CE21 / SCADA','Search code or field, e.g. CE21 / SCADA'),span:L('Cari jenis SPAN, cth: C1 / Bekalan Air','Search SPAN type, e.g. C1 / Water Supply')}[PK.type];
@@ -678,7 +718,7 @@ function togPick(c){ PK.sel=PK.sel.includes(c)?PK.sel.filter(x=>x!==c):[...PK.se
 function pickDone(){
   const ord=PK.type==='span'?[...Object.keys(SPANP),...SPN().map(x=>x.code)]:ORDER;
   const sorted=[...PK.sel].sort((a,b)=>ord.indexOf(a)-ord.indexOf(b));
-  if(PK.target==='t'){selT=sorted;eligUI()}else if(PK.target==='c')selC=sorted;else if(PK.target==='cs')selCS=sorted;else selCM=sorted;
+  if(PK.target==='t'){selT=sorted;eligUI()}else if(PK.target==='ts'){selTS=sorted;eligUI()}else if(PK.target==='c')selC=sorted;else if(PK.target==='cs')selCS=sorted;else selCM=sorted;
   drawCodes(); closeS('sPick');
 }
 
@@ -761,12 +801,12 @@ function card(t,key,n){
   const typ=t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>';
   let rows='';
   const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
-  if(key==='regEnd'){ rows+=kv('Registration',fmtRange(t.regStart,t.regEnd)); rows+=kv('Closing',fmtClose(t.closing)); }
+  if(key==='regEnd'){ rows+=t.type==='invite'?kv(L('Akhir daftar','Last registration'),'<b>'+fmt(t.regEnd)+'</b>'):kv('Registration',fmtRange(t.regStart,t.regEnd)); rows+=kv('Closing',fmtClose(t.closing)); }
   else if(key==='briefing'){ rows+=kv('Site Briefing','<b>'+fmt(t.briefing)+'</b>'); rows+=kv('Closing',fmtClose(t.closing)); }
   else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',fmtClose(t.closing)); }
   else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
-  const el=eligible(t.codes,t.gred,kindOf(t));
-  const chips=(t.codes&&t.codes.length)||t.gred?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada syarikat layak','No eligible company')}</span>`}</div>`:'';
+  const el=eligT(t);
+  const chips=!el.none?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada syarikat layak','No eligible company')}</span>`}</div>`:'';
   let acts='';
   if(t.type==='invite'&&t.link&&key==='regEnd') acts+=`<a class="btn sec sm" href="${esc(t.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📝 Google Form</a>`;
   if(key==='regEnd') acts+=flagBtn(t,'registered',L('✓ Sudah Daftar','✓ Registered'),L('Tanda Sudah Daftar','Mark Registered'));
@@ -795,12 +835,12 @@ function closeS(id){$(id).classList.remove('on')}
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2200)}
 
 // ================== BORANG TENDER ==================
-function typeUI(){$('formLinkBox').style.display=$('fType').value==='invite'?'block':'none'}
+function typeUI(){const inv=$('fType').value==='invite';$('formLinkBox').style.display=inv?'block':'none';$('regWeb').style.display=inv?'none':'block';dtSync()}
 function eligUI(){
-  const codes=selT, gred=$('fGred').value;
-  if(!codes.length&&!gred){$('eligBox').innerHTML=`<span class="muted">${L('Pilih kod dari client — syarikat yang layak akan keluar di sini.','Choose the codes from the client — eligible companies will show here.')}</span>`;return}
+  const req={codes:selT,gred:$('fGred').value,kind:kindT,ssm:YN.fSSM,ais:YN.fAIS,span:selTS};
+  if(!selT.length&&!req.gred&&!selTS.length&&!req.ssm&&!req.ais){$('eligBox').innerHTML=`<span class="muted">${L('Pilih syarat dari client — syarikat yang layak akan keluar di sini.','Choose the client requirements — eligible companies will show here.')}</span>`;return}
   if(!C().length){$('eligBox').innerHTML=`<span class="muted">${L('Belum ada syarikat. Tambah syarikat & kod di tab <b>Setting</b>.','No companies yet. Add companies & codes in the <b>Setting</b> tab.')}</span>`;return}
-  const el=eligible(codes,gred,kindT);
+  const el=eligT(req);
   let h=`<div class="muted" style="margin-bottom:4px">${L('Syarikat layak','Eligible companies')} (${el.ok.length})</div>`;
   h+=el.ok.length?el.ok.map(c=>`<div class="row"><span class="done">✓ ${esc(c.nama)}</span></div>`).join(''):`<div class="row"><span style="color:var(--red)">✗ ${L('Tiada syarikat yang memenuhi semua syarat','No company meets all requirements')}</span></div>`;
   if(el.part.length) h+=`<div class="muted" style="margin:8px 0 4px">${L('Hampir layak','Almost eligible')}</div>`+el.part.map(p=>`<div class="row"><span>${esc(p.c.nama)}</span><span class="muted">${L('kurang','missing')}: ${esc(p.miss.join(', '))}</span></div>`).join('');
@@ -810,7 +850,11 @@ function openForm(id){
   const t=id?findT(id):null;
   $('fTitle').textContent=t?L('Edit Tender','Edit Tender'):L('Tambah Tender','Add Tender');
   $('fId').value=t?.id||''; $('fNama').value=t?.nama||''; $('fType').value=t?.type||'website'; $('fLink').value=t?.link||'';
-  $('fRegS').value=t?.regStart||''; $('fRegE').value=t?.regEnd||''; selT=[...(t?.codes||[])]; kindT=t?kindOf(t):'cidb'; $('fGred').value=t?.gred||''; setKind(kindT);
+  $('fRegS').value=t?.regStart||''; $('fRegE').value=t?.regEnd||''; $('fRegLast').value=t?.regEnd||'';
+  selT=[...(t?.codes||[])]; selTS=[...(t?.span||[])]; kindT=t?kindOf(t):'cidb';
+  if(kindT==='span'){selTS=[...selTS,...selT];selT=[];kindT='cidb'}
+  setYN('fSSM',t?.ssm?1:0); setYN('fAIS',t?.ais?1:0);
+  $('fGred').value=t?.gred||''; setKind(kindT);
   $('fBrief').value=t?.briefing||''; $('fSaleS').value=t?.saleStart||''; $('fSaleE').value=t?.saleEnd||'';
   $('fClose').value=t?.closing||''; $('fNote').value=t?.note||'';
   $('fDel').style.display=t?'inline-flex':'none';
@@ -821,7 +865,8 @@ function saveTender(){
   if(!nama){toast(L('Sila isi Nama Tender','Please fill in Tender Name'));return}
   if(!closing){toast(L('Sila isi Tender Closing Date','Please fill in Tender Closing Date'));return}
   const v={nama,type:$('fType').value,link:$('fType').value==='invite'?$('fLink').value.trim():'',
-    regStart:$('fRegS').value,regEnd:$('fRegE').value,codes:[...selT],kind:kindT,gred:kindT==='cidb'?$('fGred').value:'',
+    regStart:$('fType').value==='invite'?'':$('fRegS').value,regEnd:$('fType').value==='invite'?$('fRegLast').value:$('fRegE').value,
+    codes:[...selT],kind:kindT,gred:kindT==='cidb'?$('fGred').value:'',ssm:!!YN.fSSM,ais:!!YN.fAIS,span:[...selTS],
     briefing:$('fBrief').value,saleStart:$('fSaleS').value,saleEnd:$('fSaleE').value,closing,note:$('fNote').value.trim(),updated:Date.now()};
   if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast(L('Tarikh tamat pendaftaran sebelum tarikh mula','Registration end is before start'));return}
   if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast(L('Tarikh tamat jualan sebelum tarikh mula','Sales end is before start'));return}
@@ -835,20 +880,26 @@ function delTender(){
 }
 function openDetail(id){
   const t=findT(id); const kv=(a,b)=>`<div class="kv"><span>${a}</span><span>${b}</span></div>`;
-  const el=eligible(t.codes,t.gred,kindOf(t));
+  const el=eligT(t); const yn=v=>v?`<b>${L('Ya','Yes')}</b>`:L('Tidak','No');
+  const sp=[...(t.span||[]),...(kindOf(t)==='span'?(t.codes||[]):[])], mc=kindOf(t)==='span'?[]:(t.codes||[]);
   $('dPanel').innerHTML=`<div class="ph"><h2>${L('Butiran Tender','Tender Details')}</h2><button class="x" onclick="closeS('sDetail')">✕</button></div>
     <div class="card"><div style="margin-bottom:6px">${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'}</div>
       <h2>${esc(t.nama)}</h2>
-      ${kv('Registration',fmtRange(t.regStart,t.regEnd))}
+      ${t.type==='invite'?kv(L('Akhir daftar','Last registration'),'<b>'+fmt(t.regEnd)+'</b>'):kv('Registration',fmtRange(t.regStart,t.regEnd))}
       ${kv('Site Briefing',fmt(t.briefing))}
       ${kv('Sales Period',fmtRange(t.saleStart,t.saleEnd))}
       ${kv('Closing Date','<b>'+fmtClose(t.closing)+'</b>')}
       ${t.type==='invite'?kv('Google Form',t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:var(--gold)">${L('Buka link','Open link')}</a>`:'-'):''}
       ${t.note?kv(L('Catatan','Notes'),esc(t.note)):''}
     </div>
-    <div class="card"><h2>Company Code · ${KINDS[kindOf(t)]}</h2>
+    <div class="card"><h2>${L('Syarat Kelayakan','Eligibility Requirements')}</h2>
+      <div class="kv"><span>Register SSM</span><span>${yn(t.ssm)}</span></div>
+      <div class="kv"><span>Register AIS Vendor</span><span>${yn(t.ais)}</span></div>
       ${t.gred?`<div class="kv"><span>${L('Gred minimum','Minimum grade')}</span><span><b>${esc(t.gred)}</b></span></div>`:''}
-      <div class="chips" style="margin:6px 0 10px">${(t.codes||[]).map(c=>`<span class="cc ro">${esc(c)} <small>${esc(short(codeName(c),40))}</small></span>`).join('')||`<span class="muted">${L('Tiada kod','No codes')}</span>`}</div>
+      <div class="muted" style="margin-top:8px">Company Code · ${kindOf(t)==='mof'?'MOF':'CIDB'}</div>
+      <div class="chips" style="margin:6px 0 10px">${mc.map(c=>`<span class="cc ro">${esc(c)} <small>${esc(short(codeName(c),40))}</small></span>`).join('')||`<span class="muted">${L('Tiada kod','No codes')}</span>`}</div>
+      <div class="muted">SPAN</div>
+      <div class="chips" style="margin:6px 0 10px">${sp.map(c=>`<span class="cc ro">${esc(c)} <small>${esc(short(spanName(c)||codeName(c),40))}</small></span>`).join('')||`<span class="muted">${L('Tiada','None')}</span>`}</div>
       <div class="muted">${L('Syarikat layak','Eligible companies')}</div>
       <div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada','None')}</span>`}</div>
     </div>
@@ -873,7 +924,7 @@ function settingsHTML(){
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">🏢 ${L('Syarikat & Kod','Companies & Codes')}</h2><button class="btn gold sm" onclick="openCo()">+ ${L('Tambah','Add')}</button></div>
       <p class="muted">${L('Gred & kod CIDB, kod bidang MOF dan jenis SPAN setiap syarikat. Dipadankan dengan syarat tender untuk tunjuk syarikat yang layak.','CIDB grade & codes, MOF field codes and SPAN types for each company. Matched against tender requirements to show eligible companies.')}</p>
-      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span><span class="muted" style="display:block">SPAN: ${esc(parseCodes(c.span).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):`<div class="emptyrail" style="margin:8px 0 0">${L('Belum ada syarikat.','No companies yet.')}</div>`}
+      ${co.length?co.map(c=>`<div class="co" onclick="openCo('${c.id}')" style="cursor:pointer"><div><b>${esc(c.nama)}</b><span class="muted" style="display:block">SSM: ${c.ssm?'✓':'✗'} · AIS Vendor: ${c.ais?'✓':'✗'}</span><span class="muted" style="display:block">CIDB: ${c.gred?'<span style="color:var(--gold);font-weight:800">'+esc(c.gred)+'</span> · ':''}${esc(parseCodes(c.codes).join(', ')||'-')}</span><span class="muted" style="display:block">MOF: ${esc(parseCodes(c.mof).join(', ')||'-')}</span><span class="muted" style="display:block">SPAN: ${esc(parseCodes(c.span).join(', ')||'-')}</span></div><span class="muted">✏️</span></div>`).join(''):`<div class="emptyrail" style="margin:8px 0 0">${L('Belum ada syarikat.','No companies yet.')}</div>`}
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">💧 ${L('Jenis SPAN','SPAN Types')}</h2><button class="btn gold sm" onclick="openSpan()">+ ${L('Tambah','Add')}</button></div>
@@ -897,18 +948,18 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v3.7</p>
+    <p class="muted" style="text-align:center">ProTender v3.8</p>
   </div>`;
 }
 function openCo(id){
   const c=id?findC(id):null;
   $('cTitle').textContent=c?L('Edit Syarikat','Edit Company'):L('Tambah Syarikat','Add Company');
-  $('cId').value=c?.id||''; $('cNama').value=c?.nama||''; selC=c?parseCodes(c.codes):[]; selCM=c?parseCodes(c.mof):[]; selCS=c?parseCodes(c.span):[]; $('cGred').value=c?.gred||''; drawCodes();
+  $('cId').value=c?.id||''; $('cNama').value=c?.nama||''; selC=c?parseCodes(c.codes):[]; selCM=c?parseCodes(c.mof):[]; selCS=c?parseCodes(c.span):[]; $('cGred').value=c?.gred||''; setYN('cSSM',c?.ssm?1:0); setYN('cAIS',c?.ais?1:0); drawCodes();
   $('cDel').style.display=c?'inline-flex':'none'; openS('sCo'); $('sCo').querySelector('.panel').scrollTop=0;
 }
 function saveCo(){
   const nama=$('cNama').value.trim(); if(!nama){toast(L('Sila isi nama syarikat','Please fill in company name'));return}
-  const v={nama,gred:$('cGred').value,codes:selC.join(', '),mof:selCM.join(', '),span:selCS.join(', '),updated:Date.now()};
+  const v={nama,ssm:!!YN.cSSM,ais:!!YN.cAIS,gred:$('cGred').value,codes:selC.join(', '),mof:selCM.join(', '),span:selCS.join(', '),updated:Date.now()};
   const id=$('cId').value; let c; if(id){c=findC(id);Object.assign(c,v)} else {c={id:uid(),...v};S.companies.push(c)}
   putDoc('pt_companies',c); closeS('sCo'); persist(); toast(L('Syarikat disimpan ✓','Company saved ✓'));
 }
@@ -1153,9 +1204,9 @@ const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth(
 function download(n,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()}
 function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.stringify({v:3,...S},null,1),'application/json')}
 function exportCSV(){
-  const h=LANG==='en'?['Tender Name','Type','Google Form','Registration Start','Registration End','Code Type','Min Grade','Codes','Eligible Companies','Site Briefing','Sales Start','Sales End','Closing','Registered','Bought','Submitted','Notes']:['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','Jenis Kod','Gred Min','Kod','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
+  const h=LANG==='en'?['Tender Name','Type','Google Form','Registration Start','Registration End','SSM','AIS Vendor','Code Type','Min Grade','Codes','SPAN','Eligible Companies','Site Briefing','Sales Start','Sales End','Closing','Registered','Bought','Submitted','Notes']:['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','SSM','AIS Vendor','Jenis Kod','Gred Min','Kod','SPAN','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),kindOf(t).toUpperCase(),t.gred,(t.codes||[]).join(' / '),eligible(t.codes,t.gred,kindOf(t)).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?L('Ya','Yes'):'',t.bought?L('Ya','Yes'):'',t.submitted?L('Ya','Yes'):'',t.note].map(q).join(','));
+  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),t.ssm?L('Ya','Yes'):L('Tidak','No'),t.ais?L('Ya','Yes'):L('Tidak','No'),kindOf(t)==='mof'?'MOF':'CIDB',t.gred,(kindOf(t)==='span'?[]:(t.codes||[])).join(' / '),[...(t.span||[]),...(kindOf(t)==='span'?(t.codes||[]):[])].join(' / '),eligT(t).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?L('Ya','Yes'):'',t.bought?L('Ya','Yes'):'',t.submitted?L('Ya','Yes'):'',t.note].map(q).join(','));
   download(`ProTender-${todayStr()}.csv`,'﻿'+h.join(',')+'\n'+rows.join('\n'),'text/csv');
 }
 function importJSON(inp){
