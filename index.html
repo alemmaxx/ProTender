@@ -230,6 +230,9 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .tc .acts .btn.del{flex:0 0 42px}
 .hi{position:relative}.hi .hdel{position:absolute;top:10px;right:10px;width:34px;height:34px;padding:0}
 .nstat{margin:12px 0 10px;padding:4px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line)}
+.rmw{position:relative}.rmw span{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;font-size:14px;pointer-events:none}.rmw input{padding-left:46px}
+.dacts{display:flex;gap:10px;margin-bottom:10px}.dacts .btn{flex:1}
+.btn.wa{background:#25d366;color:#06291a}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -326,6 +329,9 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
     <input type="hidden" id="fId">
     <label><span data-l="Nama Tender|Tender Name">Nama Tender</span> <b>*</b></label>
     <textarea id="fNama" rows="2" data-ph="cth: Nama tender|e.g. Tender name"></textarea>
+
+    <label>Indicative Price (RM)</label>
+    <div class="rmw"><span>RM</span><input id="fPrice" inputmode="decimal" data-ph="cth: 1,250,000.00|e.g. 1,250,000.00" onblur="this.value=fmtRM(this.value,true)"></div>
 
     <label>Tender Type</label>
     <select id="fType" onchange="typeUI()">
@@ -821,6 +827,7 @@ function card(t,key,n){
   else if(key==='saleEnd'&&t.type==='invite'){ rows+=kv(L('Akhir daftar','Last registration'),fmt(t.regEnd)); rows+=kv('Status',inviteStatus(t)); if(t.briefing) rows+=kv('Site Visit',fmt(t.briefing)); rows+=kv('Closing',t.closing?fmtClose(t.closing):`<span class="muted">${L('Menunggu email client','Awaiting client email')}</span>`); }
   else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',clTxt(t)); }
   else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
+  if(t.price) rows+=kv('Indicative Price','<b>'+fmtRM(t.price)+'</b>');
   const el=eligT(t);
   const chips=!el.none?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada syarikat layak','No eligible company')}</span>`}</div>`:'';
   let acts='';
@@ -834,11 +841,43 @@ function card(t,key,n){
     <div class="t1"><div>${n?`<span class="num">${n}</span>`:''}${typ}<h3>${esc(t.nama)}</h3></div>
       <div class="cd"><b>${l.big}</b><small>${l.small}</small></div></div>
     <div class="kvs">${rows}</div>${chips}
-    <div class="acts">${acts}<button class="btn red sm del" title="${L('Padam','Delete')}" onclick="event.stopPropagation();delTenderId('${t.id}')">🗑️</button></div>
+    <div class="acts">${acts}<button class="btn sec sm del" title="${L('Salin untuk WhatsApp','Copy for WhatsApp')}" onclick="event.stopPropagation();copyTender('${t.id}')">📋</button><button class="btn red sm del" title="${L('Padam','Delete')}" onclick="event.stopPropagation();delTenderId('${t.id}')">🗑️</button></div>
   </div>`;
 }
 function flagBtn(t,f,on,off){return `<button class="btn ${t[f]?'sec':'gold'} sm" onclick="event.stopPropagation();toggleFlag('${t.id}','${f}')">${t[f]?on:off}</button>`}
 function toggleFlag(id,f){const t=findT(id);t[f]=!t[f];putDoc('pt_tenders',t);persist()}
+const numRM=v=>{const n=parseFloat(String(v||'').replace(/[^0-9.]/g,''));return isNaN(n)?null:n};
+function fmtRM(v,bare){const n=numRM(v);if(n===null)return '';const s=n.toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});return bare?s:'RM '+s}
+// teks penuh untuk WhatsApp
+function tenderText(t){
+  const yn=v=>v?L('Ya','Yes'):L('Tidak','No'), inv=t.type==='invite', kind=kindOf(t);
+  const mc=kind==='span'?[]:(t.codes||[]), sp=[...(t.span||[]),...(kind==='span'?(t.codes||[]):[])];
+  const el=eligT(t), L1=[];
+  const add=(k,v)=>{if(v&&v!=='-')L1.push(`${k}: ${v}`)};
+  L1.push(`*${t.nama}*`);
+  add('Tender Type',inv?'Invite':'Website');
+  add('Indicative Price',fmtRM(t.price));
+  if(inv){add('Google Form',t.link);add(L('Akhir Daftar','Last Registration'),fmt(t.regEnd))}
+  else add('Document Registration Period',(t.regStart||t.regEnd)?fmtRange(t.regStart,t.regEnd):'');
+  add(inv?'Site Visit / Briefing':'Site Briefing',t.briefing?fmt(t.briefing):'');
+  if(inv) add(L('Terima BQ','BQ Received'),t.bqDate?fmt(t.bqDate):'');
+  else add('Document Sales Period',(t.saleStart||t.saleEnd)?fmtRange(t.saleStart,t.saleEnd):'');
+  L1.push(`Tender Closing Date: ${t.closing?fmtClose(t.closing):(inv?L('Menunggu email client','Awaiting client email'):'-')}`);
+  L1.push('',`*${L('Syarat Kelayakan','Eligibility Requirements')}*`);
+  L1.push(`Register SSM: ${yn(t.ssm)}`,`Register AIS Vendor: ${yn(t.ais)}`);
+  if(mc.length||t.gred){L1.push(`${kind==='mof'?L('Kod MOF','MOF Codes'):L('Kod CIDB','CIDB Codes')}${t.gred?' ('+L('Gred min ','Min grade ')+t.gred+')':''}:`);mc.forEach(c=>L1.push(`• ${c} – ${codeName(c)}`))}
+  if(sp.length){L1.push('SPAN:');sp.forEach(c=>L1.push(`• ${c} – ${spanName(c)||codeName(c)}`))}
+  if(!el.none) L1.push(`${L('Syarikat layak','Eligible companies')}: ${el.ok.length?el.ok.map(c=>c.nama).join(', '):L('Tiada','None')}`);
+  L1.push('',`*Status*`,`${L('Daftar','Registered')}: ${t.registered?L('Sudah','Yes'):L('Belum','Not yet')}`,`${inv?L('Terima BQ','BQ received'):L('Beli dokumen','Documents bought')}: ${t.bought?L('Sudah','Yes'):L('Belum','Not yet')}`,`${L('Hantar','Submitted')}: ${t.submitted?L('Sudah','Yes'):L('Belum','Not yet')}`);
+  if(t.note) L1.push('',`${L('Catatan','Notes')}: ${t.note}`);
+  return L1.join('\n');
+}
+async function copyText(txt){
+  try{await navigator.clipboard.writeText(txt);return true}catch(e){}
+  try{const a=document.createElement('textarea');a.value=txt;a.setAttribute('readonly','');a.style.cssText='position:fixed;top:-1000px';document.body.appendChild(a);a.select();a.setSelectionRange(0,txt.length);const ok=document.execCommand('copy');a.remove();return ok}catch(e){return false}
+}
+async function copyTender(id){const t=findT(id);if(!t)return;toast(await copyText(tenderText(t))?L('Butiran disalin ✓ — tampal di WhatsApp','Details copied ✓ — paste in WhatsApp'):L('Gagal salin','Copy failed'))}
+function waTender(id){const t=findT(id);if(!t)return;window.open('https://wa.me/?text='+encodeURIComponent(tenderText(t)),'_blank')}
 function clTxt(t){return t.closing?fmtClose(t.closing):(t.type==='invite'?`<span class="muted">${L('Menunggu email client','Awaiting client email')}</span>`:'-')}
 function inviteStatus(t){
   if(t.closing) return `<span class="badge b-ok">${L('Closing date diterima','Closing date received')}</span>`;
@@ -885,7 +924,7 @@ function openForm(id){
   setYN('fSSM',t?.ssm?1:0); setYN('fAIS',t?.ais?1:0);
   $('fGred').value=t?.gred||''; setKind(kindT);
   $('fBrief').value=t?.briefing||''; $('fSaleS').value=t?.saleStart||''; $('fSaleE').value=t?.saleEnd||'';
-  $('fClose').value=t?.closing||''; $('fBq').value=t?.bqDate||''; $('fNote').value=t?.note||'';
+  $('fClose').value=t?.closing||''; $('fBq').value=t?.bqDate||''; $('fNote').value=t?.note||''; $('fPrice').value=t?.price?fmtRM(t.price,true):'';
   $('fDel').style.display=t?'inline-flex':'none';
   typeUI(); eligUI(); dtSync(); closeS('sDetail'); openS('sForm'); $('sForm').querySelector('.panel').scrollTop=0;
 }
@@ -898,7 +937,7 @@ function saveTender(){
   const v={nama,type:$('fType').value,link:$('fType').value==='invite'?$('fLink').value.trim():'',
     regStart:$('fType').value==='invite'?'':$('fRegS').value,regEnd:$('fType').value==='invite'?$('fRegLast').value:$('fRegE').value,
     codes:[...selT],kind:kindT,gred:kindT==='cidb'?$('fGred').value:'',ssm:!!YN.fSSM,ais:!!YN.fAIS,span:[...selTS],
-    briefing:$('fBrief').value,saleStart:inv?'':$('fSaleS').value,saleEnd:inv?'':$('fSaleE').value,bqDate:inv?$('fBq').value:'',closing,note:$('fNote').value.trim(),updated:Date.now()};
+    price:numRM($('fPrice').value)??'',briefing:$('fBrief').value,saleStart:inv?'':$('fSaleS').value,saleEnd:inv?'':$('fSaleE').value,bqDate:inv?$('fBq').value:'',closing,note:$('fNote').value.trim(),updated:Date.now()};
   if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast(L('Tarikh tamat pendaftaran sebelum tarikh mula','Registration end is before start'));return}
   if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast(L('Tarikh tamat jualan sebelum tarikh mula','Sales end is before start'));return}
   const id=$('fId').value;
@@ -917,8 +956,10 @@ function openDetail(id){
   const el=eligT(t); const yn=v=>v?`<b>${L('Ya','Yes')}</b>`:L('Tidak','No');
   const sp=[...(t.span||[]),...(kindOf(t)==='span'?(t.codes||[]):[])], mc=kindOf(t)==='span'?[]:(t.codes||[]);
   $('dPanel').innerHTML=`<div class="ph"><h2>${L('Butiran Tender','Tender Details')}</h2><button class="x" onclick="closeS('sDetail')">✕</button></div>
+    <div class="dacts"><button class="btn sec" onclick="copyTender('${t.id}')">📋 ${L('Salin Butiran','Copy Details')}</button><button class="btn wa" onclick="waTender('${t.id}')">💬 WhatsApp</button></div>
     <div class="card"><div style="margin-bottom:6px">${t.type==='invite'?'<span class="badge b-gold">Invite</span>':'<span class="badge b-blue">Website</span>'}</div>
       <h2>${esc(t.nama)}</h2>
+      ${t.price?kv('Indicative Price','<b>'+fmtRM(t.price)+'</b>'):''}
       ${t.type==='invite'?kv(L('Akhir daftar','Last registration'),'<b>'+fmt(t.regEnd)+'</b>'):kv('Registration',fmtRange(t.regStart,t.regEnd))}
       ${kv('Site Briefing',fmt(t.briefing))}
       ${t.type==='invite'?kv(L('Terima BQ','BQ received'),t.bqDate?fmt(t.bqDate):(t.bought?'✓':'-')):kv('Sales Period',fmtRange(t.saleStart,t.saleEnd))}
@@ -982,7 +1023,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v4.2</p>
+    <p class="muted" style="text-align:center">ProTender v4.3</p>
   </div>`;
 }
 function openCo(id){
@@ -1267,9 +1308,9 @@ const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth(
 function download(n,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()}
 function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.stringify({v:3,...S},null,1),'application/json')}
 function exportCSV(){
-  const h=LANG==='en'?['Tender Name','Type','Google Form','Registration Start','Registration End','SSM','AIS Vendor','Code Type','Min Grade','Codes','SPAN','Eligible Companies','Site Briefing','Sales Start','Sales End','Closing','Registered','Bought','Submitted','Notes']:['Nama Tender','Type','Google Form','Registration Mula','Registration Tamat','SSM','AIS Vendor','Jenis Kod','Gred Min','Kod','SPAN','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
+  const h=LANG==='en'?['Tender Name','Type','Indicative Price (RM)','Google Form','Registration Start','Registration End','SSM','AIS Vendor','Code Type','Min Grade','Codes','SPAN','Eligible Companies','Site Briefing','Sales Start','Sales End','Closing','Registered','Bought','Submitted','Notes']:['Nama Tender','Type','Indicative Price (RM)','Google Form','Registration Mula','Registration Tamat','SSM','AIS Vendor','Jenis Kod','Gred Min','Kod','SPAN','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=T().map(t=>[t.nama,t.type,t.link,fmt(t.regStart),fmt(t.regEnd),t.ssm?L('Ya','Yes'):L('Tidak','No'),t.ais?L('Ya','Yes'):L('Tidak','No'),kindOf(t)==='mof'?'MOF':'CIDB',t.gred,(kindOf(t)==='span'?[]:(t.codes||[])).join(' / '),[...(t.span||[]),...(kindOf(t)==='span'?(t.codes||[]):[])].join(' / '),eligT(t).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?L('Ya','Yes'):'',t.bought?L('Ya','Yes'):'',t.submitted?L('Ya','Yes'):'',t.note].map(q).join(','));
+  const rows=T().map(t=>[t.nama,t.type,t.price?fmtRM(t.price,true):'',t.link,fmt(t.regStart),fmt(t.regEnd),t.ssm?L('Ya','Yes'):L('Tidak','No'),t.ais?L('Ya','Yes'):L('Tidak','No'),kindOf(t)==='mof'?'MOF':'CIDB',t.gred,(kindOf(t)==='span'?[]:(t.codes||[])).join(' / '),[...(t.span||[]),...(kindOf(t)==='span'?(t.codes||[]):[])].join(' / '),eligT(t).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?L('Ya','Yes'):'',t.bought?L('Ya','Yes'):'',t.submitted?L('Ya','Yes'):'',t.note].map(q).join(','));
   download(`ProTender-${todayStr()}.csv`,'﻿'+h.join(',')+'\n'+rows.join('\n'),'text/csv');
 }
 function importJSON(inp){
