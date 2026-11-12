@@ -241,6 +241,15 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .rcg{font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 4px}
 :root[data-theme="light"] .rcg{color:#000}
 .regby{margin-top:8px;font-size:12px}
+.sowh{display:flex;justify-content:space-between;align-items:center;margin:14px 0 6px}
+.sowh .btn{width:40px;height:36px;padding:0;font-size:20px}
+.sowr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sowr .sn{flex:none;min-width:24px;height:24px;border-radius:7px;background:var(--gold);color:#1b1503;font:800 12px/24px var(--f);text-align:center}
+.sowr{align-items:flex-start}.sowr .sn{margin-top:9px}
+.sowr textarea{flex:1;min-height:42px;resize:none;overflow:hidden;line-height:1.35}
+.sowr .x{flex:none;width:36px;height:36px}
+.sowe{color:var(--muted);font-size:13px;padding:8px 0}
+.sowd{margin:0;padding-left:22px}.sowd li{margin-bottom:6px;font-size:14px;line-height:1.4}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -340,6 +349,9 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 
     <label>Indicative Price (RM)</label>
     <div class="rmw"><span>RM</span><input id="fPrice" inputmode="decimal" data-ph="cth: 1,250,000.00|e.g. 1,250,000.00" onblur="this.value=fmtRM(this.value,true)"></div>
+
+    <div class="sowh"><label style="margin:0">Scope of Work</label><button type="button" class="btn gold sm" onclick="sowAdd()" aria-label="+">＋</button></div>
+    <div id="sowList"></div>
 
     <label>Tender Type</label>
     <select id="fType" onchange="typeUI()">
@@ -853,6 +865,7 @@ function card(t,key,n){
   else if(key==='saleEnd'){ rows+=kv('Sales Period',fmtRange(t.saleStart,t.saleEnd)); rows+=kv('Status',saleStatus(t)); rows+=kv('Closing',clTxt(t)); }
   else { rows+=kv('Closing','<b>'+fmtClose(t.closing)+'</b>'); if(t.briefing) rows+=kv('Site Briefing',fmt(t.briefing)); }
   if(t.price) rows+=kv('Indicative Price','<b>'+fmtRM(t.price)+'</b>');
+  if(sowOf(t).length) rows+=kv('Scope of Work',sowOf(t).length+L(' item',' items'));
   if(regNames(t).length) rows+=kv(L('Didaftar oleh','Registered by'),'<b>'+regNames(t).map(esc).join(', ')+'</b>');
   const el=eligT(t);
   const chips=!el.none?`<div class="chips">${el.ok.length?el.ok.map(c=>`<span class="chip ok">✓ ${esc(c.nama)}</span>`).join(''):`<span class="chip">${L('Tiada syarikat layak','No eligible company')}</span>`}</div>`:'';
@@ -905,6 +918,7 @@ function tenderText(t){
   add(inv?'Site Visit / Briefing':'Site Briefing',t.briefing?fmt(t.briefing):'');
   if(inv) add(L('Terima BQ','BQ Received'),t.bqDate?fmt(t.bqDate):'');
   else add('Document Sales Period',(t.saleStart||t.saleEnd)?fmtRange(t.saleStart,t.saleEnd):'');
+  if(sowOf(t).length){L1.push('','*Scope of Work*');sowOf(t).forEach((x,i)=>L1.push(`${i+1}. ${x}`));L1.push('')}
   L1.push(`Tender Closing Date: ${t.closing?fmtClose(t.closing):(inv?L('Menunggu email client','Awaiting client email'):'-')}`);
   L1.push('',`*${L('Syarat Kelayakan','Eligibility Requirements')}*`);
   L1.push(`Register SSM: ${yn(t.ssm)}`,`Register AIS Vendor: ${yn(t.ais)}`);
@@ -957,6 +971,17 @@ function eligUI(){
   if(el.part.length) h+=`<div class="muted" style="margin:8px 0 4px">${L('Hampir layak','Almost eligible')}</div>`+el.part.map(p=>`<div class="row"><span>${esc(p.c.nama)}</span><span class="muted">${L('kurang','missing')}: ${esc(p.miss.join(', '))}</span></div>`).join('');
   $('eligBox').innerHTML=h;
 }
+// ----- Scope of Work -----
+let SOW=[];
+function sowDraw(){
+  $('sowList').innerHTML=SOW.length?SOW.map((v,i)=>`<div class="sowr"><span class="sn">${i+1}</span><textarea rows="1" placeholder="${L('cth: Pemasangan paip HDPE 200mm','e.g. Install 200mm HDPE pipe')}" oninput="SOW[${i}]=this.value;sowFit(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();sowAdd()}">${esc(v)}</textarea><button type="button" class="x" onclick="sowDel(${i})" aria-label="✕">✕</button></div>`).join('')
+    :`<div class="sowe">${L('Tekan <b>＋</b> untuk tambah skop kerja.','Tap <b>＋</b> to add a scope item.')}</div>`;
+  $('sowList').querySelectorAll('textarea').forEach(sowFit);
+}
+function sowFit(e){e.style.height='auto';e.style.height=e.scrollHeight+2+'px'}
+function sowAdd(){SOW.push('');sowDraw();const ins=$('sowList').querySelectorAll('textarea');ins[ins.length-1].focus()}
+function sowDel(i){SOW.splice(i,1);sowDraw()}
+const sowOf=t=>(t.sow||[]).filter(x=>String(x).trim());
 function openForm(id){
   const t=id?findT(id):null;
   $('fTitle').textContent=t?L('Edit Tender','Edit Tender'):L('Tambah Tender','Add Tender');
@@ -967,6 +992,7 @@ function openForm(id){
   setYN('fSSM',t?.ssm?1:0); setYN('fAIS',t?.ais?1:0);
   $('fGred').value=t?.gred||''; setKind(kindT);
   $('fBrief').value=t?.briefing||''; $('fSaleS').value=t?.saleStart||''; $('fSaleE').value=t?.saleEnd||'';
+  SOW=[...(t?.sow||[])]; sowDraw();
   $('fClose').value=t?.closing||''; $('fBq').value=t?.bqDate||''; $('fNote').value=t?.note||''; $('fPrice').value=t?.price?fmtRM(t.price,true):'';
   $('fDel').style.display=t?'inline-flex':'none';
   typeUI(); eligUI(); dtSync(); closeS('sDetail'); openS('sForm'); $('sForm').querySelector('.panel').scrollTop=0;
@@ -980,7 +1006,7 @@ function saveTender(){
   const v={nama,type:$('fType').value,link:$('fType').value==='invite'?$('fLink').value.trim():'',
     regStart:$('fType').value==='invite'?'':$('fRegS').value,regEnd:$('fType').value==='invite'?$('fRegLast').value:$('fRegE').value,
     codes:[...selT],kind:kindT,gred:kindT==='cidb'?$('fGred').value:'',ssm:!!YN.fSSM,ais:!!YN.fAIS,span:[...selTS],
-    price:numRM($('fPrice').value)??'',briefing:$('fBrief').value,saleStart:inv?'':$('fSaleS').value,saleEnd:inv?'':$('fSaleE').value,bqDate:inv?$('fBq').value:'',closing,note:$('fNote').value.trim(),updated:Date.now()};
+    price:numRM($('fPrice').value)??'',sow:SOW.map(x=>x.trim()).filter(Boolean),briefing:$('fBrief').value,saleStart:inv?'':$('fSaleS').value,saleEnd:inv?'':$('fSaleE').value,bqDate:inv?$('fBq').value:'',closing,note:$('fNote').value.trim(),updated:Date.now()};
   if(v.regStart&&v.regEnd&&v.regEnd<v.regStart){toast(L('Tarikh tamat pendaftaran sebelum tarikh mula','Registration end is before start'));return}
   if(v.saleStart&&v.saleEnd&&v.saleEnd<v.saleStart){toast(L('Tarikh tamat jualan sebelum tarikh mula','Sales end is before start'));return}
   const id=$('fId').value;
@@ -1010,6 +1036,7 @@ function openDetail(id){
       ${t.type==='invite'?kv('Google Form',t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:var(--gold)">${L('Buka link','Open link')}</a>`:'-'):''}
       ${t.note?kv(L('Catatan','Notes'),esc(t.note)):''}
     </div>
+    ${sowOf(t).length?`<div class="card"><h2>Scope of Work</h2><ol class="sowd">${sowOf(t).map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:''}
     <div class="card"><h2>${L('Syarat Kelayakan','Eligibility Requirements')}</h2>
       <div class="kv"><span>Register SSM</span><span>${yn(t.ssm)}</span></div>
       <div class="kv"><span>Register AIS Vendor</span><span>${yn(t.ais)}</span></div>
@@ -1067,7 +1094,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v4.6</p>
+    <p class="muted" style="text-align:center">ProTender v4.7</p>
   </div>`;
 }
 const LICS={cidb:'CIDB',mof:'MOF',span:'SPAN'};
@@ -1393,9 +1420,9 @@ const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth(
 function download(n,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;a.click()}
 function exportJSON(){download(`ProTender-backup-${todayStr()}.json`,JSON.stringify({v:3,...S},null,1),'application/json')}
 function exportCSV(){
-  const h=LANG==='en'?['Tender Name','Type','Indicative Price (RM)','Google Form','Registration Start','Registration End','SSM','AIS Vendor','Code Type','Min Grade','Codes','SPAN','Eligible Companies','Site Briefing','Sales Start','Sales End','Closing','Registered','Bought','Submitted','Notes']:['Nama Tender','Type','Indicative Price (RM)','Google Form','Registration Mula','Registration Tamat','SSM','AIS Vendor','Jenis Kod','Gred Min','Kod','SPAN','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Catatan'];
+  const h=LANG==='en'?['Tender Name','Type','Indicative Price (RM)','Google Form','Registration Start','Registration End','SSM','AIS Vendor','Code Type','Min Grade','Codes','SPAN','Eligible Companies','Site Briefing','Sales Start','Sales End','Closing','Registered','Bought','Submitted','Scope of Work','Notes']:['Nama Tender','Type','Indicative Price (RM)','Google Form','Registration Mula','Registration Tamat','SSM','AIS Vendor','Jenis Kod','Gred Min','Kod','SPAN','Syarikat Layak','Site Briefing','Sales Mula','Sales Tamat','Closing','Sudah Daftar','Sudah Beli','Sudah Hantar','Scope of Work','Catatan'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=T().map(t=>[t.nama,t.type,t.price?fmtRM(t.price,true):'',t.link,fmt(t.regStart),fmt(t.regEnd),t.ssm?L('Ya','Yes'):L('Tidak','No'),t.ais?L('Ya','Yes'):L('Tidak','No'),kindOf(t)==='mof'?'MOF':'CIDB',t.gred,(kindOf(t)==='span'?[]:(t.codes||[])).join(' / '),[...(t.span||[]),...(kindOf(t)==='span'?(t.codes||[]):[])].join(' / '),eligT(t).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?L('Ya','Yes'):'',t.bought?L('Ya','Yes'):'',t.submitted?L('Ya','Yes'):'',t.note].map(q).join(','));
+  const rows=T().map(t=>[t.nama,t.type,t.price?fmtRM(t.price,true):'',t.link,fmt(t.regStart),fmt(t.regEnd),t.ssm?L('Ya','Yes'):L('Tidak','No'),t.ais?L('Ya','Yes'):L('Tidak','No'),kindOf(t)==='mof'?'MOF':'CIDB',t.gred,(kindOf(t)==='span'?[]:(t.codes||[])).join(' / '),[...(t.span||[]),...(kindOf(t)==='span'?(t.codes||[]):[])].join(' / '),eligT(t).ok.map(c=>c.nama).join(' / '),fmt(t.briefing),fmt(t.saleStart),fmt(t.saleEnd),fmtClose(t.closing),t.registered?L('Ya','Yes'):'',t.bought?L('Ya','Yes'):'',t.submitted?L('Ya','Yes'):'',sowOf(t).map((x,i)=>(i+1)+'. '+x).join(' | '),t.note].map(q).join(','));
   download(`ProTender-${todayStr()}.csv`,'﻿'+h.join(',')+'\n'+rows.join('\n'),'text/csv');
 }
 function importJSON(inp){
