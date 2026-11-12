@@ -250,6 +250,10 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
 .sowr .x{flex:none;width:36px;height:36px}
 .sowe{color:var(--muted);font-size:13px;padding:8px 0}
 .sowd{margin:0;padding-left:22px}.sowd li{margin-bottom:6px;font-size:14px;line-height:1.4}
+.updbar{display:block;margin:0 16px 12px;padding:12px 14px;border-radius:12px;background:var(--green2);border:1px solid var(--green);color:var(--ink);text-decoration:none;font-size:13px;line-height:1.4;cursor:pointer}
+.updbar b{display:block;color:var(--green);font-size:14px}
+:root[data-theme="light"] .updbar b{color:#000}
+@media (min-width:1000px){.updbar{margin:0 28px 14px}}
 .al.hot{background:var(--red2);border-left-color:var(--red)}
 /* ============ TABLET (≥ 700px) ============ */
 .navbrand{display:none}
@@ -462,6 +466,19 @@ textarea::placeholder,input::placeholder{color:var(--muted);opacity:.85}
     <div style="display:flex;gap:10px;margin-top:14px">
       <button class="btn sec" onclick="RC.sel=[];rcDraw()" data-l="Kosongkan|Clear">Kosongkan</button>
       <button class="btn gold full" id="rcSave" onclick="rcSave()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Kemas kini APK -->
+<div class="sheet" id="sUpd" style="z-index:45;align-items:center" onclick="if(event.target===this)updLater()">
+  <div class="panel exitbox">
+    <img src="icons/icon-192.png" alt="" style="width:64px;height:64px;border-radius:16px">
+    <h2 data-l="⬆ Versi Baru ProTender|⬆ New ProTender Version">⬆ Versi Baru ProTender</h2>
+    <p class="muted" id="updTxt"></p>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn sec full" onclick="updLater()" data-l="Nanti|Later">Nanti</button>
+      <button class="btn gold full" onclick="updGo()" data-l="⬇ Muat Turun|⬇ Download">⬇ Muat Turun</button>
     </div>
   </div>
 </div>
@@ -826,7 +843,7 @@ function render(){
   }else{
     h+=settingsHTML();
   }
-  $('main').innerHTML=h;
+  $('main').innerHTML=h.replace('</section>','</section>'+updBar());
   if(tab!=='setting') renderList();
 }
 const byNew=(a,b)=>(b.created||0)-(a.created||0);
@@ -1078,6 +1095,7 @@ function settingsHTML(){
       <div class="chips" style="margin:4px 0 10px">${Object.keys(SPANP).map(c=>`<span class="cc ro" title="${esc(spanName(c))}">${c}</span>`).join('')}</div>
       ${SPN().length?`<div class="muted" style="margin-top:6px">${L('Jenis tambahan','Extra types')}</div>`+SPN().map(x=>`<div class="co" onclick="openSpan('${x.id}')" style="cursor:pointer"><div><b>${esc(x.code)}</b><span class="muted">${esc(x.nama)}</span></div><span class="muted">✏️</span></div>`).join(''):''}
     </div>
+    ${verCardHTML()}
     ${remCardHTML()}
     <div class="card">
       <h2>👤 ${L('Akaun','Account')}</h2>
@@ -1094,7 +1112,7 @@ function settingsHTML(){
         <input type="file" id="imp" accept=".json" hidden onchange="importJSON(this)">
       </div>
     </div>
-    <p class="muted" style="text-align:center">ProTender v4.7</p>
+    <p class="muted" style="text-align:center">ProTender v4.8</p>
   </div>`;
 }
 const LICS={cidb:'CIDB',mof:'MOF',span:'SPAN'};
@@ -1451,6 +1469,38 @@ async function installApp(){
     :L('<ol class="ins"><li>Buka laman ini dalam <b>Chrome</b>.</li><li>Tekan menu <b>⋮</b> di atas kanan.</li><li>Pilih <b>Pasang aplikasi</b> atau <b>Tambah ke skrin utama</b>, kemudian tekan <b>Pasang</b>.</li></ol>','<ol class="ins"><li>Open this page in <b>Chrome</b>.</li><li>Tap the <b>⋮</b> menu at the top right.</li><li>Choose <b>Install app</b> or <b>Add to Home screen</b>, then tap <b>Install</b>.</li></ol>');
   openS('sInstall');
 }
+// ----- Kemas kini APK (macam ProSewa) -----
+const APP_BUILD=+(window.PT_BUILD||0);   // no. binaan APK (1.0.N); 0 = web
+const APK_URL='https://alemmaxx.github.io/ProTender/ProTender.apk', VER_URL='https://alemmaxx.github.io/ProTender/apk-version.json';
+let APK_NEW=0, APK_CHECKED=0;
+async function checkApk(manual){
+  if(!APP_BUILD)return;
+  if(!navigator.onLine){if(manual)toast(L('Tiada sambungan internet.','No internet connection.'));return}
+  try{
+    const r=await fetch(VER_URL+'?'+Date.now(),{cache:'no-store'}); const j=await r.json();
+    const latest=+j.build||0; const was=APK_NEW; APK_NEW=latest>APP_BUILD?latest:0; APK_CHECKED=Date.now();
+    if(was!==APK_NEW||manual) render();
+    if(manual) toast(APK_NEW?L(`⬆ Versi baru 1.0.${APK_NEW} ada.`,`⬆ New version 1.0.${APK_NEW} available.`):L(`✅ Anda guna versi terkini (1.0.${APP_BUILD}).`,`✅ You're on the latest version (1.0.${APP_BUILD}).`));
+    if(APK_NEW&&(manual||localStorage.getItem('pt_upd_later')!==APK_NEW+'|'+todayStr())) updAsk();
+  }catch(e){if(manual)toast(L('Tidak dapat semak kemas kini. Cuba lagi.','Could not check for updates. Try again.'))}
+}
+function updAsk(){
+  $('updTxt').innerHTML=L(`Versi <b>1.0.${APK_NEW}</b> sudah ada. Anda guna 1.0.${APP_BUILD}.<br><br>Muat turun dan pasang terus atas app ini. <b>Data anda kekal.</b>`,`Version <b>1.0.${APK_NEW}</b> is available. You're on 1.0.${APP_BUILD}.<br><br>Download and install it over this app. <b>Your data stays.</b>`);
+  openS('sUpd');
+}
+function updLater(){closeS('sUpd');try{localStorage.setItem('pt_upd_later',APK_NEW+'|'+todayStr())}catch(e){}}
+function updGo(){closeS('sUpd');window.open(APK_URL,'_blank');toast(L('Muat turun bermula… buka fail ProTender.apk untuk pasang.','Download started… open ProTender.apk to install.'))}
+const updBar=()=>APK_NEW?`<a class="updbar" onclick="updGo()"><b>⬆ ${L('Versi baru ProTender ada','New ProTender version available')} (1.0.${APK_NEW})</b>${L('Tekan untuk muat turun, kemudian pasang terus atas app ini. Data anda kekal.','Tap to download, then install over this app. Your data stays.')}</a>`:'';
+function verCardHTML(){
+  if(!APP_BUILD) return '';
+  return `<div class="card"><h2>📱 ${L('Versi App','App Version')}</h2>
+    <div class="kv"><span>${L('Versi anda','Your version')}</span><span><b>1.0.${APP_BUILD}</b></span></div>
+    ${APK_NEW?`<div class="kv"><span>${L('Versi terkini','Latest version')}</span><span><b style="color:var(--green)">1.0.${APK_NEW}</b></span></div>
+      <button class="btn gold full" style="margin-top:10px" onclick="updGo()">⬇ ${L('Muat turun versi baru','Download new version')}</button>`
+    :`<div class="kv"><span>${L('Kemas kini','Updates')}</span><span class="done">✅ ${L('Versi terkini','Up to date')}</span></div>${APK_CHECKED?`<p class="muted" style="font-size:12px;margin:4px 0 0">${L('Disemak','Checked')} ${new Date(APK_CHECKED).toLocaleTimeString(LANG==='en'?'en-MY':'ms-MY',{hour:'2-digit',minute:'2-digit'})}</p>`:''}`}
+    <button class="btn sec full" style="margin-top:8px" onclick="checkApk(true)">🔄 ${L('Semak kemas kini','Check for updates')}</button>
+  </div>`;
+}
 // ================== MULA ==================
 applyLang();
 render();
@@ -1458,12 +1508,15 @@ startAuth();
 setInterval(()=>{if(tab!=='setting'&&!document.querySelector('.sheet.on'))render()},60000);
 setInterval(webTick,20000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();webTick()}});
-if(isNative()){setTimeout(statusBar,300);const A=window.Capacitor.Plugins.App;A&&A.addListener('appStateChange',s=>{if(s.isActive){nativeRefresh();if(USER)scheduleNative()}})}
+if(isNative()){setTimeout(statusBar,300);const A=window.Capacitor.Plugins.App;A&&A.addListener('appStateChange',s=>{if(s.isActive){nativeRefresh();if(USER)scheduleNative();checkApk(false)}})}
+if(APP_BUILD){setTimeout(()=>checkApk(false),3000);setInterval(()=>checkApk(false),3*3600000)}
+
 // Butang Kembali: tutup pop up → balik ke Register → tanya sebelum keluar
 let EXITING=false;
 function openExit(){$('exitSub').textContent=isNative()?L('Peringatan tetap akan berbunyi pada masanya.','Reminders will still ring on time.'):L('Peringatan hanya berbunyi bila app dibuka. Guna APK untuk bunyi walaupun app ditutup.','Reminders only ring while the app is open. Use the APK to ring even when closed.');openS('sExit')}
 function onBack(){
   if($('sExit').classList.contains('on')){closeS('sExit');return}
+  if($('sUpd').classList.contains('on')){updLater();return}
   const o=[...document.querySelectorAll('.sheet.on')].pop();
   if(o){o.classList.remove('on');return}
   if(!$('login').classList.contains('off')){openExit();return}

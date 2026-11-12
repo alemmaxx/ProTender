@@ -28,6 +28,8 @@ jobs:
         run: |
           mkdir -p www/lib www/fonts
           cp -r index.html icons sounds www/
+          sed -i 's#<head>#<head><script>window.PT_BUILD=${{ github.run_number }};</script>#' www/index.html
+          grep -o 'window.PT_BUILD=[0-9]*' www/index.html
           for f in firebase-app-compat.js firebase-auth-compat.js firebase-firestore-compat.js; do
             test -f node_modules/firebase/$f || { echo "TIADA $f"; ls node_modules/firebase | head -50; exit 1; }
             cp node_modules/firebase/$f www/lib/
@@ -58,6 +60,10 @@ jobs:
           cat >> android/app/build.gradle <<'GRADLE'
 
           android {
+              defaultConfig {
+                  versionCode ${{ github.run_number }}
+                  versionName "1.0.${{ github.run_number }}"
+              }
               signingConfigs {
                   debug {
                       storeFile rootProject.file('../android-signing/debug.keystore')
@@ -84,13 +90,16 @@ jobs:
         with:
           name: ProTender-apk
           path: ProTender.apk
+      - run: echo '{"build":${{ github.run_number }},"name":"1.0.${{ github.run_number }}"}' > apk-version.json
       - name: Terbit ke Release "latest" (muat turun terus dari telefon)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
           name: ProTender APK (terkini)
           body: "Muat turun ProTender.apk di bawah dan pasang di telefon Android."
-          files: ProTender.apk
+          files: |
+            ProTender.apk
+            apk-version.json
           make_latest: true
       - name: Kemas kini salinan APK di GitHub Pages
         env:

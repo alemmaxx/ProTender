@@ -22,6 +22,7 @@ jobs:
         run: |
           mkdir -p _site && cp -r index.html download.html manifest.webmanifest sw.js icons sounds _site/
           curl -sSLf -o _site/ProTender.apk https://github.com/alemmaxx/ProTender/releases/download/latest/ProTender.apk && ls -la _site/ProTender.apk || echo "APK belum ada dalam Release"
+          curl -sSLf -o _site/apk-version.json https://github.com/alemmaxx/ProTender/releases/download/latest/apk-version.json && cat _site/apk-version.json || echo "apk-version.json belum ada"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
